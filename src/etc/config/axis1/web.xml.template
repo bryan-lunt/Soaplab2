@@ -76,7 +76,6 @@
 
   <filter>
     <filter-name>default</filter-name>
-    <servlet-name>default</servlet-name>
     <filter-class>org.soaplab.clients.spinet.filters.DefaultFilter</filter-class>
   </filter>
   <filter-mapping>
