@@ -1,0 +1,62 @@
+appl: proteinraw [
+  documentation: "InterProScan with output in TXT format, for protein"
+  groups: "EBI_interproscan, interproscan"
+  nonemboss: "Y"
+  comment: "launcher org.soaplab.ebi.interproscan.WSJob"
+  supplier: "http://www.ebi.ac.uk/cgi-bin/webservices/WSInterProScan"
+  comment: "class org.soaplab.ebi.WSJobFactory"
+]
+
+# --- hidden inputs
+string: seqtype [
+   comment: "display false"
+   default: "p"
+   comment: "defaults"
+]
+string: outformat [
+   comment: "display false"
+   default: "toolraw"
+   comment: "defaults"
+]
+integer: crc  [
+   comment: "display false"
+   default: "1"
+   comment: "defaults"
+]
+integer: searchtype  [
+   comment: "display false"
+   default: "1"
+   comment: "defaults"
+]
+
+# --- real inputs
+infile: sequence [
+   parameter: "Y"
+   information: "A protein sequence in any format, or a sequence identifier in the form
+                 <code>db:id</code><br><i>for the list of databases supported
+                 <a href=http://www.ebi.ac.uk/Tools/webservices/help/databases>see</a></i>"
+   comment: "data direct"
+]
+list: trlen [
+  information: "Minimum open reading frame size"
+  default: 100
+  comment: "defaults"
+  values: "20;30;40;50;60;70;80;90;100;110;120;130;140;150"
+  min: 1
+  max: 1
+]
+list: appl  [
+  information: "Applications to run"
+  max: "9"
+  default: true
+  comment: "defaults"
+  values: "BlastProDom;FPrintScan;HMMPIR;HMMPfam;HMMSmart;HMMTigr;ProfileScan;ScanRegExp;SuperFamily"
+]
+boolean: goterms  [
+   default: "false"
+   information: "Use GO-terms"
+]
+
+# --- result
+outfile: result  [
+]

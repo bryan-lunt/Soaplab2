@@ -1,0 +1,65 @@
+Usage:
+   build/run/run-any-client org.soaplab.admin.ExploreStorage [options]
+
+where <options> are:
+
+-h[elp]  ... print this help
+-q       ... "quiet" (less verbose mode)
+-stack   ... in case of any error it print the stact trace
+             (without this option, it prints it only when a
+              serious runtime error occures)
+
+What persistent storage to explore
+(only one option is used):
+   -all  ... all available (default)
+   -file ... file system storage
+   -db   ... local database
+
+By default, without any other options, it just shows
+what persistent storages are available.
+
+-l           ... list job IDs of all stored jobs
+-run         ... create and run a testing job
+                 (it sets testing results in storage(s))
+
+Removing jobs from the storage(s):
+
+   -clean <job-id>  ... remove given job
+   -cleanall        ... remove all jobs
+
+   -cleanlike <pattern>
+      Remove jobs whose IDs contain given pattern.
+      For example: -rp testing.helloworld
+
+   -cleanfrom <from-date>
+      Remove jobs updated after <from-date>. The format of
+      <from-date> is 'yyyy-MM-dd HH:mm:ss'.
+
+      Or, it can be a number (with or without a minus sign)
+      meaning "last jobs for the given number". The number is
+      in milliseconds unless it ends with one of the following
+      characters: 's', 'm', 'h', 'd', 'w', or 'M'.
+
+      Examples: -rf 2004-04-30 14:10:00
+                -rf -20000
+                -rf -3d
+                -rf -4w
+
+   -cleanto <to-date>
+      Remove jobs updated before <to-date>. The format is
+      the same as for <from-date>. For example:
+
+      -f -2d -t -1d   ... jobs from a day before yesterday
+
+Other options work only for a given job
+(therefore, always with '-job' option):
+
+-job <job-id>
+
+-i   ... info about specified job
+-ri  ... result info of the specified job
+
+-r    <result-name>
+      Show (or save in file(s)) the given result
+      from the specified job
+-sr   saves results (except 'report') to the current working directory

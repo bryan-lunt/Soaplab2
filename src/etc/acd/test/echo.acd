@@ -1,0 +1,91 @@
+appl: Echo [
+  documentation: "Testing various kinds and combinations of parameters"
+  groups: "TUnit"
+  nonemboss: "Y"
+  executable: "echo"
+#  comment: "tagsepar = ="
+]
+
+selection: blocktype  [
+  standard: "Y"
+  default: "Filled"
+  values: "Open;Filled;Outline"
+  information: "type of blocks"
+  help: "type of blocks: Open, Filled, or Outline. Option 'Outline'
+         draws filled blocks surrounded by a black border"
+  comment: "tagsepar |"
+]
+
+boolean: bool_nodef  [
+   information: "b1: A boolean option with no default value"
+   qualifier: "b1"
+]
+
+boolean: bool_tdef  [
+   default: "true"
+   information: "b2: A boolean option with 'true' default value"
+   qualifier: "b2"
+]
+
+boolean: bool_fdef  [
+   default: "false"
+   information: "b3: A boolean option with 'false' default value"
+   qualifier: "b3"
+]
+
+boolean: bool_env  [
+   information: "b4: A boolean that becomes an environment"
+   qualifier: "b4"
+   comment: envar
+]
+
+string: str_notag  [
+   information: "str: A string without any tag"
+   additional: "Y"
+   parameter: "Y"
+   default: "Hello World"
+   comment: "defaults"
+]
+
+string: str  [
+   information: "str: A ordinary string with a tag 'strtag'"
+   additional: "Y"
+   qualifier: strtag
+   default: "Ciao mundi"
+#   comment: "method -&& $$"
+#   comment: 'method foreachs (str, " ", "-&&# $str")'
+#   comment: "defaults"
+]
+
+string: str_env  [
+   information: "str: A stirng that becomes an environment ENVVAR"
+   additional: "Y"
+   qualifier: ENVVAR
+   default: "Ciao mundi"
+   comment: envar
+   comment: "defaults"
+]
+
+outfile: output_std  [
+  additional: "Y"
+  default: "stdout"
+]
+
+outfile: output_reg  [
+  additional: "Y"
+]
+
+infile: input_std  [
+  additional: "Y"
+  default: "stdin"
+]
+
+infile: input_reg  [
+  additional: "Y"
+]
+
+infile: input_ref  [
+  additional: "Y"
+  default: "a.file"
+]
+

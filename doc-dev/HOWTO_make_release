@@ -1,0 +1,73 @@
+  * release distribution:
+    - announcement (sf news, taverna/soaplab mailing lists...)
+---
+Releases:
+
+- how to make war files:
+
+- remove from build.properties:
+#my.soaplab.properties = testing.soaplab.properties
+#my.soaplab.client.properties = testing.soaplab.client.properties
+#server.metadata.dir = /home/senger/soaplab2/metadata/generated
+#server.runtime.dir  = /home/senger/soaplab2/_R_
+#server.scripts.dir  = /home/senger/soaplab2/run
+
+ant cleanxml
+ant gen
+ant jaxwar
+
+- how to make a release:
+========================
+
+cd soaplab2
+[ ant clean ]
+cvs tag rel-2-0-0-beta .  [ or after a mistake: rel-2-0-0-beta-a ]
+
+cd ~/tmp
+[ rm -rf soaplab2 ]  // remove the previus
+cvs -d :ext:marsenger@soaplab.cvs.sourceforge.net:/cvsroot/soaplab export -r rel-2-0-0-beta soaplab2
+[ rm soaplab2-2.0.0.beta.tar.gz ]
+tar czf soaplab2-2.0.0.beta.tar.gz soaplab2/
+
+- checking:
+cd soaplab2
+ant install
+ant jaxdeploy
+catalina start
+build/run/run-cmdline-client -name classic.helloworld -w -r
+
+Uploading file to the sourceforge
+(see details at: https://sourceforge.net/apps/trac/sourceforge/wiki/Release%20files%20for%20download)
+-----------------------------------------------------------------------------------------------------
+
+- create a new directory (e.g. 2.4.1) here: https://sourceforge.net/projects/soaplab/files_beta/soaplab2/
+- upload at least two files into this directory:
+   - soaplab2-2.4.1.tar.gz
+   - ReleaseNotes-2.4.1.txt
+- click on the "gear" icon (left of the file name) and change the file properties
+  (the "gear" icon may not be easier accessible from the non-beta file manager:
+   https://sourceforge.net/project/admin/explorer.php?group_id=104834)
+- that's it - it will show in few minutes as the newest file
+
+This is old (and probbaly obsolete):
+------------------------------------
+- uploading soaplab2-2.0.0.beta.tar.gz
+  https://frs.sourceforge.net/webupload
+
+- go to sf.net
+  - find File Release System
+  - Add Release to the existing package soaplab2
+  - New Release name: 2.0.0.beta (+ "Create this release" button)
+    - for ChangeLog use "Preserve my pre-formatted text"
+    - create a line or two of the Release Notes
+
+- release documentation:
+========================
+
+cd soaplab2
+doc-dev/to_sf.sh
+
+- release to Maven:
+===================
+
+[ needs another try... but it worked from GCP/maven... ]

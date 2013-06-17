@@ -1,0 +1,178 @@
+<!-- This is an XML entity included in main build.xml file  -->
+<!-- $Id: deployment.xml,v 1.18 2010/09/03 10:04:01 smoretti Exp $ -->
+<!-- ====================================================== -->
+
+<!-- ====================================================== -->
+<!--                                                        -->
+<!-- General (protocol-independent) deployment targets      -->
+<!--                                                        -->
+<!-- ====================================================== -->
+
+<!-- ====================================================== -->
+<!-- Collect all files needed for service distribution      -->
+<!-- ====================================================== -->
+
+<!-- Param: ${current.context.name} -->
+<target name="populate-dist" depends="cleanjars,jars">
+
+  <!-- clean the playground first -->
+  <delete quiet="true" dir="${build.web}"/>
+
+  <!-- copy all library files -->
+  <property name="user.lib.dir"     value=""/>
+  <property name="user.lib.include" value="*.jar"/>
+  <copy
+    todir="${build.web}/WEB-INF/lib"
+    flatten="true">
+    <fileset refid="runtime.dependency.fileset"/>
+    <fileset dir="${build.lib}" includes="*.jar"/>
+    <fileset dir="${user.lib.dir}" includes="${user.lib.include}"/>
+    <fileset dir="${src.webapps}/lib" includes="*.jar"/>
+  </copy>
+
+  <!-- copy log4j configuration file -->
+  <property name="server.log.dir" value="$${catalina.base}/logs"/>
+  <property
+    name="server.log4j.configuration"
+    location="${src.config}/log4j.properties.template"/>
+  <copy
+    file="${server.log4j.configuration}"
+    tofile="${build.web}/WEB-INF/classes/log4j.properties">
+    <filterset>
+      <filter token="LOGDIR" value="${server.log.dir}"/>
+    </filterset>
+  </copy>
+
+  <!-- copy Soaplab configuration file(s) -->
+  <property name="my.soaplab.properties"
+    location="${src.config}/soaplab.properties.template"/>
+
+  <property name="server.metadata.dir"
+    value="$${catalina.base}/webapps/${current.context.name}/metadata"/>
+  <property name="server.runtime.dir"
+    value="$${catalina.base}/temp/_R_"/>
+  <property name="server.scripts.dir"
+    value="$${catalina.base}/webapps/${current.context.name}/WEB-INF/run"/>
+  <property name="spinet.welcome.msg"
+    value="Soaplab Web Services"/>
+  
+  <copy
+    file="${my.soaplab.properties}"
+    tofile="${build.web}/WEB-INF/classes/soaplab.properties">
+    <filterset>
+      <filter token="PROJECT_HOME" value="$${catalina.base}/webapps/${current.context.name}"/>
+      <filter token="METADATA_DIR" value="${server.metadata.dir}"/>
+      <filter token="RUNTIME_DIR"  value="${server.runtime.dir}"/>
+      <filter token="SCRIPTS_DIR"  value="${server.scripts.dir}"/>
+      <filter token="TOMCAT_HOST"  value="${tomcat.host}"/>
+      <filter token="TOMCAT_PORT"  value="${tomcat.port}"/>
+    </filterset>
+  </copy>
+
+  <property name="my.soaplab.client.properties"
+    location="${src.config}/soaplab.client.properties.template"/>
+  <copy
+    file="${my.soaplab.client.properties}"
+    tofile="${build.web}/WEB-INF/classes/soaplab.client.properties">
+    <filterset>
+      <filter token="PROJECT_HOME" value="$${catalina.base}/webapps/${current.context.name}"/>
+      <filter token="TOMCAT_HOST"  value="${tomcat.host}"/>
+      <filter token="TOMCAT_PORT"  value="${tomcat.port}"/>
+    </filterset>
+  </copy>
+
+  <!-- copy metadata -->
+  <copy
+    todir="${build.web}/metadata">
+    <fileset dir="${metadata.generated}" includes="**/*" excludes=".cvsignore*"/>
+  </copy>
+
+  <!-- copy scripts (to be added to the PATH) -->
+  <copy
+    todir="${build.web}/WEB-INF/run">
+    <fileset dir="${project.home}/run" includes="**/*" excludes="CVS,README"/>
+  </copy>
+
+  <!-- copy JSP pages -->
+  <property name="soaplab.docs.url" value="${maven.project.url}"/>
+  <property name="local.contact"
+    value="&lt;a href=&quot;mailto:martin.senger&#64;gmail.com&quot;&gt;Martin Senger&lt;/a&gt;"/>
+  <property name="web.monitor"
+    value="" />
+
+  <condition property="listofwsdlfiles" value="services/list">
+    <isset property="jaxws.context.name"/>
+  </condition>
+
+  <condition property="listofwsdlfiles" value="typed/services/list" else="services">
+    <istrue value="${includetypedinterface.true}"/>
+  </condition>
+
+  <condition property="individualwsdllinks" value="true" else="false">
+    <istrue value="${includetypedinterface.true}"/>
+  </condition>
+  
+  <!-- ...filtered -->
+  <copy todir="${build.web}/">
+    <fileset dir="${src.webapps}" includes="index.jsp"/>
+    <filterset>
+      <filter token="SPINET_WELCOME_MSG" value="${spinet.welcome.msg}"/>
+      <filter token="SOAPLAB_VERSION"    value="${maven.project.version}"/>
+      <filter token="SOAPLAB_BUILD"      value="${TODAY_LONG}"/>
+      <filter token="SOAPLAB_URL"        value="${soaplab.docs.url}"/>
+      <filter token="SOAPLAB_CONTACT"    value="${local.contact}"/>
+      <filter token="WEB_MONITOR"        value="${web.monitor}" />
+      <filter token="SOAPLAB_WSDL"       value="${listofwsdlfiles}"/>
+      <filter token="SPINET_INDIVIDUAL_WSDL_LINKS"    value="${individualwsdllinks}"/>
+    </filterset>
+  </copy>
+
+  <!-- ...not-filtered -->
+  <copy todir="${build.web}/">
+    <fileset dir="${src.webapps}" includes="*.jsp" excludes="index.jsp"/>
+    <fileset dir="${src.webapps}" includes="images/*"/>
+    <fileset dir="${src.webapps}" includes="js/*.js"/>
+    <fileset dir="${docs.dir}"    includes="images/SoaplabLogo-small.png"/>
+  </copy>
+
+</target>
+
+<!-- ====================================================== -->
+<!-- Creating a .war file                                   -->
+<!-- ====================================================== -->
+
+<!-- Param: ${current.context.name} -->
+<target name="create-war" depends="init">
+
+  <!-- use it to change default context name -->
+  <property name="current.context.name" value="${context.name}"/>
+
+  <property name="war.released.date" value="${TODAY_LONG}"/>
+  <jar destfile="${build.dist}/${current.context.name}.war">
+    <manifest>
+      <attribute name="Built-By" value="${user.name}"/>
+      <attribute name="Released-Date" value="${war.released.date}"/>
+    </manifest>
+    <fileset dir="${build.web}"/>
+  </jar>
+</target>
+
+<!-- ================================================================== -->
+<!-- Deployment to Tomcat server                                        -->
+<!-- ================================================================== -->
+
+<!-- make a simple copy of already created .war file -->
+<!-- Param: ${current.context.name} -->
+<target name="copy-war" depends="tomcat-init,init">
+  <copy
+    todir="${real.catalina.base}/webapps"
+    file="${build.dist}/${current.context.name}.war"
+    failonerror="true">
+  </copy>
+  <antcall target="_cleandeploy">
+    <param name="param.context.name" value="${current.context.name}"/>
+  </antcall>
+  <antcall target="_deployinfo">
+    <param name="param.context.name" value="${current.context.name}"/>
+  </antcall>
+</target>

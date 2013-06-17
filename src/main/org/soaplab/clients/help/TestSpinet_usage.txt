@@ -1,0 +1,40 @@
+Sorry - DEPRECATED...
+
+TestSpinet - a simple testing tool
+==================================
+
+Spinet is a web-based interface to te Soaplab Web Services.
+TestSpinet creates a single HTML page for a given Soaplab service.
+Its main purpose is to test new stylesheets and jvascript options
+without a need to deploy it to the Tomcat server after each change.
+
+Usage:
+   build/run/run-any-client org.soaplab.clients.TestSpinet -h[elp]
+   build/run/run-any-client org.soaplab.clients.TestSpinet -name <service-name> [<options>]
+
+where:
+
+  -h[elp]  ... print this help
+  -q       ... quiet mode (useful when you want to redirect
+               a result into a file)
+  -stack   ... in case of any error it print the stact trace
+               (without this option, it prints it only when a
+                serious runtime error occures)
+
+where <service-name>
+           is a mandatory argument defining for which service
+           a panel will be created
+
+and where other <options> are:
+
+  -css <base-URL>
+           a URL pointing to a directory with all necessary
+           CSS stylesheets (stylesheet.css, supernote.css);
+           it must used an HTTP protocol, not a local file;
+           default: http://localhost/data/css/
+
+  -js <base-URL>
+           a URL pointing to a directory with all necessary
+           javascripts (prototype.js, supernote.js, services.js);
+           (it must used an HTTP protocol, not a local file)
+           default: http://localhost/data/js/

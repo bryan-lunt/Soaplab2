@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+#  Run services test batch command-line client.
+#
+#  Use ./build/run/run-batch-client -help for list of
+#  all available arguments.
+#
+#  $Id: run-batch-client,v 1.1 2008/01/25 12:27:33 marsenger Exp $
+# ----------------------------------------------------
+
+PROJECT_HOME=@PROJECT_HOME@
+LIBS_PATH=@PROJECT_DEPS@
+
+CLASSPATH=$LIBS_PATH
+CLASSPATH=`echo ${PROJECT_HOME}/build/lib/*.jar | tr ' ' ':'`:$CLASSPATH
+CLASSPATH=${PROJECT_HOME}/build/classes:$CLASSPATH
+CLASSPATH=${PROJECT_HOME}/build/plugins:$CLASSPATH
+
+exec java -cp $CLASSPATH @LOG4J@ org.soaplab.clients.BatchTestClient "$@"

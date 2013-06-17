@@ -1,0 +1,227 @@
+<!-- This is an XML entity included in main build.xml file  -->
+<!-- $Id: install.xml,v 1.12 2010/11/24 09:04:39 marsenger Exp $ -->
+<!-- ====================================================== -->
+
+<!-- ====================================================== -->
+<!--                                                        -->
+<!-- Targets dealing with Soaplab2 installation             -->
+<!--                                                        -->
+<!-- ====================================================== -->
+
+<target name="install"
+  description="Install and build Soaplab2">
+  <echo taskname="welcome">
+------------------------------------------
+Welcome to the Soaplab2 world.           |
+Project documentation is available from: |
+http://soaplab.sourceforge.net/soaplab2/ |
+                                         |
+( If you are interested only in Soaplab2 |
+  clients, stop this by Ctrl-C and start |
+  again with 'ant install-clients'. )    |
+------------------------------------------
+  </echo>
+  <echo/>
+  <echo taskname="version">
+${ant.version}
+Java: ${java.version}
+${os.name} ${os.version}
+  </echo>
+
+  <antcall target="check-ant-version"/>
+  <antcall target="bootstrap"/>
+
+  <echo/>
+  <echo taskname="Perl">
+In the current version, Soaplab2 is still using Perl to generate
+XML metadata. Until a new generator is ready, a Perl has to be
+installed on the machine where you wish to deploy Soaplab2 services.
+
+Therefore, if the next test fails, please make sure that your Perl is
+available. Sorry for any inconvenience...
+  </echo>
+  <input taskname=" Attention ">Press Return key to continue...</input>
+  <exec executable="perl" taskname="test" failonerror="true">
+    <arg line="${project.home}/run/version.pl -d -l ${sl}"/>
+  </exec>
+
+  <echo/>
+  <echo taskname="Tomcat">
+The Soaplab2 services are running in a Servlet container, such as
+Tomcat. The Tomcat has to be installed separately. Once you have done
+it, you need to tell Soaplab2 where your Tomcat is located, and how
+it can be reached.
+
+Create a file build.properties and put there similar lines:
+
+      tomcat.home = /directory/with/your/tomcat
+      tomcat.host = host-name-of-your-tomcat
+
+Default host name of your Tomcat is 'localhost' - which is good for
+testing, but not good enough when your Tomcat will be used by others.
+
+And, if your Tomcat is running on a non-standard port (different from
+8080), also the line:
+
+      tomcat.port = your-port-number
+  </echo>
+  <input taskname=" Attention ">Press Return key to continue...</input>
+
+  <available file="${lib.dir}/alltools2.jar" property="old.jar.present"/>
+  <antcall target="libcheck"/>
+
+  <echo/>
+  <echo taskname="build">
+Now Soaplab2 is going to build itself. It will need to fetch a lot of
+libraries from the Internet (using the Maven technology for resolving
+project dependencies). At the end, it will call your first Soaplab2
+service: the Hello World.
+
+I wish you (or rather us?) luck...
+Thanks for any comments and suggestions.
+  </echo>
+  <input taskname=" Attention ">Press Return key to continue...</input>
+
+  <echo/>
+  <antcall target="compile"/>
+  <antcall target="gen"/>
+
+  <echo/>
+  <antcall target="HelloWorld"/>
+
+  <echo taskname="Success">
+Installation completed.
+Now, you can deploy testing services to your Tomcat by:
+
+   ant jaxdeploy
+
+and start using them, e.g. from the command-line:
+
+    build/run/run-cmdline-client -name classic.helloworld -w -r
+
+If you wish to use the old (Soaplab1) protocol (e.g. because you wish
+to call your services from current Taverna), you need to deploy them
+differently:
+
+   ant axis1deploy
+  </echo>
+
+</target>
+
+<target name="HelloWorld" depends="init">
+  <java
+    taskname="Hello"
+    classname="org.soaplab.clients.CmdLineClient"
+    failonerror="true"
+    fork="yes">
+    
+    <classpath refid="build.classpath"/>
+    <classpath refid="dependency.classpath"/>
+    <classpath>
+      <fileset dir="${build.lib}">
+        <include name="*.jar"/>
+      </fileset>
+    </classpath>
+    
+    <sysproperty key="log4j.configuration" value="file:${log4j.configuration}"/>
+    
+    <arg value="-protocol"/>
+    <arg value="local"/>
+    <arg value="-name"/>
+    <arg value="classic.helloworld"/>
+    <arg value="-w"/>
+    <arg value="-r"/>
+    <arg value="output"/>
+    <arg value="report"/>
+    <arg value="greeting"/>
+    <arg value="Hello, Soaplab2"/>
+  </java>
+
+</target>
+
+<target name="check-ant-version">
+  <fail
+    taskname="check"
+    message="Sorry, but you need to use Ant version 1.6.5 or newer...">
+    <condition>
+      <and>
+        <not>
+          <or>
+            <contains string="${ant.version}" substring="1.7"/>
+            <contains string="${ant.version}" substring="1.8"/>
+          </or>
+        </not>
+        <not>
+          <contains string="${ant.version}" substring="1.6.5"/>
+        </not>
+      </and>
+    </condition>
+  </fail>
+</target>
+
+<target name="libcheck" if="old.jar.present">
+  <echo/>
+  <echo taskname="Warning">
+Your 'lib' directory seems to contain more than needed.
+It may be from the old Soaplab distribution and it may
+interfere with the building and running process.
+
+Consider to remove all *.jar files from there except the
+'mytasks.jar' and 'maven*.jar'.
+  </echo>
+  <input taskname=" Attention ">Press Return key to continue...</input>
+</target>
+
+
+
+
+
+<target name="install-clients"
+  description="Install and build Soaplab2 clients">
+  <echo taskname="welcome">
+------------------------------------------
+Welcome to the Soaplab2 clients world.   |
+Project documentation is available from: |
+http://soaplab.sourceforge.net/soaplab2/ |
+                                         |
+( Be aware, that probably the best       |
+  Soaplab2 client is a Taverna plug-in   |
+    http://taverna.sourceforge.net/ )    |
+------------------------------------------
+  </echo>
+
+  <echo/>
+  <echo taskname="version">
+${ant.version}
+Java: ${java.version}
+${os.name} ${os.version}
+  </echo>
+
+  <antcall target="check-ant-version"/>
+  <antcall target="bootstrap"/>
+
+  <echo/>
+  <available file="${lib.dir}/alltools2.jar" property="old.jar.present"/>
+  <antcall target="libcheck"/>
+
+  <echo/>
+  <echo taskname="build">
+Now Soaplab2 is going to build itself. It will need to fetch a lot of
+libraries from the Internet (using the Maven technology for resolving
+project dependencies)...
+  </echo>
+
+  <input taskname=" Attention ">Press Return key to continue...</input>
+
+  <echo/>
+  <antcall target="compile"/>
+
+  <echo taskname="Success">
+Installation completed.
+Try to call a Soaplab2 service using
+a pre-installed command-line client.
+Its help is available by calling:
+
+  build/run/run-cmdline-client -help
+  </echo>
+</target>

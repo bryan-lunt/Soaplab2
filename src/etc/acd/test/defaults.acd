@@ -1,0 +1,53 @@
+appl: Defaults [
+  documentation: "Setting and using default values"
+  groups: "TUnit"
+  nonemboss: "Y"
+  executable: "echo"
+]
+
+#
+# --- these parameters would be mandatory - but they are not
+#     because they have a default value (even an empty default -
+#     as shown in param2 - qualifies for that)
+#
+string: param [
+   parameter: "Y"
+   default: "a default value for param"
+   comment: defaults
+]
+
+string: param2 [
+   standard: "Y"
+   default: ""
+]
+
+#
+# --- various types of input files, with direct or reference (URL) data
+#
+
+infile: direct_input  [
+  additional: "Y"
+  qualifier: "di"
+  comment: "data direct"
+  default: "this is a default value for direct input"
+]
+
+infile: url_input  [
+  additional: "Y"
+  qualifier: "ui"
+  comment: "data filename"
+  default: "http://martin.senger.googlepages.com/testing.page.xml.txt"
+]
+
+infile: both_input  [
+  parameter: "Y"
+  additional: "Y"
+  qualifier: "i"
+  default: "this is a default, and should be sent as direct data"
+  comment: "default_for_direct"
+]
+
+outfile: output  [
+  additional: "Y"
+  default: "stdout"
+]

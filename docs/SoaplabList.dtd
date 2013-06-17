@@ -1,0 +1,17 @@
+<!-- ==================================================================== -->
+<!-- Metadata describing list of services                                 -->
+<!-- $Id: SoaplabList.dtd,v 1.1 2006/11/26 20:37:26 marsenger Exp $ -->
+<!-- ==================================================================== -->
+
+<!ELEMENT SoaplabList (category*)>
+
+<!ELEMENT category (app+)>
+<!ATTLIST category
+    name     CDATA #REQUIRED>
+
+<!ELEMENT app EMPTY>
+<!ATTLIST app
+    name     CDATA #REQUIRED
+    xml      CDATA #IMPLIED
+    module   CDATA #IMPLIED
+    desc     CDATA #IMPLIED>

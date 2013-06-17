@@ -1,0 +1,31 @@
+appl: Lists [
+  documentation: "How to use lists"
+  groups: "Testing"
+  nonemboss: "Y"
+  executable: "echo"
+  comment: defaults
+]
+
+list: format  [
+  additional: "Y"
+  default: "png"
+  values: "canon; dot; fig; gd; gif; hpgl; imap; jpg; mif; mp; pcl; pic; plain; png; ps; svg"
+  prompt: "Graphical format"
+  comment: "separator |"
+]
+
+list: menu [
+  default: "V"
+  minimum: "1"
+  maximum: "1"
+  values: "F--fungi,I--insect,P--plant,V--vertebrate,O--other,C--Custom"
+  delimiter: ","
+  codedelimiter: "--"
+  prompt: "Transcription Factor Class"
+  information: "Select class"
+]
+
+outfile: output  [
+  additional: "Y"
+  default: "stdout"
+]

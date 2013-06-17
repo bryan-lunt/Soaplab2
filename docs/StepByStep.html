@@ -1,0 +1,239 @@
+<html> <head>
+<title>Soaplab2: Step by Step</title>
+
+<link rel="shortcut icon" href="images/favicon.ico" >
+<link rel="icon" href="images/animated_favicon1.gif" type="image/gif" >
+<link rel="stylesheet" href="images/stylesheet.css" type="text/css">
+
+</head>
+
+<body>
+<h1>Step By Step Guide to the first service</h1>
+<img class="motto-img" src="images/motto-step-by-step.jpg" border=0 align="left"/>
+
+This is almost a list of bookmarks of the more detailed guides, with
+some text around. The details are good, but here you will get,
+hopefully, just an essence, a quick <em>get started</em> flavor. <p>
+
+It is written around a short tutorial for the Soaplab2 service
+providers given at the Taverna/Soaplab2 workshop in October 2007 at
+EBI. <p>
+
+<br clear="all"/>
+
+<div class="doctoc">
+<dl>
+  <dt> <a href="#ready">Pre-prepared services</a>
+  <dt> <a href="#new">Your own services</a>
+</dl> <p>
+</div>
+
+<a name="ready"></a>
+<h4> Pre-prepared services </h4>
+
+First, make sure that the distributed, testing Soaplab2 services can
+run on your machine:
+
+<ol>
+
+  <li class="dcount"> Make sure that your machine has the required
+software:
+
+<pre>
+Java 1.5.or later
+Ant 1.6.5 or later
+Apache Tomcat 5.x or later
+</pre>
+
+  <li class="dcount"> <a href="Download.html">Download</a>
+Soaplab2. Now you should have a directory <tt>soaplab2</tt>. Go
+there. <p>
+  
+  <li class="dcount"> Create a file <tt>build.properties</tt> by
+copying it from <tt>build.properties.template</tt>. Add there the
+property <pn>tomcat.home</pn> pointing to a directory where you have
+installed your Tomcat, and the property <pn>tomcat.host</pn> with the
+host name of your Tomcat. For example:
+
+<pre class="code">
+tomcat.home = /home/senger/Software/jakarta-catalina
+tomcat.host = www.my.server
+</pre>
+  
+  <li class="dcount"> <a href="BuildGuide.html">Install and build</a> Soaplab2:
+  
+<pre class="script">
+ant install
+</pre>
+
+  <li class="dcount"> Now you have installed the testing services that
+were included in the Soaplab2 distribution. Run them <em>locally</em>
+- because you have not yet started your Tomcat server - using the <a
+href="CmdLineClient.html">Soaplab2 main command-line client</a>:
+  
+<pre class="script">
+build/run/run-cmdline-client -protocol local -name testing.files -i
+build/run/run-cmdline-client -protocol local -name testing.files -w -r
+build/run/run-cmdline-client -protocol local -name testing.files -w -r input_direct_data abc
+build/run/run-cmdline-client -protocol local -name testing.files -w -r \
+                              input_url \
+                              https://sites.google.com/site/martinsenger/testing.page.xml.txt
+</pre>
+  
+  But with the following input:
+  
+<pre class="script">
+build/run/run-cmdline-client -protocol local -name testing.files -w -r input_url /etc/hosts
+</pre>
+
+there is a security problem (which should be, because you do not want
+all your local files to be exposed to the Soaplab2 clients from all
+over the world):
+
+<pre class="script">
+===ERROR===
+Soaplab::NotValidInputs
+[input] Refusing to resolve the reference: /etc/hosts
+===========
+</pre>
+
+  <li class="dcount"> Let's start playing using real Web Services
+protocol (by the way, have you called <tt>ant jaxdeploy</tt> at the
+end of step 4, as suggested in the prompt there?): Start your Tomcat
+server and open the page <tt>http://localhost:8080/soaplab2/</tt> -
+and you should be able to see them and to use them (using the <a
+href="SpinetClient.html">Spinet Web client</a>). <p>
+  
+</ol><p>
+
+<a name="new"></a>
+<h4> Your own services </h4>
+
+Now, it is time to create your own service. We are going to create a
+<a href="Gowlab.html">Gowlab</a> service, returning a geographical
+coordinates (and other details) of the given geographical place, using
+a wonderful public database <a
+href="http://geonames.org">geonames.org</a>.
+
+<ol>
+  
+  <li class="dcount"> Create an <a href="MetadataGuide.html">ACD file
+(metadata description)</a> for the new service - use the file path and
+name <tt>src/etc/acd/gowlab/search.acd</tt>:
+
+<pre class="smallercode">
+appl: Search [
+  documentation: "Returns the geographical coordinates of the given place names"
+  groups: "geonames"
+  nonemboss: "Y"
+  supplier: "http://ws.geonames.org/search"
+  comment: defaults
+  comment: "help http://www.geonames.org/export/geonames-search.html"
+]
+
+string: place  [
+  qualifier: q
+  default: "Prague capital of Czech Republic"
+  help: "Search this place in all possible attributes:
+         place name, country name, continent, admin codes, etc.
+         The search is using an AND operator." 
+]
+
+list: type  [
+  min: 1
+  max: 1
+  values: "xml;json;rdf"
+  default: xml
+  prompt: "The format of the returned document"
+]
+
+list: style  [
+  min: 1
+  max: 1
+  values: "SHORT;MEDIUM;LONG;FULL"
+  default: MEDIUM
+  prompt: "Verbosity of returned XML document"
+]
+
+outfile: result  [
+]
+</pre>
+
+  Go through the ACD file above and check with the <a
+href="MetadataGuide.html">metadata guide</a> what the individual data
+types and attributes mean. <p>
+
+  <li class="dcount"> Create Soaplab2 run-time XML metadata from the
+ACD format:
+
+<pre class="script">
+ant gengowlab
+</pre>
+  
+  <li class="dcount"> Try it locally:
+
+<pre class="sscript">
+build/run/run-cmdline-client -protocol local -name geonames.search -i
+build/run/run-cmdline-client -protocol local -name geonames.search -w -r
+build/run/run-cmdline-client -protocol local -name geonames.search -w -r type json place "Saffron Walden"
+build/run/run-cmdline-client -protocol local -name geonames.search -w -r type json place "Saffron Walden" style FULL
+build/run/run-cmdline-client -protocol local -name geonames.search -w -r type rdf style FULL
+</pre>
+
+  <li class="dcount"> <a href="Deployment.html">Deploy</a> all
+services, including the new one, to your Tomcat server:
+  
+<pre class="script">
+ant jaxdeploy
+</pre>
+
+  You can also deploy the same services using an old-fashioned <a
+href="Deployment.html#protocols">protocol</a> that is understood and
+used by the old Soaplab1 clients:
+
+<pre class="script">
+ant axis1deploy
+</pre>
+
+  <li class="dcount"> Finally, try your new service using the <a
+href="SpinetClient.html">Spinet Web client</a>. Going to (unless your
+Tomcat is running on a different port)
+<tt>http://localhost:8080/soaplab2/</tt> and clicking on
+<tt>geonames.search</tt> service: <p>
+
+<img src="images/spinet-geonames-1.png" border=0 align="left"/>
+<br clear="all"/><p>
+
+you should see the new service panel: <p>
+
+<img src="images/spinet-geonames-2.png" border=0 align="left"/>
+<img src="images/spinet-geonames-2a.png" border=0 align="left"/>
+<br clear="all"/><p>
+
+Clicking on the <em>Run service</em> button results in the result page
+like this: <p>
+
+<img src="images/spinet-geonames-3.png" border=0 align="left"/>
+<br clear="all"/><p>
+
+Or, with the <em>FULL</em> style, <a
+href="images/spinet-geonames-3a.png">this one</a>.
+
+</ol><p>
+
+
+<p>
+<iframe id="maintoc" src="TOC.html" scrolling="auto"></iframe>
+
+<div align=right><font size=-2>
+<!-- hhmts start -->
+Last modified: Sat Sep  4 09:46:41 2010
+<!-- hhmts end -->
+</font></div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1011961-1";
+urchinTracker();
+</script>
+</body> </html>

@@ -1,0 +1,13 @@
+.cvsignore
+build
+build.properties
+pom.xml
+.project
+.classpath
+*.log*
+log4j.properties
+_R_
+result___*
+test-reports
+services.list
+results

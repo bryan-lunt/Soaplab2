@@ -1,0 +1,140 @@
+<html> <head>
+<title>Soaplab2: How to build clients</title>
+
+<link rel="shortcut icon" href="images/favicon.ico" >
+<link rel="icon" href="images/animated_favicon1.gif" type="image/gif" >
+<link rel="stylesheet" href="images/stylesheet.css" type="text/css">
+
+</head>
+
+<body>
+<h1>How to build clients</h1>
+<p>
+
+<img class="motto-img" src="images/motto-installing-clients.jpg" border=0 align="left"/>
+
+Sometimes you wish only to <em>call</em> Soaplab2 services, not to
+<em>provide</em> them. Of course, you may do it from the full Soaplab2
+installation but you can also make it with less steps (for example,
+you do not need to know how to create services metadata and how to
+deploy services, you even do not need to run any special server). <p>
+
+<br clear="all"/>
+
+<p> This document describes how to install few internal Soaplab2
+clients. Even though they cover the full functionality of Soaplab2
+services, they are not the best user-friendly clients. Their main
+purpose is to test Soaplab2 servers, or to be used in batch scripts
+for running Soaplab2 services repeatedly.<p>
+
+For the real useful and fully user-supportive clients check these
+other documents:
+
+<ul>
+  <li class="tiny"> <a href="TavernaNotes.html">How to call Soaplab2 from Taverna</a>
+  <li class="tiny"> <a href="SpinetClient.html">Spinet: A simple Web client to Soaplab2</a>
+</ul><p>
+
+
+<p> Soaplab basic clients are installed and built by <em>Ant</em>. The
+details about built-time properties (however, none of them is
+mandatory for Soaplab2 clients) and few other Ant tricks are described
+in the main <a href="BuildGuide.html">build guide</a>. <p>
+
+
+<a name="install"></a>
+<h4>Installing Soaplab2 clients</h4>
+
+Once you have Soaplab2 in your directory, by default named
+<tt>soaplab2</tt>, type:
+
+<pre class="script">
+ant install-clients
+</pre>
+
+And that's it.<p>
+
+Once finished, it suggests to use the basic Soaplab2 <a
+href="CmdLineClient.html">command-line client</a>. In order to do it
+you need to know a URL of a Soaplab2 server - and you can call its
+services. Few examples (on Windows machines, change the slashes to
+backslashes):
+
+<pre class="sscript">
+build/run/run-cmdline-client -help
+build/run/run-cmdline-client -host a.soaplab.server -la
+build/run/run-cmdline-client -host a.soaplab.server -w -r -name classic.helloworld
+build/run/run-cmdline-client -e http://a.soaplab.server:8080/soaplab2/services/classic.helloworld
+</pre>
+
+<a name="props"></a>
+<h4>Configuration of Soaplab2 clients</h4>
+
+The command-line client shown above (and few others, as well) can use
+a client property file to define which Soaplab2 server to connect
+to. Having such client property file you save some command-line
+options. <p>
+
+The client property file is called, very imaginatively, a
+<tt>soaplab.client.properties</tt> and should be put into any
+directory specified in the environment variable <tt>CLASSPATH</tt>. By
+default, the installation task of Soaplab2 clients creates this file
+from a template <tt>src/etc/config/soaplab.client.properties</tt> and
+puts it in the <tt>build/classes</tt>. <p>
+
+Or, you can put your properties into any file, for example the
+<tt>testing.client.properties</tt>, and add a line to the file
+<tt>build.properties</tt> (in the Soaplab2 main directory):
+
+<pre class="code">
+my.soaplab.client.properties = <em>testing.client.properties</em>
+</pre>
+
+and then run:
+
+<pre class="script">
+ant config
+</pre>
+
+Here is a simple example of my Soaplab client property file:
+
+<pre class="code">
+# ------------------------------
+# where to find service/services
+# ------------------------------
+host = localhost
+port = 8080
+
+# ------------------------------
+# how to access service/services
+# ------------------------------
+
+# protocol can be 'jaxws' or 'local' (and maybe more later)
+protocol = local
+
+# ------------------------------
+# properties for batch testing
+# ------------------------------
+base.dir = @PROJECT_HOME@
+test.data.dir = ${base.dir}/data
+batch.test.file = ${base.dir}/data/defaultTests.cfg
+batch.test.file = ${base.dir}/data/embossTests.cfg
+batch.report.table
+emboss.home = /home/senger/Software/emboss
+</pre>
+
+<p>
+<iframe id="maintoc" src="TOC.html" scrolling="auto"></iframe>
+
+<div align=right><font size=-2>
+<!-- hhmts start -->
+Last modified: Mon Feb  4 17:24:39 2008
+<!-- hhmts end -->
+</font></div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1011961-1";
+urchinTracker();
+</script>
+</body> </html>

@@ -1,0 +1,170 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.soaplab</groupId>
+  <artifactId>taverna-soaplab-client</artifactId>
+  <version>2.2.0</version>
+  <name>Soaplab2 Taverna client</name>
+  <description>Soaplab2 is a refactoring and enhancement of a long-standing project Soaplab.
+  It provides webservices as well as clients. Packaging through this pom file was prepared
+  for Taverna Soaplab plugin but can be used by Soaplab Java client programs in general. 
+  </description>
+  <url>http://soaplab.sourceforge.net/soaplab2/</url>
+  <developers>
+    <developer>
+      <id>marsenger</id>
+      <name>Martin Senger</name>
+      <email>martin.senger@gmail.com</email>
+    </developer>
+    <developer>
+      <id>mahmutuludag</id>
+      <name>Mahmut Uludag</name>
+      <email>uludag@ebi.ac.uk</email>
+    </developer>
+  </developers>
+
+  <repositories>
+    <repository>
+      <id>java.net-m1</id>
+      <url>http://download.java.net/maven/1/</url>
+      <layout>legacy</layout>
+    </repository>
+    <repository>
+      <id>java.net-m2</id>
+      <url>http://download.java.net/maven/2/</url>
+    </repository>
+    <repository>
+      <id>biomoby-m2</id>
+      <url>http://biomoby.org/m2repo/</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>com.sun.xml.ws</groupId>
+      <artifactId>jaxws-tools</artifactId>
+      <version>2.1.7</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.tulsoft</groupId>
+      <artifactId>alltools</artifactId>
+      <version>2.1.1</version>
+      <exclusions>
+        <exclusion>
+            <artifactId>axis-saaj</artifactId>
+            <groupId>org.apache.axis</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.5</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.14</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
+      <version>1.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>1.3.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>2.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
+      <version>1.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-configuration</groupId>
+      <artifactId>commons-configuration</artifactId>
+      <version>1.5</version>
+      <!-- we need to exclude this in order to get Java 1.5. XML parser
+           (otherwise axis will complain about the lexical-handler
+           feature not supported -->
+      <exclusions>
+        <exclusion>
+          <groupId>xerces</groupId>
+          <artifactId>xerces</artifactId>
+        </exclusion>
+      </exclusions>  
+    </dependency>
+
+    <dependency>
+      <groupId>commons-discovery</groupId>
+      <artifactId>commons-discovery</artifactId>
+      <version>0.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-httpclient</groupId>
+      <artifactId>commons-httpclient</artifactId>
+      <version>3.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>jdom</groupId>
+      <artifactId>jdom</artifactId>
+      <version>1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.activation</groupId>
+      <artifactId>activation</artifactId>
+      <version>1.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
+      <version>1.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>wsdl4j</groupId>
+      <artifactId>wsdl4j</artifactId>
+      <version>1.5.1</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.3.1</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+    	<groupId>javax.annotation</groupId>
+    	<artifactId>jsr250-api</artifactId>
+    	<version>1.0</version>
+    </dependency>
+
+  </dependencies>
+  <!-- @FOR_ECLIPSE@ -->
+</project>

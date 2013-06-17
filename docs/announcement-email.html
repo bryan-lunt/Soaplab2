@@ -1,0 +1,95 @@
+<html> <head>
+<title>Soaplab2 Announcement</title>
+
+<!--
+<link rel="shortcut icon" href="images/soaplab-favicon.ico" >
+<link rel="icon" href="images/gcp-animated_favicon.gif" type="image/gif" >
+-->
+<link rel="stylesheet" href="images/stylesheet.css" type="text/css">
+
+</head>
+
+<body>
+
+<pre class="smallercode">
+From:      Martin Senger &lt;martin.senger@gmail.com&gt;
+To:        soaplab-users@lists.sourceforge.net,
+           soaplab-two-dev@lists.sourceforge.net 
+Date:      Apr 5, 2006 8:18 AM
+Subject:   [Soaplab-users] Soaplab 2
+Mailed-by: lists.sourceforge.net
+
+Hi,
+  For some time, there have been talks about making a new generation of
+Soaplab. Now, the time seems to be good for that. (Do not worry, the
+current Soaplab will be still supported.)
+  The new code will be in a separate CVS module (soaplab2). I have
+created a new mailing list (soaplab-two-dev) for developing the new
+soaplab. Please consider to subscribe to it here:
+  <a href="http://lists.sourceforge.net/lists/listinfo/soaplab-two-dev">http://lists.sourceforge.net/lists/listinfo/soaplab-two-dev</a>.
+
+  Below are the main goals and plans for Soaplab2 (sorry for posting it
+here - this will be hopefully the last post into this list about the
+Soaplab2):
+
+  With regards,
+  Martin
+
+The main goals of Soaplab2:
+---------------------------
+
+* Clearer architecture:
+
+ - Core (representing by the full Soaplab API). Implement also parts
+that were not implemented so far: iterator pattern (streaming) for
+input/output, server-push notification.
+
+ - Plug-ins defining individual "analysis providers"; major "analysis
+providers" are command-line tools (what is done by AppLab in the
+current Soaplab), web resource (current Gowlab), access to non-Soaplab
+web services (e.g. interproscan at EBI). Another candidate is a plug-in
+for accessing an underlying grid.
+
+ - Plug-ins defining access protocols (how to call Soaplab from
+clients). At the moment, the only protocol is SOAP/HTML, but at least
+REST should be added.
+
+* Remove internal dependencies on CORBA (AppLab part).
+
+* Make it pure Java:
+
+ - The Perl launcher (which is now between Soaplab and command-line
+tools) should be replaced (possibly still keeping his "scripting"
+character by using e.g. Java beanshell).
+
+ - Replace the Perl ACD2XML converter by a Java convertor.
+
+* "Soaplab Dashboard"
+
+ - A user interface (presumably web-based) allowing to create and
+deploy new Soaplab services on-the-fly, including an ACD (or directly
+XML) editor for Soaplab metadata.
+
+ - It will need to create and implement a separate "Soaplab Admin
+API".
+
+* Better support for Soaplab WSDL (and better WSDL in the first place,
+at least for the derived services). Based on work of Peter Ernst from
+the German Cancer Research Center.
+
+* Re-write: clean the code, fix old bugs, make it more maintainable.
+
+</pre>
+
+<p>
+
+
+
+<hr>
+<div align=right><font size=-2>
+<address><A HREF="mailto:martin.senger&#64;gmail.com">Martin Senger</A><BR></address>
+<!-- hhmts start -->
+Last modified: Sun Dec  3 22:40:47 2006
+<!-- hhmts end -->
+</font></div>
+</body> </html>

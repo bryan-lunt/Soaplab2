@@ -1,0 +1,12 @@
+<bindings xmlns="http://java.sun.com/xml/ns/jaxb" version="2.1"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+	jaxb:extensionBindingPrefixes="xjc">
+	<bindings>
+	<!-- Avoids generating enums at all.
+	     more information: https://jaxb.dev.java.net/guide/Avoid_strong_databinding.html
+	  -->
+		<globalBindings typesafeEnumMaxMembers="0">
+			<xjc:simple />
+		</globalBindings>
+	</bindings>
+</bindings>

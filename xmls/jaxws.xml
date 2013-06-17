@@ -1,0 +1,187 @@
+<!-- This is an XML entity included in main build.xml file  -->
+<!-- $Id: jaxws.xml,v 1.18 2010/08/16 13:10:52 mahmutuludag Exp $ -->
+<!-- ====================================================== -->
+
+<!-- ====================================================== -->
+<!--                                                        -->
+<!-- JAX-WS targets - for SERVICES side                     -->
+<!--                                                        -->
+<!-- ====================================================== -->
+
+<target name="jaxinit" depends="init">
+
+  <!-- use it to change default context name -->
+  <property name="jaxws.context.name" value="${context.name}"/>
+
+  <!-- if you change this you need also to change it in
+       org.soaplab.share.SoaplabConstants -->
+  <property name="soaplab.namespace" value="http://org.soaplab.2"/>
+
+  <!-- use these if you have your own templates -->
+  <property name="jaxws.web.xml.template" value="${src.config}/jaxws/web.xml.template"/>
+  <property name="jaxws.xml.template"     value="${src.config}/jaxws/sun-jaxws.xml.template"/>
+
+  <!-- property propagated into web.xml and sun-jaxws.xml -->
+  <property name="web.display.name"  value="Soaplab Web Services"/>	
+  <property name="web.display.desc"
+    value="The project home page is http://soaplab.sourceforge.net/soaplab2/"/>	
+  <property name="url.pattern.for.list"   value="/services/list"/>	
+  <property name="url.pattern.for.others" value="/services/*"/>	
+
+</target>
+
+<!-- ================================================================== -->
+<!-- Generating code (service side)...                                  -->
+<!-- (No need to do this often because the generated items are already  -->
+<!--  under CVS)                                                        -->
+<!-- ================================================================== -->
+<target name="jaxgen" depends="jaxinit,compile">
+
+  <taskdef name="wsgen" classname="com.sun.tools.ws.ant.WsGen">
+    <classpath refid="dependency.classpath" />
+  </taskdef>
+
+  <wsgen
+    sei="org.soaplab.services.protocol.jaxws.AnalysisListService"
+    destdir="${build.classes}"
+    resourcedestdir="${src.wsdl}"
+    sourcedestdir="${src.main}"
+    keep="true"
+    verbose="false"
+    genwsdl="true"
+    protocol="soap1.1"
+    servicename="{${soaplab.namespace}}AnalysisList"
+    portname="{${soaplab.namespace}}AnalysisList"
+    extension="false">
+
+    <classpath refid="build.classpath"/>
+    <classpath refid="dependency.classpath"/>
+    <classpath>
+      <pathelement location="${java.home}/../lib/tools.jar"/>
+    </classpath>
+  </wsgen>
+
+  <wsgen
+    sei="org.soaplab.services.protocol.jaxws.AnalysisService"
+    destdir="${build.classes}"
+    resourcedestdir="${src.wsdl}"
+    sourcedestdir="${src.main}"
+    keep="true"
+    verbose="false"
+    genwsdl="true"
+    protocol="soap1.1"
+    servicename="{${soaplab.namespace}}Analysis"
+    portname="{${soaplab.namespace}}Analysis"
+    extension="false">
+
+    <classpath refid="build.classpath"/>
+    <classpath refid="dependency.classpath"/>
+    <classpath>
+      <pathelement location="${java.home}/../lib/tools.jar"/>
+    </classpath>
+  </wsgen>
+
+  <!-- call config to copy generated wsdl files closer to their classes -->
+  <antcall target="config"/>
+    
+</target>
+
+<!-- ================================================================== -->
+<!-- Collect all files needed for JAX-WS service distribution           -->
+<!-- ================================================================== -->
+<target name="jaxdist" depends="jaxinit"
+  description="Populate JAX-WS services distribution space">
+
+  <antcall target="jaxtyped">
+    <param name="current.protocol" value="jaxws"/>
+  </antcall>
+
+  <antcall target="populate-dist">
+    <param name="current.context.name" value="${jaxws.context.name}"/>
+  </antcall>
+
+  <!-- remove some library files -->
+  <!-- we need (some) axis libraries for the EBI webservices plugin -->
+  <delete>
+    <fileset dir="${build.web}/WEB-INF/lib"
+      includes="axis-saaj*"/>
+  </delete>
+  <!-- -->
+  
+  <!-- filters for web configuration files -->
+  <filterset id="web.config.filter">
+    <filter token="DISPLAY_NAME"   value="${web.display.name}"/>
+    <filter token="DISPLAY_DESC"   value="${web.display.desc}"/>
+    <filter token="URL_FOR_LIST"   value="${url.pattern.for.list}"/>
+    <filter token="URL_FOR_OTHERS" value="${url.pattern.for.others}"/>
+  </filterset>
+
+  <!-- copy WEB configuration files -->
+  <copy
+    file="${jaxws.web.xml.template}"
+    tofile="${build.web}/WEB-INF/web.xml">
+    <filterset refid="web.config.filter"/>
+  </copy>
+  <copy
+    file="${jaxws.xml.template}"
+    tofile="${build.web}/WEB-INF/sun-jaxws.xml">
+    <filterset refid="web.config.filter"/>
+  </copy>
+
+  <!-- copy resource files (such as .wsdl) -->
+  <copy
+    todir="${build.web}/WEB-INF/wsdl">
+    <fileset dir="${src.wsdl}" includes="Analysis*.xsd, Analysis*.wsdl"/>
+  </copy>
+
+  <!-- for typed services (some just copied files will be overwritten) -->
+  <antcall target="copy-typed-resources">
+    <param name="current.protocol" value="jaxws"/>
+  </antcall>
+
+</target>
+
+
+<!-- ================================================================== -->
+<!-- Creating a .war file                                               -->
+<!-- ================================================================== -->
+<target name="jaxwar" depends="jaxdist"
+  description="Create a JAX-WS war file for services distribution">
+
+  <antcall target="create-war">
+    <param name="current.context.name" value="${jaxws.context.name}"/>
+  </antcall>
+
+</target>
+
+
+<!-- ================================================================== -->
+<!-- Deployment to Tomcat server                                        -->
+<!-- ================================================================== -->
+<target name="jaxdeploy" depends="tomcat-init,jaxwar"
+  description="Deploy (copy) a JAX-WS war file to a local Tomcat server">
+
+  <antcall target="copy-war">
+    <param name="current.context.name" value="${jaxws.context.name}"/>
+  </antcall>
+
+</target>
+
+<target name="jaxdeployx" depends="tomcat-init,jaxwar"
+  description="Deploy (use tomcat manager) a JAX-WS war file to a Tomcat server">
+
+  <antcall target="deploy">
+    <param name="current.context.name" value="${jaxws.context.name}"/>
+  </antcall>
+
+</target>
+
+<!-- make a simple copy of already created .war file -->
+
+<target name="jaxcopy" depends="tomcat-init,jaxinit">
+
+  <antcall target="copy-war">
+    <param name="current.context.name" value="${jaxws.context.name}"/>
+  </antcall>
+
+</target>

@@ -1,0 +1,345 @@
+<html> <head>
+<title>Soaplab2: Simple Web Client</title>
+
+<link rel="shortcut icon" href="images/favicon.ico" >
+<link rel="icon" href="images/animated_favicon1.gif" type="image/gif" >
+<link rel="stylesheet" href="images/stylesheet.css" type="text/css">
+
+</head>
+
+<body>
+<h1>Spinet - Simple Web Client</h1>
+<p>
+
+<img class="motto-img" src="images/motto-spinet-client.jpg" border="0" align="left" />
+
+
+The Soaplab's main <em>raison d'&ecirc;tre</em> is to be a Web service. As
+such, it provides its services to various, possibly many, clients,
+without caring much about how they were written or which programming
+language was used to create them. That is what a reasonably designed
+Web service should do. <p>
+
+However, people that just installed Soaplab on their servers would
+like to use it at once, to make sure that the installation went well,
+without installing or fetching third-party clients first. Therefore,
+Soaplab comes with its own simple client that can be used from any
+modern web browser without writing any piece of additional code - and
+that is <em>Spinet</em>. <p>
+
+The Spinet client appears almost automatically as the Soaplab Welcome
+page (the page provided by your Tomcat when you point your browser to
+the Soaplab services URL). It allows to select a service, to specify
+its inputs in a usual HTML form, start the service, and to display its
+results. What could be a simpler client? <p>
+
+Yes, we know that this is not a typical usage of Web services (the Web
+services are for programs not for clicking humans, right?) - but it
+can help with testing and obtaining attention to your Soaplab
+servers.
+
+<br clear="all"/>
+
+<div class="doctoc">
+<dl>
+  <dt> <a href="#use">How to use Spinet</a>
+  <dt> <a href="#config">How to configure Spinet</a>
+  <dt> <a href="#deploy">How to deploy Spinet</a>
+</dl>
+</div>
+
+
+<a name="use"></a>
+<h2>How to use Spinet</h2>
+
+The URL of the Spinet is the same as the URL of your Soaplab services
+- without any service name attached. By default, it is
+<tt>http://localhost:8080/soaplab2/</tt>. When you point your browser
+there you should see a similar welcome page to this one (the list of
+services may be, of course, different, depending what services you had
+deployed): <p>
+
+<img class="motto-img" src="images/welcome-page.png" border=0 align="left"/>
+
+<br clear="all"/>
+
+The services are grouped by their categories. The service names are
+click-able: the same click either open or close a service panel, a
+panel with the form for service inputs and with the links to the
+service results (once the service has been executed). You can collapse
+(close) all currently open service panels by clicking on the icon <img
+src="images/collapse.gif" border=0/> in the right upper corner. <p>
+
+
+The simplest possible Soaplab2 service is a classic HelloWorld. Here
+are its screen shots: <p>
+
+<table border=0 cellpadding=5>
+
+<tr>
+
+<td valign="top">
+<a href="images/spinet-hw-start.png" target="_blank"><img src="images/spinet-hw-start-small.png" border=0 align="left"/></a>
+</td>
+
+<td valign="top"> The service panel has only one text field where you
+can type your favorite greeting. Or you can leave it unchanged - and
+the default value will be used. Just press <em>Run
+service</em>...</td>
+
+</tr>
+
+<tr>
+
+<td valign="top">
+<a href="images/spinet-hw-done.png" target="_blank"><img src="images/spinet-hw-done-small.png" border=0 align="left"/></a>
+</td>
+
+<td valign="top"> When the service is finished it shows its report and
+a list of links to the results. The <em>report</em> and
+<em>detailed_status</em> are special results that are shown within the
+service panel (therefore, if you prefer to see the report in a
+separate window, click right on it and select such option in the
+browser-provided menu), other results will be open in a separate
+window or tab. </td>
+
+</tr>
+<tr>
+
+<td valign="top">
+<a href="images/spinet-hw-done-two.png" target="_blank"><img src="images/spinet-hw-done-two-small.png" border=0 align="left"/></a>
+</td>
+
+<td valign="top"> The same service panel can be used to run the same
+service (perhaps with different inputs) again and again. The
+individual jobs are shown side by side. Any of them can be
+<em>Remove</em>d. Note that you can close the service panel (by
+clicking on the service name link) and open again, and the last inputs
+and jobs results and states are still kept there. </td>
+
+</tr>
+<tr>
+
+<td valign="top">
+<a href="images/spinet-hw-help.png" target="_blank"><img src="images/spinet-hw-help-small.png" border=0 align="left"/></a>
+</td>
+
+<td valign="top"> The small icon in the left upper corner displays a help text. The richness of the shown text largely depends on the service metadata you have put into the service ACD (or XML) file. <p>
+
+Each input field can have also its own help text. Its contents again
+depends on the service metadata (see more about fields <em>help</em>,
+<em>prompt</em> and <em>info</em> in the <a
+href="MetadataGuide.html">metadata guide</a>). </td>
+
+</tr>
+</table>
+<p>
+
+
+The service panels can be more complex. Here is an example of a (still
+rather simple) EMBOSS classic <em>Seqret</em> service: <p>
+
+<table border=0 cellpadding=5>
+
+<tr>
+<td valign="top">
+<a href="images/spinet-seqret-start.png" target="_blank"><img src="images/spinet-seqret-start-small.png" border=0 align="left"/></a>
+</td>
+
+<td valign="top"> The panel separates the mandatory and optional
+inputs. You can also see more types of inputs (check boxes, lists,
+radio buttons). <p>
+
+However, the most noticeable is the mandatory sequence sub-panel. Here
+one can specify a sequence either directly (by using a text area and
+the radio button <em>"direct data or local file"</em>), or as a
+reference (by using a text field, perhaps with a help of available
+EMBOSS databases in the select list, and the radio button <em>"as <a
+href="FAQ.html#001">USA</a> or as URL"</em>, or even to upload a
+sequence from a local file.
+
+<div class="note">Be careful when selecting a local file
+for uploading - if you misspell it, it may not be reported
+properly.</div> </td>
+
+</tr>
+</table>
+<p>
+
+
+Now, let's look at the service that has a bit more appealing, graphical
+results - the <em>Prettyplot</em> from EMBOSS: <p>
+
+<table border=0 cellpadding=5>
+
+<tr>
+<td valign="top">
+<a href="images/spinet-prettyplot-done.png" target="_blank"><img src="images/spinet-prettyplot-done-small.png" border=0 align="left"/></a>
+</td>
+
+<td valign="top"> Here you can see two executions of the same service
+but with two different graphical output formats: the PNG images and
+colored postscript.  </td>
+
+</tr>
+
+<tr>
+<td valign="top">
+<a href="images/spinet-prettyplot-result.png" target="_blank"><img src="images/spinet-prettyplot-result-small.png" border=0 align="left"/></a>
+</td>
+
+<td valign="top"> Some Soaplab results are actually a list of
+individual results - such as an array of graphical PNG images from the
+previous example. For such results, Spinet provides a bar with indexes
+of available result pages; the result page is then shown below the
+yellow bar. </td>
+
+</tr>
+</table>
+<p>
+
+There are few other features that may be worth to mention: <p>
+
+<table border=0 cellpadding=5>
+
+<tr>
+
+<td valign="top">
+<a href="images/spinet-pepwheel-status.png" target="_blank"><img src="images/spinet-pepwheel-status-small.png" border=0 align="left"/></a>
+</td>
+
+<td valign="top"> A service execution is monitored by a status
+sub-panel. It is updated automatically every few seconds but you may
+set manually a longer polling interval. Which is useful for the longer
+running services. You can also click on <em>Update now</em> to get an
+immediate status.
+
+<div class="note">Sometimes the status window of very short-live
+services does not update automatically and you need to click on the
+<em>Update now</em> button. </div>
+
+There is also a button <em>Terminate</em> to interrupt a running
+service.
+
+</td>
+
+</tr>
+
+<tr>
+
+<td valign="top">
+<a href="images/spinet-emboss-dbselect.png" target="_blank"><img src="images/spinet-emboss-dbselect-small.png" border=0 align="left"/></a>
+</td>
+
+<td valign="top"> The EMBOSS services dealing with input sequences
+have a <em>database selection list</em> that shows those databases
+your EMBOSS installation <a target="_blank"
+href="http://emboss.sourceforge.net/docs/themes/Databases.html">was
+configured for</a>. Making a selection copies a selected database
+prefix to the reference text field below the list - without removing
+the sequence name (if there is already any entered there). </td>
+
+</tr>
+
+</table>
+
+<a name="config"></a>
+<h2>How to configure Spinet</h2>
+
+Actually, you do not need to configure anything special for Spinet
+client. <p>
+
+It is worth to pay some attention to the configuration of the Soaplab
+services - but there is nothing special to do for the Spinet
+client. Perhaps, it is good to make sure that you have enabled Soaplab
+results provided as URLs. By default, this feature is, however,
+already enabled. Spinet can definitely takes advantage of the result
+of the URL type. <p>
+
+The properties dealing with URL results are <a
+href="API/org/soaplab/services/Config.html#PROP_RESULTS_URL_IGNORE"><pn>results.url.ignore</pn></a>,
+<a
+href="API/org/soaplab/services/Config.html#PROP_RESULTS_URL_DIR"><pn>results.url.target.dir</pn></a>
+and <a
+href="API/org/soaplab/services/Config.html#PROP_RESULTS_URL"><pn>results.url</pn></a>. <p>
+
+More about how to configure Soaplab services is in the <a
+href="ConfigurationGuide.html">configuration guide</a>. Spinet has
+also good understanding of the Soaplab services rapping EMBOSS - the
+notes how to deploy and configure them is in the <a
+href="EmbossNotes.html">EMBOSS notes</a>. <p>
+
+Spinet client is installed/deployed (together with the Soaplab
+services) in the Tomcat. It uses <em>local protocol</em> to get access
+to the Soaplab services. This means that Spinet sits in the same JVM
+as Soaplab services.
+
+<div class="note">This particularly means that Spinet cannot be
+deployed in a different Tomcat. But this may be desirable - therefore,
+this may be made possible in the future. </div>
+
+
+<a name="deploy"></a>
+<h2>How to deploy Spinet</h2>
+
+Spinet is deployed automatically when Soaplab2 service are being <a
+href="Deployment.html">deployed</a>. There are, however, few
+built-time properties that can be set and influence the deployment:
+
+<dl>
+
+  <dt> <span class="hitt">soaplab.docs.url</span>
+       
+  <dd> A property containing a URL to the Soaplab2 documentation. Its
+default value is <a
+href="http://soaplab.sourceforge.net/soaplab2/">http://soaplab.sourceforge.net/soaplab2/</a>. Which
+is usually good enough. But you may wish to have there instead a link
+to your own page, with information about your Soaplab2
+services. <p>
+
+  <dt> <span class="hitt">local.contact</span>
+       
+  <dd> Similarly as above, you may wish to set this property with the
+name and email address of a person whom to complain about problems
+with your services. The default value is <tt>&lt;a
+href=&quot;mailto:martin.senger&#64;gmail.com&quot;&gt;Martin
+Senger&lt;/a&gt;</tt>. <p>
+
+  <dt> <span class="hitt">web.monitor</span>
+
+  <dd> Similarly as above, you may wish to set a web monitoring script for Spinet page, like
+Google Analytics or Piwik. Value of web.monitor must be on a single line. NO web monitor by default. <p>
+
+  <dt> <span class="hitt">spinet.welcome.msg</span>
+       
+  <dd> A property to customise title of your Spinet web page.
+  The default value is "<tt>Soaplab Web Services</tt>". <p>
+  Following snapshot is from a Soaplab server that has customised
+  <tt>spinet.welcome.msg</tt> property and
+  has <a href="TypedServicesClients.html">typed interface</a> enabled.
+
+
+
+<img id="welcome-page-with-wsdl-links" style="" class="motto-img"
+ src="images/welcome-page-with-wsdl-links.png" border=0 align="left"
+ title="this welcome page looks different than the example above as it uses a customised style sheet"/>
+
+</dl><p>
+
+<br/>
+
+<p>
+<iframe id="maintoc" src="TOC.html" scrolling="auto"></iframe>
+
+<div align=right><font size=-2>
+<!-- hhmts start -->
+Last modified: Tue Aug 17 11:03:55 2010
+<!-- hhmts end -->
+</font></div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1011961-1";
+urchinTracker();
+</script>
+</body> </html>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://emboss.org/common"
+	xmlns="http://emboss.org/common" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:annotation>
+		<xs:documentation>Common sequence input type used by most EMBOSS
+			programs</xs:documentation>
+	</xs:annotation>
+	<xs:simpleType name="SequenceFormat">
+		<xs:annotation>
+			<xs:documentation>input sequence formats accepted by EMBOSS
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="gcg" />
+			<xs:enumeration value="gcg8" />
+			<xs:enumeration value="embl" />
+			<xs:enumeration value="swiss" />
+			<xs:enumeration value="fasta" />
+			<xs:enumeration value="ncbi" />
+			<xs:enumeration value="genbank" />
+			<xs:enumeration value="nbrf" />
+			<xs:enumeration value="pir" />
+			<xs:enumeration value="codata" />
+			<xs:enumeration value="strider" />
+			<xs:enumeration value="clustal" />
+			<xs:enumeration value="phylip" />
+			<xs:enumeration value="acedb" />
+			<xs:enumeration value="msf" />
+			<xs:enumeration value="jackknifer" />
+			<xs:enumeration value="jackknifernon" />
+			<xs:enumeration value="nexus" />
+			<xs:enumeration value="nexusnon" />
+			<xs:enumeration value="treecon" />
+			<xs:enumeration value="mega" />
+			<xs:enumeration value="meganon" />
+			<xs:enumeration value="ig" />
+			<xs:enumeration value="sam" />
+			<xs:enumeration value="staden" />
+			<xs:enumeration value="text" />
+			<xs:enumeration value="raw" />
+			<xs:enumeration value="bam" />			
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="sequenceInput">
+		<xs:annotation>
+			<xs:documentation>Common sequence input type for EMBOSS
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:choice>
+				<xs:annotation>
+					<xs:documentation>You should either provide direct data of the
+						input sequence or use EMBOSS USA convention to refer entries known
+						to your EMBOSS installation 
+					</xs:documentation>
+				</xs:annotation>
+				<xs:element name="direct_data"
+					type="xs:string" />
+				<xs:element name="usa" type="xs:string" />
+			</xs:choice>
+			<xs:element minOccurs="0" name="sformat"
+				type="SequenceFormat" />
+			<xs:element minOccurs="0" name="sbegin"	type="xs:int" >
+				<xs:annotation>
+					<xs:documentation>Start of sequence(s) to be used
+					</xs:documentation>
+				</xs:annotation>
+				</xs:element>
+			<xs:element minOccurs="0" name="send" type="xs:int" >
+				<xs:annotation>
+					<xs:documentation>End of sequence(s) to be used
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="sprotein" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Sequence is protein</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="snucleotide" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Sequence is nucleotide</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="sreverse" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Reverse (if DNA)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" name="slower"
+				type="xs:boolean" >
+				<xs:annotation>
+					<xs:documentation>Make lower case</xs:documentation>
+				</xs:annotation></xs:element>
+			<xs:element minOccurs="0" name="supper"
+				type="xs:boolean" >
+				<xs:annotation>
+					<xs:documentation>Make upper case</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
+

@@ -1,0 +1,65 @@
+GetWSDLFiles
+============
+
+Usage:
+   build/run/run-any-client org.soaplab.typedws.generate.GetWSDLFiles -h[elp]
+   build/run/run-any-client org.soaplab.typedws.generate.GetWSDLFiles <find-arguments> <file-arguments>
+
+where:
+
+  -h[elp]  ... print this help
+  -q       ... quiet mode (useful when you want to redirect
+               a result into a file)
+  -stack   ... in case of any error it prints the stack trace
+               (without this option, it prints it only when a
+                serious runtime error occures)
+
+where <find-arguments> defines what services to use for creating their
+"typed interface" equivalents, where to find them and what protocol to
+use to access them (some of these parameters may also be specified in
+the Soaplab client configuration property file - by default named
+soaplab.client.properties and put on the CLASSPATH):
+
+   -protocol jaxws   ... service will be accessed as a Web Service,
+                         using JAX-WS toolkit (default protocol)
+   -protocol local   ... service will be accessed as local class
+                         (no remote server or any Web Service used)
+   -protocol axis1   ... service will be accessed as a Web Service,
+                         using old Axis 1 toolkit (such protocol may
+                         not be supported by the given Soaplab server)
+
+   -host <host>      ... host name (default: localhost)
+   -port <port>      ... port number (defaullt: 8080)
+   -ctx <context>    ... context part of the URL (default: soaplab2)
+
+   -lname <service>  ... a name of a list service to be used
+                         (default   'AnalysisFactory' for axis1 protocol,
+                          otherwise 'list')
+
+   -el <url>         ... a full List service URL (an endpoint);
+                         if given it has precedence over -host, -port, -ctx,
+                         and -lname;
+                         default is created from other parameters as:
+                         http://<host>:<port>/<context>/services/<list-service>
+
+where <file-arguments> defines what templates to use and where to
+create outputs:
+
+   -wsdlout-dir <dir-name>         ...  output directory where to create WSDLs
+                                   (default: generated/wsdl/)
+
+   -sawsdl-template <file-name>    ... template file for SA WSDLs
+                                   (default: src/etc/wsdl/SAWSDLTemplate.wsdl)
+
+   -wsdl-template <file-name>      ... template file for non-SA WSDLs
+                                   (default: src/etc/wsdl/WSDLTemplate.wsdl)
+
+   -wsdl-endpoint <file-name>      ... template file for endpoint
+                                   (default: src/etc/config/jaxws/typed-interface-endpoint.template)
+
+   -iotypes-template <file-name>   ... template file for input/output types
+                                   (default: src/etc/wsdl/InputOutputTypesTemplate)
+
+   -endpoints-template <file-name> ... template file for a list of services
+                                   (default: src/etc/config/jaxws/sun-jaxws.xml.template)
+

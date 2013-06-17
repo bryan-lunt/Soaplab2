@@ -1,0 +1,210 @@
+body {
+     background-color:#FFFAF0;/*floralwhite;*/
+     font-family:Tahoma,Arial,Helvetica,sans-serif;
+}
+.version {
+     font-size:75%;
+}
+.motto-img {
+     text-align: left;
+     margin-bottom: 1em;
+}
+.main-header {
+     background-color:yellow;
+}
+.category-header {
+     background-color:silver;
+}
+.category-header .category-name {
+     font-weight:bold;
+     font-size:85%;
+}
+.description {
+     font-size:80%;
+     font-style:italic;
+}
+
+.panel {
+     background-color:#ffff99;
+}
+
+.button, .small-button {
+     width:100px;
+}
+.small-button {
+     font-size:90%;
+     width:90%;
+}
+
+.inputs {
+}
+.outputs {
+}
+.message, .smallmessage, .fixmessage {
+   font-weight: bold;
+   font-size:80%;
+   color:red;
+}
+.smallmessage {
+   font-size:70%;
+}
+.fixmessage {
+   margin-top: 1em;
+   width:300px;
+}
+
+.input-name, .output-name {
+   font-style:italic;
+   font-weight: bold;
+   font-size:80%;
+}
+.input-ui {
+   font-style:normal;
+   font-weight:normal;
+   font-size:80%;
+}
+.input-separator, .output-separator {
+   font-size:75%;
+   text-align:right;
+   line-height:90%;
+   color:#c0c0c0;
+}
+
+.input-text {
+   width:220px;
+}
+.input-float, .input-integer {
+   width:150px;
+   text-align: right;
+}
+.data-input-box {
+   border-style: solid;
+   border-width: 1px;
+   border-color: #c0c0c0;
+}
+.data-input-toggle {
+   font-size:70%;
+   font-style:italic;
+   line-height:85%;
+}
+
+.showdb-select {
+   font-weight: normal;
+   font-size:70%;
+   background-color:#F0FFFF;/*azure;*/
+}
+.showdb-comment {
+   font-style: italic;
+   font-size:70%;
+   color:#808080;/*gray;*/
+}
+
+.status {
+   font-size:65%;
+   padding-left:150px;
+}
+.status .job-status {
+   color: blue;
+   float: left;
+   margin-right: 1em;
+   margin-bottom: 1em;
+}
+.status-running, .status-completed, .status-user-terminated, .status-error-terminated, .status-unknown {
+   font-size: 12px;
+   font-weight: bold;
+   margin: 5px;
+   text-align: center;
+   background-color: #8a9fff;
+}
+.job-status .status-running {
+   color: yellow;
+}
+.job-status .status-completed {
+   color: white;
+}
+.job-status .status-user-terminated {
+   color: #dd0000;
+}
+.job-status .status-error-terminated {
+   color: #dd0000;
+}
+.job-status .status-unknown {
+   color: black;
+}
+.result-list {
+   color:#A52A2A;/*brown;*/
+   font-size: 12px;
+}
+.inline-result {
+   color: black;
+   font-weight: normal;
+   font-size: 85%;
+}
+.input-period {
+   width:25px;
+   font-size: 85%;
+   background-color:#F0FFFF;/*azure;*/
+   text-align: right;
+}
+
+a:visited {
+   color: #0000ff;
+}
+
+.result-bar {
+   display:inline;
+   background-color:yellow;
+   float:left;
+   text-align:left;
+   width:100%;
+}
+.result-title {
+   display:inline;
+   float:left;
+   text-align:left;
+   margin-top:5px;
+   margin-left:5px;
+   margin-right:5px;
+   font-weight:bold;
+}
+.result-note {
+   display:inline;
+   text-align:right;
+   font-style:italic;
+   font-weight:normal;
+   font-size:75%;
+}
+.result-links li {
+   display:inline;
+   background-color:#eee;
+   border:1px solid;
+   border-color:#f3f3f3 #bbb #bbb #f3f3f3;
+   margin:0;
+   padding:.4em;
+}
+.result-links a, a:link {
+   color:#0000EE;
+   text-decoration:none;
+}
+.result-links a:hover {
+   color:red;
+   text-decoration:underline;
+}
+.result-body {
+   float:left;
+   vertical-align:top;
+   margin:5px;
+   border:none;
+   height:100%;
+   width:100%;
+}
+
+
+H1.tomcat {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:22px;}
+H2.tomcat {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:16px;}
+H3.tomcat {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:14px;}
+BODY.tomcat {font-family:Tahoma,Arial,sans-serif;color:black;background-color:white;}
+B.tomcat {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;}
+P.tomcat {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:12px;}A.tomcat {color : black;}
+A.name.tomcat {color : black;}
+HR.tomcat {color : #525D76;}

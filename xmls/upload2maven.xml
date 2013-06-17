@@ -1,0 +1,66 @@
+<!-- ================================================================== -->
+<!--                  Uploading to Maven repository                     -->
+<!-- ================================================================== -->
+
+<!-- This is an XML entity included in ../build.xml file -->
+<!-- $Id: upload2maven.xml,v 1.6 2009/06/19 10:23:54 mahmutuludag Exp $ -->
+
+<!-- 
+
+It contains tasks that deploy (upload) project specific jar files to a
+Maven repository. It uses files project[-*].pom where are details what
+to upload and what are project dependencies.
+
+The tasks here usually depends on task from the main ../build.xml that
+creates project jar files.
+
+-->
+
+<!-- ================================================================== -->
+<!--                      Remote Maven repository                       -->
+<!-- ================================================================== -->
+
+<!-- Deploy all parts of this project to a remote Maven repository -->
+<target name="mdeploy" depends="mdeploy-core"/>
+
+<!-- deploying soaplab.jar -->
+<target name="mdeploy-core" depends="initmaven,jars">
+  <artifact:install-provider artifactId="${bio.maven.install.provider}" version="1.0-beta-2"/>
+
+  <artifact:deploy file="${build.lib}/${maven.project.artifactId}-${maven.project.version}.jar">
+    <remoteRepository id="bio.maven.repository" url="${bio.maven.repository.scp}">
+    </remoteRepository>
+    <pom refid="maven.project"/>
+  </artifact:deploy>
+</target>
+
+<!-- deploying taverna-client.jar -->
+<target name="mdeploy-tavernaclient" depends="initmaven,tavernaclient-jar">
+  <artifact:install-provider artifactId="${bio.maven.install.provider}" version="1.0-beta-2"/>
+
+  <artifact:deploy file="${build.lib}/${maven.taverna-client.artifactId}-${maven.taverna-client.version}.jar">
+    <remoteRepository url="${bio.maven.repository.scp}">
+      <authentication username="${bio.maven.auth.username}" privateKey="${bio.maven.auth.privkey}"/>
+    </remoteRepository>
+    <pom refid="maven.taverna-client"/>
+  </artifact:deploy>
+</target>
+
+<!-- ================================================================== -->
+<!--                      Local Maven repository                        -->
+<!-- ================================================================== -->
+
+<!--  Install all parts of this project in a local Maven repository -->
+<target name="minstall" depends="minstall-core"/>
+
+<target name="minstall-core" depends="initmaven,jars">
+  <artifact:install file="${build.lib}/${maven.project.artifactId}-${maven.project.version}.jar">
+    <pom refid="maven.project"/>
+  </artifact:install>
+</target>
+
+<target name="minstall-tavernaclient" depends="initmaven,tavernaclient-jar">
+  <artifact:install file="${build.lib}/${maven.taverna-client.artifactId}-${maven.taverna-client.version}.jar">
+    <pom refid="maven.taverna-client"/>
+  </artifact:install>
+</target>

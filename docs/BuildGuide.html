@@ -1,0 +1,649 @@
+<html> <head>
+<title>Soaplab2: How to build</title>
+
+<link rel="shortcut icon" href="images/favicon.ico" >
+<link rel="icon" href="images/animated_favicon1.gif" type="image/gif" >
+<link rel="stylesheet" href="images/stylesheet.css" type="text/css">
+
+</head>
+
+<body>
+<h1>Soaplab2: How to build it</h1>
+<p>
+
+<img class="motto-img" src="images/motto-installation-and-building.jpg" border=0 align="left"/>
+
+Soaplab is installed and built by <em>Ant</em>. <p>
+
+<em>Ant</em> is a very powerful tool that can do almost everything. It
+can be also widely configured, by setting various properties, in order
+to customise user's actions. Which means that its usage can sometimes
+become a bit confusing. Therefore, this documents starts by explaining
+few basic rules how to use Ant, and only the next chapter describes
+how to use it for building Soaplab2. <p>
+
+<br clear="all"/>
+
+<div class="doctoc">
+<dl>
+  <dt> <a href="#ant">General rules for using Ant</a>
+  <dt> <a href="#install">Installing Soaplab2</a>
+  <dt> <a href="#build">Soaplab2 building tasks</a>
+       <dl>
+	 <dt> <a href="#eclipse"><img src="images/eclipse.gif" border=0/> Notes for Eclipse users</a>
+       </dl>
+  <dt>
+</dl> <p>
+</div>
+
+<a name="ant"></a>
+<h3>General rules for using Ant</h3>
+
+The Ant has a help for the command-line details (<tt>ant
+-help</tt>). The list of available tasks can be obtained by:
+
+<pre class="script">
+ant -projecthelp
+</pre>
+
+It displays something like this:
+<pre class="code">
+Main targets:
+
+ all             Clean, compile, etc..
+ axis1deploy     Deploy (copy) an Axis-1 war file to a Tomcat server
+ axis1dist       Populate Axis-1 services distribution space
+ axis1war        Create a Axis-1 war file for services distribution
+ bootstrap       Fetch Maven library - needed only the first time.
+ clean           Remove all generated files.
+ cleanxml        Remove all generated service metadata
+ compile         Compile all source code (default)
+ config          Create all run-time scripts and configuration files.
+ docs            Generate documentation.
+ gen             Generate service metadata from all ACD files
+ genebi          Generate XML metadata for EBI's sample services.
+ genemboss       Generate XML metadata for EMBOSS (needs EMBOSS installed).
+ gengowlab       Generate XML metadata for Gowlab services.
+ gensowa         Generate XML metadata for Sowa services.
+ info-list       Show a list of available services
+ initeclipse     For Eclipse users... create pom files in the right place
+ install         Install and build Soaplab2
+ install-clients Install and build Soaplab2 clients
+ jars            Create all jar files related to this project.
+ jaxdeploy       Deploy (copy) a JAX-WS war file to a Tomcat server
+ jaxdist         Populate JAX-WS services distribution space
+ jaxwar          Create a JAX-WS war file for services distribution
+ test-junit      Run the junit test cases
+</pre>
+
+Soaplab2 uses Ant version 1.6.5 and later. Check your version. For
+example:
+
+<pre class="script">
+ant -version
+Apache Ant version 1.7.0 compiled on December 13 2006
+</pre>
+
+The Ant can be (and, in some point, should be) customised by defining
+some properties in the file <pn><tt>build.properties</tt></pn>
+(located in the Soaplab2 directory). Such file does not come
+automatically with the Soaplab distribution (because its contents is
+specific for your installation and environment). However, there is a
+template of such file <tt>build.properties.template</tt>. Make a copy
+of this template, and un-comment and edit properties that you
+wish/need to change. <p>
+
+<div class="note">
+
+If you wish to use the same properties for more projects, you can also
+put the <tt>build.properties</tt> file into your home directory. Such
+property file is then shared and re-used by every project. The
+question is, however, whether it is a good practise. You can easily
+forget about it and have a hard time to find why something is not
+working as expected.
+
+</div>
+
+What is the format of the <tt>build.properties</tt> file?  Simply
+speaking, it follows the same syntax as required by
+<tt>java.util.Property.load()</tt> method. The gory details can be
+found <a
+href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/Properties.html#load(java.io.InputStream)">here</a>.
+For example, here are few, randomly picked-up, properties: <p>
+
+<pre class="sscript">
+compile.deprecation = true
+compile.warnings = true
+tomcat.home = /home/senger/Software/jakarta-catalina
+emboss.home = /home/senger/Software/emboss
+</pre>
+
+The usual problem with properties could be to mix together properties
+used by Ant and properties used by Soaplab2. The properties used by
+Ant are usually referred to as <em>build-time properties</em>, while
+the Soaplab2 properties, used in the run-time by Soaplab2 services,
+are called <em>run-time properties</em>.
+
+<div class="note">
+
+About Soaplab2 run-time properties, you will learn all details later,
+in the <a href="ConfigurationGuide.html">configuration guide</a>. They
+use a similar syntax (similar, not the same, because the run-time
+properties allow more features than the build-time properties) but
+they are used in different time - when Soaplab2 services are running
+and accessed by users. <p>
+
+What adds to the confusion is also a fact that Ant helps to build
+run-time property files for Soaplab2 by re-using (propagating) some
+build-time properties to the run-time properties. Sorry about it...
+
+</div>
+
+The Ant properties can be also specified directly on the command line
+by using <tt>-D</tt> option (or more of them, if you wish to specify
+more properties). The properties on the command line has precedence
+over properties defined in the property files. For example:
+
+<pre class="script">
+ant -Dcompile.warnings=true compile
+ant -Dcompile.warnings=true -Dcompile.debug=false compile
+</pre>
+
+The whole construct with the <tt>-D</tt> option must constitute a
+single command-line parameter. Therefore, this is wrong:
+
+<img src="images/wrong.gif" border=0 align="left"/>
+<pre class="sscript">
+ant -D compile.warnings=true compile
+</pre>
+<br clear="all"/>
+
+From the same reason, if the property value contains a space, the
+whole construct must be quoted:
+
+<pre class="sscript">
+ant "-Dbig.apple=New York" 
+</pre>
+
+<h4>Some build-time properties</h4>
+
+Of course, the most important is to know what properties can be
+used. Fortunately, they are not many of them because most of them have
+reasonable default values. The ones you <em>have to specified</em> are
+those defining something specific to your machine. At the moment, it
+is only one such property - defining the local path to your Tomcat:
+
+<pre class="script">
+tomcat.home = /home/senger/Software/jakarta-catalina
+</pre>
+
+Other properties that you <em>may use</em> are described later in this
+document, when individual Ant's targets (tasks) are explained. The
+best way (but not always an easy) way to find what properties can be
+used, is to look into <tt>build.xml</tt> file (and its include files
+in the <tt>xmls</tt> directory). <p>
+
+For enabling typed interface for your Soaplab Web Services please
+check <a href="TypedInterface.html">typed interface help page</a>.
+
+<h4><img src="images/eclipse.gif" border=0/> A note for Eclipse users</h4>
+
+<img class="motto-img" src="images/eclipse-ant.png" border=0 align="left"/>
+
+<div>
+If you are a Java developer, you may be using <a
+href="http://www.eclipse.org/">Eclipse</a>. Be aware, that some tasks
+defined in the Soaplab2's Ant cannot be done (or not easily done)
+directly by Eclipse itself. You still should make them by calling
+the Ant. But you can do it from Eclipse (see there is a difference:
+<em>by Eclipse</em> and <em>from Eclipse</em>). Use a double click in
+the Ant's view. <p>
+
+This is especially true for the <pn>config</pn> task that creates
+important files in the <tt>build/classes</tt> directory, the files
+needed for proper run of Soaplab. But Eclipse has a tendency
+(especially after refreshing by F5 key) to remove these files. The
+<tt>config</tt> task brings them back. (When using Ant from the
+command-line you usually do not call this task directly, it is called
+by other tasks.)
+
+</div>
+<br clear="all"/>
+
+<h4>Ant and Maven</h4>
+
+Soaplab2 is built by Ant but under the hood it uses nice features of
+another famous tool - <a
+href="http://maven.apache.org/">Maven</a>. Mainly because it nicely
+handles Soaplab2's dependencies on the third-party libraries. You do
+not need to know details about it - but you should know what is going
+on on your computer. Here it is: <p>
+
+Ant calls Maven whenever you build Soaplab2 to find whether there are
+some unresolved third-party dependencies. If there are - and
+definitely there are the first time you build Soaplab2 - Maven
+downloads them to your computer. It creates a <em>local Maven
+repository</em> - which is a directory in your home directory (the
+name depends on the platform: on Linux, its name is
+<tt>.m2</tt>). This repository can be used by more projects using
+Maven. Important is to know that:
+
+<ul>
+  
+  <li class="tiny"> Something is created <em>outside</em> of your
+Soaplab2 directory, and <p>
+
+  <li class="tiny"> The first time, it can take some time, and you need
+to be on-line.
+
+</ul><p>
+
+There is an <a
+href="http://pantheon.generationcp.org/index.php?option=com_content&task=view&id=379&Itemid=197">article</a>
+describing details how the Ant-Maven marriage is handled. It is from
+another project, but the principles (and files) are very similar to
+Soaplab2 (because both Soaplab2 and the article share the same author
+<img src="images/smile.gif" border=0/>). The article also explains
+what to do if you wish to have the local Maven repository created
+elsewhere - which you may need if your home directory has some space
+limits. <p>
+
+
+
+<a name="install"></a>
+<h3>Installing Soaplab2</h3>
+
+Once you have Soaplab2 in your directory, by default named
+<tt>soaplab2</tt>, you can install it by calling:
+
+<pre class="script">
+ant install
+</pre>
+
+The <em>installation</em> is nothing more than calling several Ant's
+task in a row. <p>
+
+<div class="note"> There is also a simplified version of this
+installation task, the <tt>install-clients</tt> task. You can use it
+when you wish to <a href="BuildClientGuide.html">install only Soaplab2
+clients</a>.</div>
+
+First, it downloads one special library that glues Maven with
+Ant. Without this library, the Ant would complain that it cannot
+work. Internally (and anytime repeatable), it calls <tt>ant
+bootstrap</tt>. <p>
+
+Next, it checks that you have installed Perl. This is a legacy issue
+and will, sooner or later, disappear. The goal is to have Soaplab2
+pure Java. The only remaining non-Java part is the converter between
+ACD and XML files (more about ACD files in the <a
+href="MetadataGuide.html">metadata guide</a>). <p>
+
+After that, it reminds you to create the <tt>build.properties</tt>
+file and put there properties locating the place where you have
+installed Tomcat. These properties are not used yet, but ultimately
+they will be needed when you deploy your Soaplab2 services (see more
+about that step in the <a href="Deployment.html">deployment guide</a>
+document). <p>
+
+Then the real installation starts. In a series of steps, Ant downloads
+many third-party libraries, builds the whole Soaplab2, generates XML
+files for several testing services, and as a jewel at the end, it runs
+one testing service, the <em>HelloWorld</em> service. <p>
+
+<div class="note">
+
+The HelloWorld service call may fail if your machine has Perl program
+installed elsewhere than in <tt>/usr/bin/perl</tt>. It will almost
+definitely fail on Windows. If you still wish to see this service
+succeeded please correct the testing scripts in he <tt>run</tt>
+directory.
+
+</div>
+
+Once installation finished, it suggests to run the deployment task:
+
+<pre class="script">
+ant jaxdeploy
+</pre>
+
+This will deploy few testing services into your Tomcat and you can
+start using them (see the <a href="CmdLineClient.html">command-line
+client</a> document how to use your services from the command-line):
+
+<pre class="script">
+build/run/run-cmdline-client -name classic.helloworld -w -r
+</pre>
+
+Or, perhaps even easier, you can open your browser and point it to
+your Tomcat and use the <a href="SpinetClient.html">Spinet
+client</a>. Unless you run Tomcat on a different port, or unless you
+deployed your services into a different <em>context</em>, the URL to
+open should be this: <a href="http://localhost:8080/soaplab2/"
+target="_blank">http://localhost:8080/soaplab2/</a>. <p>
+
+
+The installation task can be repeated anytime without any harm. <p>
+
+
+<a name="build"></a>
+<h3>Soaplab2 building tasks</h3>
+
+This chapter lists various Ant tasks, explaining what they do and how
+you can customise them. For better understanding, it helps if you read
+first the <a href="#ant">general rules for using Ant</a>. <p>
+
+More Ant tasks (the more specialised ones) are described in separate
+documents. The deployment tasks:
+
+<pre class="code">
+ axis1deploy  Deploy (copy) an Axis-1 war file to a Tomcat server
+ axis1dist    Populate Axis-1 services distribution space
+ axis1war     Create a Axis-1 war file for services distribution
+ jaxdeploy    Deploy (copy) a JAX-WS war file to a Tomcat server
+ jaxdist      Populate JAX-WS services distribution space
+ jaxwar       Create a JAX-WS war file for services distribution
+</pre>
+
+are in the <a href="Deployment.html">deployment guide</a>, and the
+metadata tasks:
+
+<pre class="code">
+ cleanxml     Remove all generated service metadata
+ gen          Generate service metadata from all ACD files
+ genebi       Generate XML metadata for EBI's sample services.
+ genemboss    Generate XML metadata for EMBOSS (needs EMBOSS installed).
+ gengowlab    Generate XML metadata for Gowlab services.
+ gensowa      Generate XML metadata for Sowa services.
+</pre>
+
+are in the <a href="MetadataGuide.html#build">service metadata
+guide</a>. <p>
+
+The remaining tasks are:
+
+<h4>Ant task: all</h4>
+
+This is simply an aggregation of several other tasks. It cleans the
+building space and fills it again with a fresh build. <p>
+
+Most of the new created files (those that can be re-generated anytime
+later) are generated in the <tt>build</tt> directory.
+
+<h4>Ant task: bootstrap</h4>
+
+An important task - but done only once, at the very beginning.  It
+fetches a Maven library. <p>
+
+Note that other libraries can be (and are) fetched later by Maven, but
+Maven itself needs a library which obviously "cannot be fetched before
+it is fetched". That's why we have here a separate task for
+it. Probably we should call it better a Catch-22 task <img
+src="images/smile.gif" border=0/>.
+
+<h4>Ant task: clean</h4>
+
+It removes all generated files, and the <tt>build</tt> directory
+itself. Whenever you encountered a strange problem, the first try is
+to clean and build again:
+
+<pre class="script">
+ant clean compile
+</pre>
+
+
+<h4>Ant task: compile</h4>
+
+It compiles all source code. It is also a default task - the one
+called when you simply call <tt>ant</tt>. <p>
+
+You can influence how the Java compiled code is produced by setting
+compilation properties. The default values are:
+
+<pre class="code">
+compile.debug = true
+compile.verbose = false
+compile.deprecation = false
+compile.optimize = false
+compile.warnings = false
+</pre>
+
+
+<h4>Ant task: config</h4>
+
+It creates all run-time scripts and configuration files. This is
+usually not called directly (the other tasks call it) but it is an
+important task. <p>
+
+Generally, it transforms template files (sitting mostly in the
+directory <tt>src/etc/config</tt>) into real configuration files and
+puts them into <tt>build/classes</tt> directory where they are used by
+Soaplab services. <p>
+
+The template files do not contain any local dependencies (such as a
+full path to your <tt>soaplab2</tt> directory). The <em>config</em>
+task injects the "local knowledge" into them during the copying. The
+"injection" is done on places marked in the templates by pairs of the
+&#64; characters. You do not need to know it - unless you wish to
+write your own template file. Please check the template what injection
+points are used. Here is an example of two pairs of replacement tokens
+(from the <tt>soaplab.properties.template</tt>:
+
+<pre class="code">
+base.dir = @PROJECT_HOME@
+metadata.dir = @METADATA_DIR@
+...
+</pre>
+
+If you have your own template file, you need to let Ant know about it
+by setting a build-time property pointing to your template file. For
+example, for the major Soaplab2 configuration file, you set the
+property <tt>my.soaplab.properties</tt>:
+
+<pre class="code">
+my.soaplab.properties = testing.soaplab.properties
+</pre>
+
+Other build-time properties for setting other configuration files are:
+
+<pre class="code">
+log4j.configuration = testing.log4j.properties
+my.soaplab.client.properties = testing.soaplab.client.properties
+</pre>
+
+Examples and details about configuration files are in the <a
+href="ConfigurationGuide.html">configuration guide</a>. <p>
+
+The <em>config</em> task also generates <em>run-time scripts</em> into
+<tt>build/run</tt> directory. The scripts can be used to start various
+Soaplab2 client and administrative command-line programs (as shown in
+the <a href="CmdLineClient.html">command-line client</a> and <a
+href="AdminTools">administrative tools</a> documents). <p>
+
+The <em>run-time scripts</em> are also a good place where you can see
+names and location of all third-party libraries Soaplab2 is using. <p>
+
+
+<h4>Ant task: docs</h4>
+
+It generates documentation, mostly the javadoc API. <p>
+
+The Soaplab2 is distributed together with the full documentation. In
+includes also hyper-links to the API documentation - which must be
+first created by this task. Whenever you see a dead link in the
+Soaplab pages, a chance is that it may be revived by running this
+task.
+
+<h4>Ant task: info-list</h4>
+
+This is an interesting task: it actually runs some Soaplab2 code (the
+same the Soaplab2 services run), reading your configuration files, and
+showing the current list of Soaplab2 services on your machine. The
+services may be not yet available to all clients (they may not be yet
+deployed; even the Tomcat does not need to be yet started). For
+example:<p>
+
+<pre class="smaller-code">
+  [service] alignment.wu_blastn_raw
+  [service] alignment.wu_blastn_xml
+  [service] alignment.wu_blastp_raw
+  [service] alignment.wu_blastp_xml
+  [service] alignment.wu_blastx_raw
+  [service] alignment.wu_blastx_xml
+  [service] alignment.wu_tblastn_raw
+  [service] alignment.wu_tblastn_xml
+  [service] alignment.wu_tblastx_raw
+  [service] alignment.wu_tblastx_xml
+  [service] alignment_consensus.cons
+  [service] alignment_consensus.megamerger
+  [service] alignment_consensus.merger
+  [service] alignment_differences.diffseq
+  [service] alignment_dot_plots.dotmatcher
+  [service] alignment_dot_plots.dotpath
+  [service] alignment_dot_plots.dottup
+  [service] alignment_dot_plots.polydot
+  [service] alignment_global.est2genome
+  ...
+</pre>
+
+It also creates a file <tt>services.list</tt>. Its name can be changed
+by the property <pn>services.names.file</pn>:
+
+<pre class="script">
+ant -Dservices.names.file=my.services info-list
+</pre>
+
+The file contains nothing more than the service names, each one on a
+separate line. <p>
+
+
+<h4>Ant task: jars</h4>
+
+It creates all jar files related to this project. Well, what else to
+say...
+
+<h4>Ant task: test-junit</h4>
+
+It runs the junit test cases. <p>
+
+Before running them, it compiles them first (the testing classes are
+not part of the normal compilation). Running this task may give you
+the following error:
+
+<pre class="smallercode">
+================================= WARNING ================================
+Junit library is not present in a correct directory. Tests not executed.
+The library (junit.jar) is, however, in your local Maven repository.
+Therefore:
+    Put it in your ${ANT_HOME}/lib directory.
+    Or, put in your ${HOME}/.ant/lib directory.
+    Or start ant with -lib &lt;your junit library&gt;.
+==========================================================================
+</pre>
+
+<a name="eclipse"></a>
+<h4><img src="images/eclipse.gif" border=0/> Ant task: initeclipse and Notes for Eclipse users</h4>
+
+
+Many of the building tasks can be accomplished also from Eclipse. But
+not all. For example, as already mentioned above, the Ant's
+<em>config</em> task must be run by Ant. Another example is the
+<em>docs</em> task (generating javadoc API documentation). There are,
+however, few issues that, when not known and solved properly, can be
+annoying:
+
+<ul>
+
+  <li> Eclipse automatically creates and uses two configuration
+files (both are created in the main <tt>soaplab2</tt> directory): the
+<tt>.project</tt> and <tt>.classpath</tt>. For building purposes, the
+latter one is more important. It contains information about what to
+compile (source paths) and where to put it (output paths). You should
+make sure that both Eclipse and Ant use the same locations. The best
+way to do so is to use the provided <tt>.classpath.template</tt> file
+and to make its copy (named <tt>.classpath</tt>) and only then start
+Eclipse. <p>
+
+  <li> Whenever (well, not always; I am not sure exactly when it
+happens) you refresh Eclipse Soaplab2 project, it removes Soaplab2's
+configuration files from the <tt>build/classes</tt>. You need to run
+the Ant's <em>config</em> task to re-create them.
+
+       <div class="note">
+
+       If anybody can tell me how to do it better I will appreciate it
+very much. Thanks.
+
+       </div>
+
+  <li> Maven and Eclipse is another issue. All Soaplab2 dependencies
+are defined in the <tt>xmls/project.pom</tt>. You obviously want to
+share this dependencies in Eclipse, as well. <p>
+
+       First, you need to install a Maven plug-in into your
+Eclipse. Then, you need to create several <tt>pom.xml</tt> files - the
+files where the Eclipse Maven plug-in looks for the
+dependencies. These files are created by running the Ant's
+<em>initeclipse</em> task (which is often invoked from other tasks
+automatically, but can be run also separately). Make sure that you
+enable Maven plug-in only <em>after</em> the <tt>pom.xml</tt> files
+have been created. <p>
+
+       This is the sequence of steps I usually follow when Eclipse is
+not happy (which happens when Soaplab2's dependencies or Soaplab2's
+version change):
+
+       <ol>
+
+	 <li class="dcount"> Disable Maven in Eclipse.
+	 
+	 <li class="dcount"> Manually remove <tt>pom.xml</tt> and
+<tt>src/main/pom.xml</tt> files.
+
+	 <div class="note">
+
+	 This should be done automatically by Ant but I have not yet
+figured why it does not do it always.
+
+	 </div>
+	 
+	 <li class="dcount"> Run <tt>ant config</tt>.
+
+	 <li class="dcount"> Enable again Maven in Eclipse. <p>
+
+       </ol>
+
+       There is also an <a
+href="http://pantheon.generationcp.org/index.php?option=com_content&task=view&id=379&Itemid=197#eclipse">article</a>
+about the above. It is, again, an article from another project, but
+similar to Soaplab2, regarding the usage of Ant and maven.
+
+       <div class="note">
+
+       Until the article is updated, it explains situation with
+the Maven plug-in version 1. With the version 2 or later (available
+now) it may be easier.
+
+       </div>
+
+</ul><p>
+
+
+
+
+
+<p>
+<iframe id="maintoc" src="TOC.html" scrolling="auto"></iframe>
+
+<div align=right><font size=-2>
+<!-- hhmts start -->
+Last modified: Tue Aug 10 14:28:54 2010
+<!-- hhmts end -->
+</font></div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1011961-1";
+urchinTracker();
+</script>
+</body> </html>

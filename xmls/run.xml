@@ -1,0 +1,37 @@
+<!-- This is an XML entity included in main build.xml file  -->
+<!-- $Id: run.xml,v 1.1 2010/08/09 18:56:53 marsenger Exp $ -->
+<!-- ====================================================== -->
+
+<!-- ====================================================== -->
+<!--                                                        -->
+<!-- Prepare to call various Java programs                  -->
+<!--                                                        -->
+<!-- ====================================================== -->
+
+<target name="run-init" depends="compile">
+
+  <!-- contributed tasks -->
+  <taskdef resource="net/sf/antcontrib/antlib.xml">
+    <classpath refid="dependency.classpath"/>
+  </taskdef>
+  
+  <condition property="real.log4j.configuration"
+    value="${log4j.configuration}"
+    else="file:${log4j.configuration}">
+    <contains string="${log4j.configuration}" substring="file:"/>
+  </condition>
+
+  <path id="build.lib.classpath">
+    <fileset dir="${build.lib}">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+
+  <tempfile property="args.in.file" suffix=".args" deleteonexit="true"/>
+  <for list="${args}" delimiter=" " param="arg">
+    <sequential>
+      <echo append="true" file="${args.in.file}">@{arg}${line.separator}</echo>
+    </sequential>
+  </for>
+
+</target>

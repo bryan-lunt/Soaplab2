@@ -1,0 +1,16 @@
+appl: Embl [
+  documentation: "Get DNA sequence from the EMBL"
+  groups: "Testing"
+  nonemboss: "Y"
+  comment: "launcher get"
+  supplier: "http://srs.ebi.ac.uk/srsbin/cgi-bin/wgetz"
+  comment: "method -e+[EMBL:'$acc_number']+-ascii"
+]
+
+string: acc_number  [
+  default: V00808
+  parameter: "Y"
+]
+
+outfile: result  [
+]

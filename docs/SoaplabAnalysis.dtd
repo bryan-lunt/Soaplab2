@@ -1,0 +1,138 @@
+<!ELEMENT DsLSRAnalysis (analysis)+>
+
+<!ELEMENT analysis (description?, input*, output*, analysis_extension?)>
+
+<!ATTLIST analysis
+    type          CDATA #REQUIRED
+    name          CDATA #IMPLIED
+    version       CDATA #IMPLIED
+    supplier      CDATA #IMPLIED
+    installation  CDATA #IMPLIED>
+
+<!ELEMENT description ANY>
+<!ELEMENT extension ANY>
+
+<!ELEMENT input (default?, allowed*, extension?)>
+
+<!ATTLIST input
+    type          CDATA #REQUIRED
+    name          CDATA #REQUIRED
+    mandatory     (true|false) "false">
+
+<!ELEMENT default (#PCDATA)>
+<!ELEMENT allowed (#PCDATA)>
+
+<!ELEMENT output (extension?)>
+
+<!ATTLIST output
+    type          CDATA #REQUIRED
+    name          CDATA #REQUIRED>
+
+<!-- =========================== -->
+<!-- Soaplab specific extensions -->
+<!-- =========================== -->
+
+<!ELEMENT analysis_extension (app_info, event, parameter*, option*)>
+
+<!ELEMENT app_info EMPTY>
+<!ATTLIST app_info
+    category        CDATA #REQUIRED
+    creation_date   CDATA #IMPLIED
+    copyright       CDATA #IMPLIED
+    contact         CDATA #IMPLIED
+    help_URL        CDATA #IMPLIED
+    report_adaptor  CDATA #IMPLIED>
+
+<!ELEMENT event (action+, condition*)>
+<!ATTLIST event
+    id              CDATA #IMPLIED>
+
+<!ELEMENT action (option*)>
+<!ATTLIST action
+    type            (exe | monitor | dummy) "exe"
+    file            CDATA #IMPLIED
+    launcher        CDATA #IMPLIED
+    method          CDATA #IMPLIED>
+
+<!ELEMENT option EMPTY>
+<!ATTLIST option
+    name            CDATA #REQUIRED
+    value           CDATA #IMPLIED
+    type            (normal | private | style) "normal">
+
+<!ELEMENT condition (option*)>
+<!ATTLIST condition
+    boolexp         CDATA #IMPLIED
+    regexp          CDATA #IMPLIED
+    evaluator       CDATA #IMPLIED
+    owner           (n_a | server | client) "n_a"
+    verlevel        (n_a | none | silent | warning | abort) "abort">
+
+<!ELEMENT parameter (base, (standard | range | data | choice | choice_list)?)>
+
+<!ELEMENT base (default?, prompt?, help?, condition*, option*)>
+<!ATTLIST base
+    name            CDATA #REQUIRED
+    type            CDATA #REQUIRED
+    qualifier       CDATA #IMPLIED
+    tagsepar        CDATA #IMPLIED
+    input_adaptor   CDATA #IMPLIED
+    method          CDATA #IMPLIED
+    mandatory       (true | false) "false"
+    envar           (true | false) "false"
+    send_defaults   (true | false) "false">
+
+<!ELEMENT standard (repeatable?, list*)>
+<!ATTLIST standard
+    format          CDATA #IMPLIED>
+
+<!ELEMENT repeatable (option*)>
+<!ATTLIST repeatable
+    min             CDATA #IMPLIED
+    max             CDATA #IMPLIED>
+
+<!ELEMENT list (list_item*)>
+<!ATTLIST list
+    name            CDATA #IMPLIED
+    type            (full | slice) "full"
+    slice           CDATA #IMPLIED>
+
+<!ELEMENT list_item EMPTY>
+<!ATTLIST list_item
+    type            (regular | node | separator) "regular"
+    value           CDATA #IMPLIED
+    shown_as        CDATA #IMPLIED
+    level           CDATA "0">
+
+<!ELEMENT range (repeatable?)>
+<!ATTLIST range
+    min             CDATA #IMPLIED
+    max             CDATA #IMPLIED
+    format          CDATA #IMPLIED>
+
+<!ELEMENT data (result*, repeatable?, list*)>
+<!ATTLIST data
+    iotype          ( input | stdin | output | stdout | stderr ) #REQUIRED
+    ioformat        ( direct | url | unspecified ) "unspecified"
+    mimetype        CDATA #IMPLIED
+    extension       CDATA #IMPLIED>
+
+<!ELEMENT result (option*)>
+<!ATTLIST result
+    name            CDATA #REQUIRED
+    type            CDATA #REQUIRED
+    output_adaptor  CDATA #IMPLIED
+    special_type    (normal | info | url) "normal">
+
+<!ELEMENT choice (base+)>
+<!ATTLIST choice
+    radiotype       (zero_or_one | just_one) "just_one">
+
+<!ELEMENT choice_list (base+)>
+<!ATTLIST choice_list
+    grouptype       (zero_or_more | one_or_more) "zero_or_more"
+    separator       CDATA #IMPLIED>
+
+<!ELEMENT prompt    (#PCDATA)>
+<!ELEMENT help      (#PCDATA)>
+

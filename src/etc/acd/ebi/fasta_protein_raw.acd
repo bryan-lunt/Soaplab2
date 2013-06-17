@@ -1,0 +1,120 @@
+appl: fasta_protein_raw [
+  documentation: "FASTA with output in TXT format, for PROTEINS"
+  groups: "EBI_similarity_search"
+  nonemboss: "Y"
+  comment: "launcher org.soaplab.ebi.fasta.WSJob"
+  supplier: "http://www.ebi.ac.uk/cgi-bin/webservices/WSFasta"
+  comment: "class org.soaplab.ebi.WSJobFactory"
+]
+
+# --- hidden inputs
+string: outformat [
+   comment: "display false"
+   default: "txt"
+   comment: "defaults"
+]
+integer: searchtype  [
+   comment: "display false"
+   default: "1"
+   comment: "defaults"
+]
+
+# --- real inputs
+infile: sequence [
+   parameter: "Y"
+   information: "A protein sequence in any format, or a sequence identifier in the form
+                 <code>db:id</code><br><i>for the list of databases supported
+                 <a href=http://www.ebi.ac.uk/Tools/webservices/help/databases>see</a></i>"
+   comment: "data direct"
+]
+list: program  [
+  information: "Program to run"
+  min: 1
+  max: 1
+  default: fasta3
+  comment: "defaults"
+  values: "fasta3;fastx3;fasty3;fastf3;fasts3;tfastx3;tfasty3"
+]
+list: matrix  [
+  information: "Comparison matrix. BL stands for BLOSUM, P for PAM, M for MDM."
+  min: 1
+  max: 1
+  default: BL50
+  comment: "defaults"
+  values: "BL50;BL62;BL80;P120;P250;M10;M20;M40"
+]
+list: db  [
+  information: "Search database"
+  max: 14
+  default: uniprot
+  comment: "defaults"
+  values: "uniprot;uniref100;uniref90;uniref50;uniparc;swissprot;ipi;prints;sgt;pdb;imgthlap;epop;jpop;uspop"
+]
+list: scores [
+  information: "Maximum number of reported scores in the output"
+  default: 50
+  comment: "defaults"
+  values: "10;20;30;40;50;60;70;80;90;100"
+  min: 1
+  max: 1
+]
+list: alignments [
+  information: "Maximum number of reported alignments in the output"
+  default: 50
+  comment: "defaults"
+  values: "10;20;30;40;50;60;70;80;90;100"
+  min: 1
+  max: 1
+]
+list: gapopen [
+  information: "Penalty for the first residue in a gap"
+  default: "-12"
+  comment: "defaults"
+  values: "0;-2;-4;-6;-8;-10;-12;-14;-16;-18"
+  min: 1
+  max: 1
+]
+list: gapext [
+  information: "Penalty for additional residues in a gap"
+  default: "-2"
+  comment: "defaults"
+  values: "0;-2;-4;-6;-8"
+  min: 1
+  max: 1
+]
+list: eupper [
+  information: "Expectation Upper Value"
+  default: "10.0"
+  comment: "defaults"
+  values: "1.0;1e-600;1e-300;1e-100;1e-50;1e-10;1e-5;0.0001;0.1;1.0;2.0;5.0;10.0;20.0;50"
+  min: 1
+  max: 1
+]
+list: elower [
+  information: "Expectation Lower Value"
+  values: "1.0;1e-600;1e-300;1e-100;1e-50;1e-10;1e-5;0.0001;0.1;1.0;2.0;5.0;10.0;20.0;50"
+  min: 1
+  max: 1
+]
+list: ktup [
+  information: "Limit the word-length the search should use"
+  default: "6"
+  comment: "defaults"
+  values: "1;2;3;4;5;6"
+  min: 1
+  max: 1
+]
+boolean: histogram  [
+   default: "false"
+   information: "Histogram"
+]
+string: seqrange [
+   information: "Region within the query sequence should be searched. Format: START-END. Eg: 50-200"
+]
+string: dbrange [
+   information: "Sequence range to search within the database. Format: START-END. Eg: 1-300, if the user wishes to search all entries with no more than 300 aa). It is also possible to use ranges such as 1000-3000 which indicates sequences with at least 1000 aa and up-to, but no more than 3000 aa."
+]
+
+# --- result
+outfile: result  [
+]

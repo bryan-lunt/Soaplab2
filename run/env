@@ -1,0 +1,16 @@
+#!/usr/bin/perl -w
+#
+# It prints all environment varibales to STDOUT.
+#
+# This is a simple UNIX 'env' program - and it is here
+# because of running Soaplab2 under Windows.
+#
+# $Id: env,v 1.1 2007/10/25 09:08:28 marsenger Exp $
+# ---------------------------------------------
+
+use strict;
+use warnings;
+
+foreach my $key (sort keys %ENV) {
+    print "$key = $ENV{$key}\n"
+}

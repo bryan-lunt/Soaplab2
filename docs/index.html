@@ -1,0 +1,146 @@
+<html> <head>
+<title>Soaplab2</title>
+<meta name="Author" content="Martin Senger" />
+  <meta name="Description" content="
+    Soaplab is a set of Web Services providing a programatic access to some
+    applications on remote computers. It is an implementation of an
+    Analysis Web Service.
+  " />
+  <meta name="Keywords" content="Soaplab, Soaplab2, AppLab, WebService, Web service, SOAP,
+                                 tools, source code, free software, distributed computing,
+                                 EBI, eScience, myGrid, grid,
+                                 Java, perl, bioinformatics, EMBOSS, Taverna, workbench
+  " />
+<meta name="Robots" content="all" />
+
+<link rel="shortcut icon" href="images/favicon.ico" >
+<link rel="icon" href="images/animated_favicon1.gif" type="image/gif" >
+
+<link rel="stylesheet" href="images/stylesheet.css" type="text/css">
+
+</head>
+
+<body>
+<iframe id="maintoc" src="TOC.html" scrolling="auto"></iframe>
+<!-- <img src="images/SoaplabLogo-small.png" border=0 align="left"/> -->
+<h1>Soaplab2</h1>
+
+Soaplab2 is a refactoring and enhancement of a long-standing project
+<a href="http://soaplab.sourceforge.net/soaplab1/">Soaplab</a> (that
+is still being used and maintained). Please check the details of the
+aims and reasons of the project on its original <a
+href="http://soaplab.sourceforge.net/soaplab1/">Soaplab pages</a>
+until this Soaplab2 documentation is finished. The main reasons for
+Soaplab2 were captured in <a href="announcement-email.html">this
+email</a>. <p>
+
+
+Soaplab2 (or Soaplab) is a tool that can automatically generate and
+deploy Web Services on top of existing command-line analysis
+programs. It is especially well suited for applications with well
+described input and output parameters, such as <a
+href="http://emboss.sourceforge.net/" target="_top">EMBOSS</a> (a
+package of Open Source software for sequence analysis). Soaplab allows
+integration of many applications within a single programming
+interface. <p>
+
+Soaplab can also interoperate with other Web Services and can create
+Web Services on top of existing web resources (e.g. extracting data
+from a third-party web page and providing its data as a Web Service) -
+a sub-project called <em>Gowlab</em>. [ An old documentation available
+<a
+href="http://soaplab.sourceforge.net/soaplab1/Gowlab.html">here</a>. ]
+<p>
+
+<h3>What Soaplab solves</h3>
+
+An <b>executive summary</b> who can benefit from using Soaplab can be
+expressed in three following questions. If you answer them
+affirmatively then Soaplab can help you: <p>
+
+<ol>
+  <li> You have (or someone else has) one or more <b>command-line
+       programs</b> (analysis tools) to offer
+  <li> You wish to access them from other computers, eventually over
+       the Internet
+  <li> You wish to access them using your (or someone else)
+       client programs, not just by filling the forms and clicking on
+       web pages manually
+</ol> <p>
+
+Also, Soaplab will work for you with the modified first question:
+You wish to grab (screen-scrape) data from a web page (more about this
+in the <em>Gowlab</em> sub-project).<p>
+
+You <em>do not need to be a programmer</em> in order to benefit from
+Soaplab. Soaplab generates everything needed for creating and
+running your Web services from description files (which you <em>have
+to create</em>).<p>
+
+<h3>Acknowledgment</h3>
+
+Even thought the work on Soaplab2 is still driven by Martin Senger,
+the original Soaplab author, any progress would be impossible
+without the help of others: <p>
+
+Peter Rice's group at <a
+href="http://www.ebi.ac.uk/Rice/">European Bioinformatics
+Institute</a> is the major driving force. Especially thanks to Mahmut
+Uludag, Alan Bleasby, Jon Ison, and Tom Oinn (you know <a
+href="http://taverna.sourceforge.net/">Taverna</a>, don't you?). <p>
+
+Equally helpful is Peter Ernst from the Sandor Suhai's group at <a
+href="http://genome.dkfz-heidelberg.de/">German Cancer Research
+Center</a>. Sebastien Moretti from University of Lausanne was helpful
+with testing and maintenance of batch test sets.<p>
+
+The funding and support come from various sources, depending mostly on
+the individuals involved. The significant contribution, especially in
+2007, came from the <a href="http://www.irri.org">International Rice
+Research Institute</a> (including the <a
+href="http://www.generationcp.org/">Generation Challenge
+Programme</a>), and from the <a
+href="http://www.bioinfogrid.eu/">BioinfoGRID project</a>.
+Project was also supported by the European Comission through the 
+<a href="http://www.embracegrid.info/">EMBRACE Network of Excellence</a>
+by its funding for the <a href="http://www.ebi.ac.uk/soaplab/">EBI
+Soaplab Web Services</a>.<p>
+
+The tooltips library used in the <a href="SpinetClient.html">Spinet
+client</a> is credited to <a href="http://www.twinhelix.com">TwinHelix
+Designs</a>. Most of the icons in the <em>Spinet</em> client were
+shamelessly stolen from the open-source project <a
+href="http://www.eclipse.org/">Eclipse</a>. <p>
+
+The documents icons were created at <a
+href="http://www.glassgiant.com/">GlassGiant.com</a>. <p>
+
+<h3>References for Soaplab and Soaplab2</h3>
+
+<div style="font-size:small;">
+Martin Senger, Peter Rice, Tom Oinn,<br>
+<a href="http://www.nesc.ac.uk/events/ahm2003/AHMCD/pdf/115.pdf" target="_top">"Soaplab - a unified Sesame door to analysis tools"</a>,<br>
+Proceedings, UK e-Science, All Hands Meeting 2003, Editors - Simon J Cox,<br>
+p.509-513, ISBN - 1-904425-11-9,<br>
+September 2003
+
+<p/>
+
+Senger M., Rice P., Bleasby A., Oinn T., Uludag M.,<br>
+<a href="http://www.open-bio.org/w/images/3/3c/Rice_Soaplab2_abstract.pdf" target="_top">"Soaplab2: more reliable Sesame door to bioinformatics programs"</a>,<br>
+The 9th annual Bioinformatics Open Source Conference, 2008
+
+</div>
+
+<div align=right><font size=-2>
+<!-- hhmts start -->
+Last modified: Tue Aug 10 14:31:55 2010
+<!-- hhmts end -->
+</font></div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1011961-1";
+urchinTracker();
+</script>
+</body> </html>

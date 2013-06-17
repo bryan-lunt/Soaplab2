@@ -1,0 +1,18 @@
+appl: HelloWorld [
+  documentation: "Classic greeting from the beginning of the UNIX epoch"
+  groups: "Plugins"
+  nonemboss: "Y"
+  comment: "class org.soaplab.samples.HelloWorldJobFactory"
+]
+
+string: greeting  [
+  additional: "Y"
+  parameter: "Y"
+  default: "Hello World"
+  comment: "defaults"
+]
+
+outfile: output  [
+  additional: "Y"
+  default: "stdout"
+]

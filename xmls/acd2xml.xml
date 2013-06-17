@@ -1,0 +1,119 @@
+<!-- This is an XML entity included in main build.xml file  -->
+<!-- $Id: acd2xml.xml,v 1.4 2010/08/05 12:11:31 mahmutuludag Exp $ -->
+<!-- ====================================================== -->
+
+<!-- ====================================================== -->
+<!--                                                        -->
+<!-- Targets dealing with ACD to XML conversion             -->
+<!--                                                        -->
+<!-- ====================================================== -->
+
+<!-- ====================================================== -->
+<!-- Generating metadata: from ACD files to XML             -->
+<!-- ====================================================== -->
+<target name="gen" depends="gensowa,gengowlab,genebi"
+  description="Generate service metadata from all ACD files"/>
+
+<!-- cleaning -->
+<target name="cleanxml" depends="init"
+  description="Remove all generated service metadata">
+  <delete includeemptydirs="true">
+    <fileset dir="${metadata.generated}" includes="**/*" excludes=".cvsignore*"/>
+  </delete>
+</target>
+
+<!-- genaral generating task: default values are for Sowa -->
+<target name="_gen" depends="init">
+
+  <property name="generator.dir"     location="${metadata.dir}/old.generator"/>
+  <property name="acd.dir"           location="${basedir}/src/etc/acd/sowa"/>
+  <property name="sl"                location="${metadata.generated}/OtherApplications.xml"/>
+  <property name="gen.output.base"   location="${basedir}"/>
+  <property name="gen.job.class"     value="org.soaplab.sowa.SowaJobFactory"/>
+  <property name="installation.name" value="Soaplab2 default installation"/>
+  <property name="gen.disabled.apps" value=""/>
+  <property name="gen.help.base.url" value=""/>
+  <property name="gen.supplier"      value=""/>
+  <property name="gen.version"       value=""/>
+  
+  <ls dir="${acd.dir}" property="sa" includes="*.acd" onlybasename="true"/>
+  
+  <copy file="${src.config}/generator.config.template"
+    tofile="${generator.dir}/al.Cfg.pl"
+    overwrite="yes">
+    <filterset>
+      <filter token="PROJECT_DIR"           value="${gen.output.base}"/>
+      <filter token="SUB_PROJECT"           value="sowa"/>
+      <filter token="PACKAGE_INSTALLATION"  value="${installation.name}"/>
+      <filter token="JOB_CLASS"             value="${gen.job.class}"/>
+      <filter token="DISABLED_APPS"         value="${gen.disabled.apps}"/>
+      <filter token="HELP_BASE_URL"         value="${gen.help.base.url}"/>
+      <filter token="PACKAGE_SUPPLIER"      value="${gen.supplier}"/>
+      <filter token="PACKAGE_VERSION"       value="${gen.version}"/>
+    </filterset>
+  </copy>
+  
+  <echo>${generator.dir}/acd2xml -d -l ${sl} -p . -r ${acd.dir} ${sa}</echo>
+
+  <exec executable="perl" taskname="acd2xml" failonerror="true">
+    <arg file="${generator.dir}/acd2xml"/>
+    <arg value="-d"/>
+    <arg value="-l"/>
+    <arg value="${sl}"/>
+    <arg value="-r"/>
+    <arg value="${acd.dir}"/>
+    <arg value="-p"/>
+    <arg value="."/>
+    <arg line="${sa}"/>
+  </exec>
+
+</target>
+
+<!-- ================================================================== -->
+<!-- Dealing with sample Sowa services                                  -->
+<!-- ================================================================== -->
+<target name="gensowa" depends="init"
+  description="Generate XML metadata for Sowa services.">
+
+  <property name="sowa.sl"      location="${metadata.generated}/OtherApplications.xml"/>
+  <property name="sowa.acd.dir" location="${basedir}/src/etc/acd/sowa"/>
+  
+  <antcall target="_gen">
+    <param name="acd.dir"       value="${sowa.acd.dir}"/>
+    <param name="sl"            value="${sowa.sl}"/>
+  </antcall>
+
+</target>
+
+<!-- ================================================================== -->
+<!-- Dealing with sample Gowlab services                                -->
+<!-- ================================================================== -->
+<target name="gengowlab" depends="init"
+  description="Generate XML metadata for Gowlab services.">
+  
+  <property name="gowlab.sl"      location="${metadata.generated}/GowlabApplications.xml"/>
+  <property name="gowlab.acd.dir" location="${basedir}/src/etc/acd/gowlab"/>
+  
+  <antcall target="_gen">
+    <param name="acd.dir"       value="${gowlab.acd.dir}"/>
+    <param name="sl"            value="${gowlab.sl}"/>
+    <param name="gen.job.class" value="org.soaplab.gowlab.GowlabJobFactory"/>
+  </antcall>
+  
+</target>
+
+<!-- ================================================================== -->
+<!-- Dealing with sample services (the EBI's ones)                      -->
+<!-- ================================================================== -->
+<target name="genebi" depends="init"
+  description="Generate XML metadata for EBI's sample services.">
+  
+  <property name="ebi.sl"      location="${metadata.generated}/EBIApplications.xml"/>
+  <property name="ebi.acd.dir" location="${basedir}/src/etc/acd/ebi"/>
+  
+  <antcall target="_gen">
+    <param name="acd.dir"       value="${ebi.acd.dir}"/>
+    <param name="sl"            value="${ebi.sl}"/>
+  </antcall>
+  
+</target>

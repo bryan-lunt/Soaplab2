@@ -1,0 +1,207 @@
+<html> <head>
+<title>Soaplab2: Download</title>
+
+<link rel="shortcut icon" href="images/favicon.ico" >
+<link rel="icon" href="images/animated_favicon1.gif" type="image/gif" >
+<link rel="stylesheet" href="images/stylesheet.css" type="text/css">
+
+</head>
+
+<body>
+<h1>Where to get Soaplab2 from</h1>
+<p>
+
+<img class="motto-img" src="images/motto-download.jpg" border=0 align="left"/>
+
+Soaplab2 is distributed in several ways. Pick up the one that suits
+your needs, skills and courage. As always with Soaplab, different
+types of users (service providers, developers, Taverna users) may have
+different requirements and expectations. <p>
+
+<br clear="all"/>
+
+<div class="doctoc">
+<dl>
+  <dt> <a href="#cvs">Soaplab2 from the CVS</a>
+  <dt> <a href="#export">Soaplab2 from a released distribution</a>
+<!--  <dt> <a href="#war">Pre-packed sets of Soaplab2 services</a> -->
+  <dt> <a href="#maven">Soaplab2 from a Maven repository</a>
+</dl> <p>
+</div>
+<p>
+
+If you want to have everything (including sources), and always the
+latest version (with more bugs fixed, and perhaps new bugs
+introduced), take Soaplab2 form the CVS:
+
+<a name="cvs"></a>
+<h3>Soaplab2 from the CVS</h3>
+
+<div class="reqs">
+<u><a href="Requirements.html">Requirements:</a></u>
+CVS client,
+Java (JDK),
+Apache Ant,
+Apache Tomcat,
+<em>Perl</em>
+</div><p>
+
+
+Soaplab2 is available at <a
+href="http://sourceforge.net/projects/soaplab/">SourceForge</a> in the
+<a href="http://soaplab.cvs.sourceforge.net/soaplab/soaplab2/">CVS
+module <b>soaplab2</b></a>. <p>
+
+Use a CVS client to check it out anonymously from SourceForge. For
+example, to use the command-line CVS client, type:
+
+<pre class="script">
+cvs -d:pserver:anonymous@soaplab.cvs.sourceforge.net:/cvsroot/soaplab login
+cvs -z3 -d:pserver:anonymous@soaplab.cvs.sourceforge.net:/cvsroot/soaplab co -P soaplab2
+</pre>
+
+When prompted for a password, simply press the Enter key.<p>
+
+Anytime later, you can update it by typing:
+
+<pre class="script">
+cd soaplab2
+cvs update -dP
+</pre>
+
+Once you have, or once you update it, go and <a
+href="BuildGuide.html">build</a> it. <p>
+
+
+
+
+<a name="export"></a>
+<h3>Soaplab2 from a released distribution</h3>
+
+<div class="reqs">
+<u><a href="Requirements.html">Requirements:</a></u>
+Java (JDK),
+Apache Ant,
+Apache Tomcat,
+<em>Perl</em>
+</div><p>
+
+Time to time, Soaplab2 releases stable versions on the <a
+href="http://sourceforge.net/project/showfiles.php?group_id=104834">SourceForge
+download page</a>. They are similar to the CVS distribution with the
+following differences:
+
+<ul>
+
+  <li class="tiny">
+
+  A release is a snapshot in one time point. It was not updated since
+it was released. Which brings more stability but also you may miss
+some new fixes and features. <p>
+
+  
+  <li class="tiny">
+
+  You cannot update this release automatically, you need to download a
+new release and re-install it (which is, however, not a big deal). <p>
+
+
+  <li class="tiny">
+
+  You do not need a CVS client installed on your machine. <p>
+
+  
+</ul><p>
+
+
+<!--
+<a name="war"></a
+<h3>Pre-packed sets of Soaplab2 services</h3>
+
+<div class="reqs">
+<u><a href="Requirements.html">Requirements:</a></u>
+Java (JDK),
+Apache Tomcat,
+</div><p>
+
+This is the fastest way how to start providing Soaplab2 services from
+your server(s). The <a
+href="http://sourceforge.net/project/showfiles.php?group_id=104834">SourceForge
+download page</a> has several pre-packed <em>war files</em> that contain
+everything to run a set of Soaplab2 Web Services (well, almost
+everything, see below). <p>
+
+You just have to put a selected <em>war file</em> into your Tomcat
+installation (in the <tt>&lt;tomcat-home&gt;/webapps</tt>
+directory). Tomcat even does not need to be restarted; after a moment
+it spots the new war file, unpacks it, and starts using it. <p>
+
+You can also use your Tomcat manager to upload a <em>war file</em>
+directly from SourceForge to your Tomcat (here is a brief note <a
+href="Deployment.html#tomcat-manager">how to enable Tomcat
+manager</a>). <p>
+
+Often, the pre-packed service sets need to know about your
+environment. For example, the service pack with EMBOSS services needs
+to know where is your EMBOSS installed. You have to manually edit the
+file
+<tt>&lt;tomcat-home&gt;/webapps/soaplab2/WEB-INF/classes/soaplab.properties</tt>. Or,
+you can download the war file, unpacked it (using the Java's tool
+<em>jar</em>, edit the <tt>soaplab.properties</tt>, pack it again, and
+upload it to your Tomcat. In any case, check the notes accompanying
+the <em>war files</em> releases, which properties are expected to be
+set (usually very little, often just one property). A general
+description how to set Soaplab's properties and what they mean is in
+the <a href="ConfigurationGuide.html">configuration guide</a>. <p>
+
+-->
+
+<a name="maven"></a>
+<h3>Soaplab2 from a Maven repository</h3>
+
+<div class="reqs">
+<u><a href="Requirements.html">Requirements:</a></u>
+Java (JDK or JRE)
+</div><p>
+
+Maven repositories are for developers of Soaplab2 add-ons, or for
+those running Soaplab2 as a part of a bigger project. Typical example
+of the latter is <a href="http://taverna.sf.net">Taverna</a>. <p>
+
+The advantage of the Maven repository is that it knows about all
+third-party dependencies that are needed by Soaplab2. <p>
+
+The Soaplab2 is in the <a href="http://biomoby.org/m2repo/">Open-Bio
+Maven repository</a>:
+
+<pre class="script">
+  &lt;repository&gt;
+      &lt;id&gt;bio.maven.repository&lt;/id&gt;
+      &lt;url&gt;http://biomoby.org/m2repo/&lt;/url&gt;
+  &lt;/repository&gt;
+</pre>
+
+and you put Soaplab2 in your dependency file using (use the version
+number you wish):
+
+<pre class="script">
+  &lt;groupId&gt;org.soaplab&lt;/groupId&gt;
+  &lt;artifactId&gt;soaplab&lt;/artifactId&gt;
+  &lt;version&gt;2.0.0-beta1&lt;/version&gt;
+</pre>
+
+
+<iframe id="maintoc" src="TOC.html" scrolling="auto"></iframe>
+
+<div align=right><font size=-2>
+<!-- hhmts start -->
+Last modified: Mon Feb  4 18:11:18 2008
+<!-- hhmts end -->
+</font></div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1011961-1";
+urchinTracker();
+</script>
+</body> </html>

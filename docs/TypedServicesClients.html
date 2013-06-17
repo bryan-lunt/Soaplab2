@@ -1,0 +1,201 @@
+<html>
+<head>
+<title>Soaplab2: Using typed services</title>
+
+<link rel="shortcut icon" href="images/favicon.ico">
+<link rel="icon" href="images/animated_favicon1.gif" type="image/gif">
+<link rel="stylesheet" href="images/stylesheet.css" type="text/css">
+
+</head>
+
+<body>
+<h1>Using strongly typed services</h1>
+
+<img class="motto-img" src="images/motto-typed-interface.jpg" border=0
+	align="left" />
+
+<h3>Introduction</h3>
+
+<p>One of the unique features of Soaplab is its generic interface that
+makes it possible to use one single interface when accessing any
+Soaplab Web Services regardless of the command line interface of
+underlying programs. However it is not possible to specify
+input/output data types as part of Soaplab generic WSDL; instead the
+interface accommodates methods to query this information. This
+difference from common WSDL interfaces, for example, doesn't allow
+standard Web Services clients to check/validate input data before
+sending a request or output data after a response has been
+received. There was a growing concern in Bioinformatics Web Services
+community that Soaplab should include input/output type descriptions
+at WSDL level. To address this concern, starting with version 2.2,
+Soaplab includes an interface called <em>typed interface</em>
+(sometimes <em>typed services</em> that includes input output type
+definitions at WSDL level. This document describes how to use such
+services.</p>
+
+<a name="wsdl"></a>
+<h3>WSDL</h3>
+
+<p>Currently, Soaplab does not provide any Java client library for
+accessing the typed services; no equivalent of the class
+<tt>org.soaplab.clients.SoaplabBaseClient</tt> that is used for
+Soaplab regular services. Therefore, the typed services are used via
+their WSDLs. After all, this was the main reason for having
+typed services.</p>
+
+<p>Each typed service has two WSDLs: one with and one without semantic
+annotations. The semantic annotation is an W3C extension of the WSDL -
+and it may (even should) be accepted by all tool kits and tools
+consuming WSDLs. But in reality, there may be tools that are confused
+by this extension. Therefore, you have a choice what WSDL to use. Here
+is an example of a semantic annotation incorporated in a WSDL (the
+example uses <a href="http://edamontology.sourceforge.net/"
+target="_blank">EDAM ontology</a> for annotations):
+
+<pre class="code">
+...
+&lt;portType name="diffseq"&gt;
+  &lt;operation name="run"&gt;
+    &lt;documentation&gt;starts a job and returns its job identifier&lt;/documentation&gt;
+    <b>&lt;sawsdl:attrExtensions sawsdl:modelReference="http://purl.org/edam/operation/EDAM:0000256"/&gt;</b>
+    &lt;input message="tns:run"/&gt;
+    &lt;output message="tns:runResponse"/&gt;
+  &lt;/operation&gt;
+...
+</pre>
+</p>
+
+<p>The URLs of the services' WSDLs are the same as service endpoints
+with the suffix <tt>?wsdl</tt>, or, for semantically annotated WSDLs,
+with the suffix <tt>.sa?wsdl</tt>. For example (using the default
+host, port and context names):
+
+<pre class="script">
+http://localhost:8080/soaplab2/typed/services/alignment_differences.diffseq<b>?wsdl</b>
+http://localhost:8080/soaplab2/typed/services/alignment_differences.diffseq<b>.sa?wsdl</b>
+</pre>
+</p>
+
+<p>The <a href="SpinetClient.html">Spinet web interface</a> also
+provides links to these WSDLs (right of the service names) - here is
+an example:
+
+<img class="motto-img" src="images/welcome-page-with-wsdl-links.png" border=0 align="left"/>
+
+<br clear="all"/>
+
+</p>
+
+<h3>How to use strongly typed services</h3>
+
+Pickup your favorite toolkit, tool or programming language library and
+feed it with a service WSDL. Here is an example of a Perl script that
+calls an EMBOSS service <tt>edit.seqret</tt>, using Perl's modules
+<tt>XML::Compile::SOAP11</tt> and <tt>XML::Compile::WSDL11</tt>:
+
+<pre class="smallercode">
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+use XML::Compile::SOAP11;
+use XML::Compile::WSDL11;
+use XML::Compile::Transport::SOAPHTTP;
+
+# read WSDL, compile in into a client who will call the service
+my $service_endpoint =
+    'http://localhost:8080/soaplab2/typed/services/edit.seqret';
+my $wsdl  = XML::LibXML-&gt;new-&gt;parse_file ($service_endpoint . '?wsdl');
+my $proxy = XML::Compile::WSDL11-&gt;new ($wsdl);
+foreach my $schema ( 1, 2, 3 ) {
+    my $xsdXml =
+	XML::LibXML-&gt;new-&gt;parse_file( $service_endpoint . '?xsd=' . $schema );
+    if ($XML::Compile::SOAP::VERSION &lt; 2.0) {
+	$proxy-&gt;schemas-&gt;importDefinitions ($xsdXml);
+    } else {
+	$proxy-&gt;importDefinitions ($xsdXml);
+    }
+}
+my $call = $proxy-&gt;compileClient ('runAndWaitFor');
+
+# prepare inputs
+my $inputs = {
+    sequence =&gt; { usa =&gt; 'asis:actttggg' }
+};
+
+# call the service
+my ($answer, $trace) = $call-&gt;($inputs);
+
+# check the response
+die 'ERROR: ' . $answer-&gt;{Fault}-&gt;{'faultstring'} . "\n"
+    if defined $answer and defined $answer-&gt;{Fault};
+die "Sorry, no response from the service\n\n"
+    unless defined $answer;
+
+# print the results
+for my $result (keys %{ $answer-&gt;{parameters} }) {
+    print "$result:\n" . '=' x length ($result) . "=\n";
+    print $answer-&gt;{parameters}-&gt;{$result};
+    print "\n";
+}
+</pre>
+
+<p>When executed, it prints the same results as a regular Soaplab service:
+
+<pre class="script">
+detailed_status:
+================
+0
+report:
+=======
+Summary:
+        Completed: Successfully
+        Termination status: 0
+        Started:   2010-Aug-16 12:48:34 (BST)
+        Ended:     2010-Aug-16 12:48:34 (BST)
+        Duration:  0:00:00.042
+Report:
+Name: edit.seqret
+Job ID: [edit.seqret]_87d82c4.12a7a5ae329._7ffc
+Program and parameters:
+/usr/local/bin/seqret
+-sequence
+asis:actttggg
+-outseq
+o_outseq
+-auto
+--- end of parameters
+Exit: 0
+
+outseq:
+=======
+>asis
+actttggg
+
+outseq_url:
+===========
+http://localhost:8080/soaplab2/results/[edit.seqret]_87d82c4.12a7a5ae329._7ffc_outseq
+</pre>
+</p>
+
+<!-- Mahmut, please uncomment the below when you re-deployed at EBI
+with the new namespaces:
+
+<p>You can try the same script and to invoke the same service at
+EBI. Just change the service endpoint to
+<tt>http://www.ebi.ac.uk/soaplab/typed/services/edit.seqret</tt>. </p>
+
+-->
+
+<p><iframe id="maintoc" src="TOC.html" scrolling="auto"></iframe>
+<div align=right><font size=-2> <!-- hhmts start --> Last
+modified: Mon Feb 4 17:24:39 2008 <!-- hhmts end --> </font></div>
+<script src="http://www.google-analytics.com/urchin.js"
+	type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1011961-1";
+urchinTracker();
+</script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+These are some facts that may need some discussion or thinking:
+---------------------------------------------------------------
+
+* A parameter represented as STDIN does not have the same flexibility
+as outher inputs. It is always supposed to be "direct data". It would
+be nice, even for this type of input, to be able to give data by
+reference. But that would need a change in the ACD->XML parser (I
+believe).
+
+* There may be few not-fully finished issues with the synchronizations
+of job states and job reports when accessing the same job from several
+different JVMs. At the moment, it does this:
+
+- The job state is synchonized, which means that any JVM that changes
+a job state is going through check in the FileStorage (a persisen
+storage is the only place where the synchronization of two JVMs can
+happen) not allowing to overrite lower job state by a higher one.
+
+- Also a check is done for the last event that the persisten storage
+keeps really the latest one (checking it by comparing timestamps of
+two events before overwritting one).
+
+- The 'report' result is not synchronized (otherwise we could loose a
+richer report and replace it with later oane but with fewer facts). If
+we would like to change this, we would need to store individual report
+properties and re-create a report by merging them etc. Too wokr for
+little rsult (I concluded).
+
+- There may be places for some optimalization (when we find this is a
+bottleneck): i) The JobState can synchronized only after a (short)
+period a time - it would save going again and again to the persisten
+storage; ii) Perhaps also the Reporter can optimized by sending a new
+report to the persistent storage only after a (short) delay - so more
+report properties coming in a sequence will be written only once.
+
+* The Config reads properties and has many options how a property can
+be recognized, using various prefixes that narrow properties to
+specific services or classes. But so far, in real life, the class
+prefixes are not that often. So if, in the future, we find that this
+slows down the Config too much, we may introduce a new property
+"do.not.use.class.prefix" - when it is set to true, the class prefix
+will not be tried.
+

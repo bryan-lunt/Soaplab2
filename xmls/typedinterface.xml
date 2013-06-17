@@ -1,0 +1,216 @@
+<!-- This is an XML entity included in main build.xml file  -->
+<!-- $Id: typedinterface.xml,v 1.9 2010/08/16 13:10:52 mahmutuludag Exp $ -->
+<!-- ====================================================== -->
+
+
+<!--
+     Generates WSDL,XSD files for the typed interface.
+     Uses XJCTask to generate JAXB binding classes.
+
+     Most of the tasks here are executed only if the property
+     "includetypedinterface.true" is true.
+     -->
+
+<target name="typed-init" depends="init,run-init">
+
+  <property name="wsdlout.dir" value="${basedir}/generated/wsdl"/>
+  <property name="javaout.dir" value="${basedir}/generated/java"/>
+  <property name="episode.xjc" value="${basedir}/generated/episode_common_sequence_type.xml"/>
+
+  <mkdir dir="${wsdlout.dir}"/>
+  <mkdir dir="${javaout.dir}"/>
+
+  <property name="url.pattern.for.typed.interface" value="/typed/services/*"/>
+
+  <!-- filters for web configuration files -->
+  <filterset id="typed.web.config.filter">
+    <filter token="DISPLAY_NAME"           value="${web.display.name}"/>
+    <filter token="DISPLAY_DESC"           value="${web.display.desc}"/>
+    <filter token="URL_FOR_LIST"           value="${url.pattern.for.list}"/>
+    <filter token="URL_FOR_OTHERS"         value="${url.pattern.for.others}"/>
+    <filter token="URL_FOR_TYPED_SERVICES" value="${url.pattern.for.typed.interface}"/>
+  </filterset>
+
+</target>
+    
+<!-- ========================================================================= -->
+<!-- Top level target for generation of web applications with typed interface. -->
+<!-- Typed interface uses jax-ws stack irrespective of the stack used for      -->
+<!-- generic interface.                                                        -->
+<!-- ========================================================================= -->
+<target name="jaxtyped" if="includetypedinterface.true"
+  depends="typed-wsdls, xjc, compile-typed"
+  description="Generate typed services (only if includetypedinterface.true is true)">    
+</target>
+
+
+<!-- ================================================================== -->
+<!-- Generate the XSD and WSDL files for types services                 -->
+<!-- ================================================================== -->
+<target name="typed-wsdls" depends="compile,typed-init"
+  if="includetypedinterface.true">
+
+  <!-- command-line parameters -->
+  <property name="sawsdl.template"     value="${src.wsdl}/SAWSDLTemplate.wsdl"/>
+  <property name="wsdl.template"       value="${src.wsdl}/WSDLTemplate.wsdl"/>
+  <property name="wsdl.endpoint"       value="${src.config}/jaxws/typed-interface-endpoint.template"/>
+  <property name="iotypes.template"    value="${src.wsdl}/InputOutputTypesTemplate"/>
+  <property name="endpoints.template"  value="${src.config}/${current.protocol}/typed.interface.endpoints.template"/>
+
+  <java classname="org.soaplab.typedws.generate.GetWSDLFiles" fork="yes">
+    <arg value="-wsdlout-dir" />         <arg file="${wsdlout.dir}" />
+    <arg value="-sawsdl-template" />     <arg file="${sawsdl.template}" />
+    <arg value="-wsdl-template" />       <arg file="${wsdl.template}" />
+    <arg value="-wsdl-endpoint" />       <arg file="${wsdl.endpoint}" />
+    <arg value="-iotypes-template" />    <arg file="${iotypes.template}" />
+    <arg value="-endpoints-template" />  <arg file="${endpoints.template}" />
+    <arg value="-argsfile"/>             <arg file="${args.in.file}"/>
+
+    <classpath>
+      <path refid="dependency.classpath" />
+      <path refid="build.classpath" />
+    </classpath>
+  </java>
+
+  <copy file="${src.wsdl}/requests_responses.xsd"
+    todir="${wsdlout.dir}"/>
+  <copy file="${src.wsdl}/sequence_input.xsd"
+    todir="${wsdlout.dir}"/>
+
+</target>
+
+
+<!-- ================================================================== -->
+<!-- From XML schema of typed interface to Java classes                 -->
+<!-- ================================================================== -->
+
+<target name="xjctaskdef" depends="init">
+  <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
+    <classpath>
+      <path refid="dependency.classpath" />
+    </classpath>
+  </taskdef>
+</target>
+
+<!-- transforms XML schema files of typed interface to a set of JAXB content classes -->
+<target name="xjc" depends="typed-init,xjc-common-types, xjc-common-sequence-type"
+  if="includetypedinterface.true">
+
+  <xjc
+    destdir="${javaout.dir}"
+    extension="true"
+    binding="xmls/jaxbbindings.xml"
+    >
+    <schema dir="${wsdlout.dir}" includes="*.xsd"
+      excludes="requests_responses.xsd, sequence_input.xsd"/>    
+    <depends dir="${wsdlout.dir}" includes="*.xsd"
+      excludes="requests_responses.xsd, sequence_input.xsd"/>
+    <produces dir="${javaout.dir}"
+      excludes="org/emboss/common/*.java, org/soaplab/typedws/*.java"/>
+    <arg value="-b"/>
+    <arg file="${episode.xjc}"/>     
+   </xjc>
+</target>
+
+<!-- transforms XML schema files of common request/response types to a set of JAXB content classes"--> 
+<target name="xjc-common-types" depends="typed-init,xjctaskdef"
+  if="includetypedinterface.true" >
+
+  <xjc schema="${src.wsdl}/requests_responses.xsd"
+    destdir="${javaout.dir}"
+    extension="true"
+    binding="xmls/jaxbbindings.xml"
+    >
+    <depends dir="${wsdlout.dir}"
+      includes="requests_responses.xsd"/>
+    <produces dir="${javaout.dir}/org/soaplab/typedws"
+      excludes="ServiceProvider.java,TypedWS.java" />
+    <arg value="-npa"/>
+  </xjc>
+
+</target>
+
+
+<!-- transforms XML schema file of common sequence type (EMBOSS specific) to a set of JAXB content classes -->
+<target name="xjc-common-sequence-type" depends="typed-init,xjctaskdef"
+  if="includetypedinterface.true" >
+
+  <xjc schema="${wsdlout.dir}/sequence_input.xsd"
+    destdir="${javaout.dir}"
+    extension="true"
+    binding="xmls/jaxbbindings.xml"
+    >
+    <depends dir="${wsdlout.dir}"
+      includes="sequence_input.xsd"/>
+    <produces dir="${javaout.dir}"
+      includes="org/emboss/common/*.java, ${episode.xjc}" />
+    <arg value="-episode"/>
+    <arg file="${episode.xjc}"/>
+  </xjc>
+</target>
+
+<!-- ================================================================== -->
+<!-- Compile generated JAXB binding classes                             -->
+<!-- ================================================================== -->
+<target name="compile-typed" depends="config,typed-init"
+  if="includetypedinterface.true">
+
+    <condition property="xlint.param" value="-Xlint:unchecked" else="-Xlint:none">
+      <istrue value="${compile.warnings}"/>
+    </condition>
+
+    <javac fork="yes"
+      srcdir="${javaout.dir}"
+      destdir="${build.classes}"
+      verbose="${compile.verbose}"
+      debug="${compile.debug}"
+      debuglevel="lines,vars,source"
+      deprecation="${compile.deprecation}"
+      optimize="${compile.optimize}"
+      excludes="${project.excludes}">
+      <classpath refid="build.classpath"/>
+      <classpath refid="dependency.classpath"/>
+      <compilerarg value="${xlint.param}"/>
+    </javac>
+    
+</target>
+
+<!-- ================================================================== -->
+<!-- Clean generated files, use this when set of services has changed   -->
+<!-- ================================================================== -->
+<target name="cleantyped" depends="typed-init"
+  description="Remove files generated for types services">
+  <delete includeemptydirs="true" quiet="true">
+    <fileset dir="${wsdlout.dir}" includes="**/*"/>
+    <fileset dir="${javaout.dir}" includes="**/*"/>
+    <fileset file="${episode.xjc}"/>
+  </delete>
+</target>
+
+<!-- ================================================================== -->
+<!-- Copy generated resources to the protocol-specific distribution     -->
+<!-- ================================================================== -->
+<target name="copy-typed-resources" depends="typed-init"
+  if="includetypedinterface.true">
+
+  <copy
+    failonerror="false"
+    todir="${build.web}/WEB-INF/wsdl">
+    <fileset dir="${wsdlout.dir}" includes="*.xsd, *.wsdl"/>
+  </copy>
+
+  <copy
+    overwrite="true"
+    file="${src.config}/${current.protocol}/web.xml.withtypedinterface.template"
+    tofile="${build.web}/WEB-INF/web.xml">
+    <filterset refid="typed.web.config.filter"/>
+  </copy>
+
+  <copy
+    overwrite="true"
+    file="${wsdlout.dir}/sun-jaxws.xml.template"
+    tofile="${build.web}/WEB-INF/sun-jaxws.xml">
+    <filterset refid="typed.web.config.filter"/>
+  </copy>
+
+</target>

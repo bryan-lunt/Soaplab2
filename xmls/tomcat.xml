@@ -1,0 +1,124 @@
+<!-- This is an XML entity included in main build.xml file  -->
+<!-- $Id: tomcat.xml,v 1.6 2011/04/06 14:29:46 mahmutuludag Exp $ -->
+<!-- ====================================================== -->
+
+<!-- ====================================================== -->
+<!--                                                        -->
+<!-- Targets dealing with a Tomcat server                   -->
+<!--                                                        -->
+<!-- ====================================================== -->
+
+<!-- Tomcat access -->
+<property name="tomcat.port" value="8080"/>
+<property name="tomcat.host" value="localhost"/>
+
+<!-- ================================================================== -->
+<!-- Tomcat init sets property 'real.catalina.base' to its location     -->
+<!-- ================================================================== -->
+<target name="tomcat-init">
+
+  <!-- Tomcat location -->
+  <condition property="real.catalina.base" value="${env.CATALINA_HOME}">
+    <isset property="env.CATALINA_HOME"/>
+  </condition>
+  <condition property="real.catalina.base" value="${env.CATALINA_BASE}">
+    <isset property="env.CATALINA_BASE"/>
+  </condition>
+  <condition property="real.catalina.base" value="${catalina.home}">
+    <isset property="catalina.home"/>
+  </condition>
+  <condition property="real.catalina.base" value="${catalina.base}">
+    <isset property="catalina.base"/>
+  </condition>
+  <condition property="real.catalina.base" value="${tomcat.home}">
+    <isset property="tomcat.home"/>
+  </condition>
+
+  <!-- check that we know about Tomcat -->
+  <fail unless="real.catalina.base">
+'
+
+    ERROR: Tomcat server not found.
+    -------------------------------
+    Please set environment variable CATALINA_BASE to point to it,
+    or create a file 'build.properties' and put there the line:
+    catalina.base = &lt;location of your Tomcat&gt;
+    (do not include '&lt;' and '&gt;' there),
+    or start your Ant with this property on the command-line:
+    ant -Dcatalina.base=&lt;location of your Tomcat&gt; 
+  </fail>
+</target>
+
+<target name="tomcat-running" depends="tomcat-init">
+  <condition property="tomcat.is.running">
+    <socket server="${tomcat.host}" port="${tomcat.port}"/>
+  </condition>
+  <fail unless="tomcat.is.running">
+'
+
+    ERROR: Tomcat does not seem to be running.
+    ------------------------------------------
+    I have just checked ${tomcat.host}:${tomcat.port}...
+    You may perhaps consider to start it.
+    Or to set differently the following properties:
+    "tomcat.host" (current value: ${tomcat.host}), and
+    "tomcat.port" (current value: ${tomcat.port})
+  </fail>
+</target>
+
+<!-- ================================================================== -->
+<!-- Suggest what to do after deployment                                -->
+<!-- ================================================================== -->
+<target name="_deployinfo">
+  <echo taskname="-- Attention --">
+Soaplab Web Services were deployed.
+You may need to restart your Tomcat server.
+Or, use the Tomcat Manager to reload ${param.context.name}
+  </echo>
+</target>
+
+<!-- ================================================================== -->
+<!-- Remove the existing Soaplab web application from Tomcat            -->
+<!-- ================================================================== -->
+<target name="_cleandeploy" depends="tomcat-init">
+  <delete dir="${real.catalina.base}/webapps/${param.context.name}"/>
+</target>
+
+
+<!-- ================================================================== -->
+<!-- Deploy Soaplab web application using Tomcat manager                -->
+<!-- ================================================================== -->
+
+<!-- 
+since Soaplab doesn't read metadata-files and run-scripts using classpath but
+reads from file system, we need to make sure we have unpackWars=true unless
+these files are located outside web archive file  
+ -->
+<!--  Install web application using tomcat manager -->
+<target name="deploy" depends="tomcat-init">
+<!-- TBD: use maven for this dependency -->
+  <path id="tomcat-ant.classpath">
+    <pathelement location="${real.catalina.base}/lib/catalina-ant.jar"/>
+  </path>
+
+  <!-- Configure the custom Ant deploy task for the Manager application -->
+  <taskdef name="deploy"    classname="org.apache.catalina.ant.DeployTask"
+    classpathref="tomcat-ant.classpath"/>
+
+  <echo>
+    this target assumes you have unpackWars and autoDeploy parameters set to true
+    in your tomcat server.xml file
+  </echo>
+  <fail unless="tomcat.manager.username">
+   property tomcat.manager.username not found
+  </fail>
+    <fail unless="tomcat.manager.password">
+   property tomcat.manager.password not found
+  </fail>
+  <property name="tomcat.manager.url" value="http://${tomcat.host}:${tomcat.port}/manager"/>
+  
+  <deploy url="${tomcat.manager.url}" username="${tomcat.manager.username}" password="${tomcat.manager.password}"
+          path="/${current.context.name}" war="file:${build.dist}/${current.context.name}.war"
+          update="true"
+          />
+</target>

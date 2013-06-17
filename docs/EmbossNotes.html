@@ -1,0 +1,348 @@
+<html> <head>
+<title>Soaplab2: EMBOSS Notes</title>
+
+<link rel="shortcut icon" href="images/favicon.ico" >
+<link rel="icon" href="images/animated_favicon1.gif" type="image/gif" >
+<link rel="stylesheet" href="images/stylesheet.css" type="text/css">
+
+</head>
+
+<body>
+<h1>EMBOSS Notes</h1>
+<img class="motto-img" src="images/motto-emboss-notes.jpg" border=0 align="left"/>
+
+Soaplab's main goal, from the very beginning, was to make Web Services
+especially on top of <a
+href="http://emboss.sourceforge.net/">EMBOSS</a>. These notes contain
+few details how to make it happen. <p>
+
+
+<br clear="all"/>
+
+<div class="doctoc">
+<dl>
+  <dt> <a href="#plugin">Soaplab2's plug-in for EMBOSS</a>
+  <dt> <a href="#install">EMBOSS installation</a>
+  <dt> <a href="#build">Build Soaplab2 metadata for EMBOSS</a>
+  <dt> <a href="#env">Run-time environment for EMBOSS</a>
+  <dt> <a href="#test">How to test EMBOSS services</a>
+</dl> <p>
+</div>
+
+<a name="plugin"></a>
+<h4>Soaplab2's plug-in for EMBOSS</h4>
+
+EMBOSS, as a set of command-line tools, is a typical target of
+Soaplab. But it also requires some special treatment (e.g. collecting
+resulting images, or dealing with an EMBOSS-specific sequence
+references - the famous <a href="FAQ.html#001">USA</a>). These
+specifics are implemented as a Soaplab's plug-in (its main author is
+Mahmut Uludag from the EBI). <p>
+
+The plug-in code is in the package <tt>org.soaplab.emboss</tt> and it
+is distributed together with the main Soaplab2 release files. But this
+is just a plug-in - you need to have on your computer (the one where
+Soaplab2 Web services will be running within Tomcat servlet container)
+EMBOSS itself. <p>
+
+<a name="install"></a>
+<h4>EMBOSS installation</h4>
+
+It is obviously beyond this document to go to details (and anyway, the
+EMBOSS documentation and support are quite exquisite). Let us just
+list the basic steps: <p>
+
+<ol>
+
+  <li class="dcount"> Download EMBOSS from <a
+href="http://emboss.sourceforge.net/download/">EMBOSS homepage</a> and
+unpack it. Go to the created directory. <p>
+
+  <li class="dcount"> Type: <tt>sh ./configure --prefix=&lt;where-to-install-emboss&gt;</tt><p>
+  
+  <li class="dcount"> Then: <tt>make</tt><p>
+  
+  <li class="dcount"> Then: <tt>make check</tt><p>
+  
+  <li class="dcount"> Then: <tt>make install</tt><p>
+  
+  <li class="dcount"> EMBOSS needs a list of databases. A default list
+is in
+<tt>&lt;emboss-home&gt;share/EMBOSS/emboss.default</tt>. Consider to
+edit it. <a href="embossrc">Here</a> is another example of a list of
+databases, as used during developing Soaplab2 at EBI. <p>
+
+  The file can be either left in
+<tt>&lt;emboss-home&gt;share/EMBOSS/emboss.default</tt>, or put in the
+home directory under the name <tt>.embossrc</tt>. But it has to be a
+home directory of the user who is running Tomcat server. <p>
+  
+  <li class="dcount"> Extract data for few EMBOSS databases: Go to the
+directory where you have <em>installed</em> EMBOSS and type there:
+
+<pre class="script">
+bin/tfextract share/EMBOSS/test/data/site.dat
+bin/printsextract share/EMBOSS/test/data/site.dat
+bin/prosextract -prositedir share/EMBOSS/test/data
+bin/rebaseextract ./share/EMBOSS/test/data/withrefm ${emboss_home_src}/test/data/proto
+</pre>
+above <tt>${emboss_home_src}</tt> is the root directory where you unpacked the emboss distribution file
+
+</ol>
+<p>For installing EMBASSY applications follow steps 1 to 5 for each
+EMBASSY package you want to install. Using the same prefix in step 2
+lets EMBASSY applications share the same directory structure EMBOSS
+applications use so EMBASSY applications doesn't need speacial treatment. 
+
+</p>
+
+There are also few EMBOSS applications that need to have installed
+third-party programs (that are not part of the EMBOSS
+distribution). For example, the <tt>emma</tt> needs
+<tt>clustalw</tt>. The other one in this category is the EMBOSS tool
+<tt>eprimer3</tt>. If you do not have them installed, you will be
+getting errors from the Soaplab2 services. Similar to this:
+
+<pre class="sscript">
+Standard error stream:
+Died: The program 'primer3_core' must be on the path.
+It is part of the 'primer3' package, version 1.1,
+available from the Whitehead Institute.
+See: http://primer3.sourceforge.net/
+</pre>
+
+or this one:
+
+<pre class="sscript">
+Standard error stream:
+   EMBOSS An error in ajsys.c at line 988:
+cannot find program 'clustalw'
+</pre>
+<p>
+
+
+<a name="build"></a>
+<h4>Build Soaplab2 metadata for EMBOSS</h4>
+
+As any Soaplab service, the EMBOSS services need also ACD files. But
+they already have them. You only need to convert them into Soaplab's
+XML metadata files: <p>
+
+First, you have to tell where is your EMBOSS installed. Either set an
+environment variable EMBOSS_HOME, or an Ant's build-time property
+<pn>emboss.home</pn> to point there. <p>
+
+You can also set few other properties. They will be propagated into
+generated XML metadata - they are the <em>built-time
+properties</em>. Which means that you should set them either on the
+Ant's command line (when running <tt>ant genemboss</tt>, or
+(preferable) in your <tt>build.properties</tt>):
+
+<dl>
+  <dt> <span class="hitt">emboss.supplier</span>
+
+  <dd> Any string indicating who is running EMBOSS Web
+services. Default value is an empty string. <p>
+
+  <dt> <span class="hitt">emboss.version</span>
+
+  <dd> Any string indicating your EMBOSS version.  Default value is an
+empty string. <p>
+
+       For example:
+       
+<pre class="code">
+emboss.home = /home/senger/Software/emboss
+emboss.supplier = My local laptop
+emboss.version = 6.1.0
+</pre>
+       
+</dl><p>
+
+Then, consider to disable some EMBOSS applications (those that are
+meant more or less only for testing or administrative tasks). The list
+of already disabled applications is available in
+<tt>xmls/emboss.xml</tt>. Change it (by setting the property
+<pn>gen.disabled.apps</pn>) only if you have some special reasons. <p>
+
+Finally, generate Soaplab's metadata (do not worry about few warnings
+<tt>Duplicated input name (graph_format)...</tt>):
+
+<pre class="script">
+ant genemboss
+</pre>
+
+This task creates also the file
+<tt>metadata/generated/EMBOSSApplications.xml</tt>. Add its name to
+the Soaplab configuration file as a property <pn>applist</pn>:
+
+<pre class="code">
+applist = ${metadata.dir}/EMBOSSApplications.xml
+</pre>
+
+You can do it directly in the template
+<tt>src/etc/config/soaplab.properties.template</tt> but better way is
+to use built-time property <pn>my.soaplab.properties</pn> (see more
+about the configuration in the <a
+href="ConfigurationGuide.html">configuration guide</a>). <p>
+
+Try now:
+
+<pre class="script">
+ant clean
+ant info-list
+</pre>
+
+Do you see all EMBOSS services? <p>
+
+<div class="note"> Running "ant clean" is not usually needed - but it
+does not harm. It makes sure that the run-time configuration file,
+created in <tt>build/classes/soaplab.properties</tt> is really
+updated. </div>
+
+
+<a name="end"></a>
+<h4>Run-time environment for EMBOSS</h4>
+
+The <em>run-time</em> properties must be put in the
+<tt>soaplab.properties</tt> file. There are just two mandatory ones,
+and few optional ones:
+
+<dl>
+  <dt> <span class="hitt">emboss.home</span>
+
+  <dd> We have been already using this property to find EMBOSS
+installation directory in the <em>built-time</em>. Of course, the
+<em>run-time</em> needs the same knowledge. <p>
+
+       Juts to repeat what is the difference: The <em>built-time</em>
+properties should be given either on the command line when the
+<tt>ant</tt> is being invoked, or (better) put into
+<tt>build.properties</tt> file. The <em>run-time</em> properties must
+be put into <tt>soaplab.properties</tt> file (which ends up in the
+<tt>classes</tt> directory). <p>
+
+  <dt> <span class="hitt">emboss.data</span>
+
+  <dd> This property is needed only if you use a non-standard EMBOSS
+installation. By default, the EMBOSS <tt>data</tt> directory is
+<tt>&lt;emboss-home&gt;/shared/EMBOSS/data</tt>. Soaplab2 can find
+this directory simply from the <pn>emboss.home</pn> property. Only if
+the <tt>data</tt> directory is elsewhere, use
+<pn>emboss.data</pn>. <p>
+
+  <dt> <span class="hitt">emboss.path</span>
+
+  <dd> The same situation as above - but with the EMBOSS <tt>bin</tt>
+directory. By default, EMBOSS binaries are in
+<tt>&lt;emboss-home&gt;/bin</tt> where Soaplab2 can find them. Only if
+you have installed them elsewhere, set this property. <p>
+
+
+  <dt> <span class="hitt">applist</span>
+
+  <dd> This is a mandatory property - but already described in the
+previous section. It keeps a full path to the metadata with the list
+of EMBOSS services. <p>
+
+
+  <dt> <span class="hitt">env.LD_LIBRARY_PATH</span>
+
+  <dd>This property sets an environment variable <tt>LD_LIBRARY_PATH</tt>
+	before any EMBOSS tool is started. You need it only if your EMBOSS
+	binaries have dependencies to shared libraries which are not located in
+	the same folder(s) used during EMBOSS installation. For example, for
+	systems not running recent versions of Linux, you'll have to add a
+	directory containing libgd.so.2 to LD_LIBRARY_PATH, due to the
+	requirement for GD 2, in EMBOSS 5.0.
+	<p>
+
+       
+  <dt> <span class="hitt">env.PATH</span>
+
+  <dd> This property sets an environment variable <tt>PATH</tt> for
+any EMBOSS tool. It is not used to find the EMBOSS binaries themselves
+(Java does not do that) but to allow EMBOSS binaries to locate their
+own third-party applications. A typical example is the EMBOSS tool
+<tt>emma</tt> that needs to find <tt>clustalw</tt> program. For example:
+
+<pre class="code">
+env.PATH = /usr/local/bin:/usr/bin:/bin:/dir2/clustalw:/dir3/hmmer-2.3.2/binaries
+</pre>
+       
+</dl><p>
+
+
+<a name="test"></a>
+<h4>How to test EMBOSS services</h4>
+
+The Soaplab2 is equipped with ability to run more/many services
+(sequentially or in parallel) with pre-defined sets of input data as a
+testing batch. The way how to run it is described in the <a
+href="BatchTestClient.html">batch-test client document</a>. But
+because this ability is particularly useful for EMBOSS (being a
+package with hundreds of programs) here is a brief overview how to run
+this batch test for EMBOSS services: <p>
+
+<ul>
+
+  <li class="tiny"> The batch test for EMBOSS requires to set
+<pn>emboss.home</pn> property (see above how to do it). <p>
+
+  <li class="tiny"> Another property to be set is
+<pn>batch.test.file</pn>. Here is how it should be set for both,
+EMBOSS and EMBASSY:
+
+<pre class="code">
+test.data.dir = ${base.dir}/data
+batch.test.file = ${base.dir}/data/embossTests.cfg
+batch.test.file = ${base.dir}/data/embassyTests.cfg
+</pre>
+
+  As you see, you can use the same property several time, to include
+more testing definitions. The <pn>base.dir</pn> property, used in the
+example above, should point to the Soaplab2 main directory. If you
+have the testing configuration files elsewhere, set
+<pn>test.data.dir</pn> differently. <p>
+
+  <li class="tiny"> And start the batch test:
+
+<pre class="script">
+build/run/run-batch-client
+</pre>
+
+  In my case, I have not installed <tt>clustalw</tt> nor
+<tt>primer3_core</tt> (that's why I am getting two errors) and I have
+not installed EMBASSY package either (that's why I am getting 61 <em>not
+available</em>):
+  
+<pre class="script">
+Summary
+-------
+Successfully:  150
+Erroneously:   2
+Not available: 61
+</pre>
+  
+</ul><p>
+
+If you are getting more errors, it may be that your EMBOSS databases
+do not contain the same sequences as defined in the testing data
+sets. Check please <tt>data/*Test.cfg</tt> files. <p>
+
+
+<p>
+<iframe id="maintoc" src="TOC.html" scrolling="auto"></iframe>
+
+<div align=right><font size=-2>
+<!-- hhmts start -->
+Last modified: Mon Feb  4 18:17:17 2008
+<!-- hhmts end -->
+</font></div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1011961-1";
+urchinTracker();
+</script>
+</body> </html>

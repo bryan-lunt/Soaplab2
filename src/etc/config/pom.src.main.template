@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <parent>
+    <artifactId>${maven.project.artifactId}</artifactId>
+    <groupId>${maven.project.groupId}</groupId>
+    <version>${maven.project.version}</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>${maven.project.groupId}</groupId>
+  <artifactId>${maven.project.artifactId}-core</artifactId>
+  <name>${maven.project.artifactId}-core</name>
+  <version>${maven.project.version}</version>
+  <build>
+    <sourceDirectory>${src.main}</sourceDirectory>
+    <testSourceDirectory>${src.test}</testSourceDirectory>
+  </build>
+</project>

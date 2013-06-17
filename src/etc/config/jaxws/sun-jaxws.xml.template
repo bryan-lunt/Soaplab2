@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<endpoints
+  version="2.0"
+  xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime">
+
+  <endpoint
+    implementation="org.soaplab.services.protocol.jaxws.AnalysisListService"
+    name="soaplab2-list"
+    url-pattern="@URL_FOR_LIST@"
+    wsdl="WEB-INF/wsdl/AnalysisList.wsdl" />
+
+  <endpoint
+    implementation="org.soaplab.services.protocol.jaxws.AnalysisService"
+    name="soaplab2-service"
+    url-pattern="@URL_FOR_OTHERS@"
+    wsdl="WEB-INF/wsdl/Analysis.wsdl" />
+
+  <!-- TYPED_INTERFACE_ENDPOINTS -->
+
+</endpoints>

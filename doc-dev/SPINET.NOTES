@@ -1,0 +1,49 @@
+* Size (length) of the form buttons are not in good shape when using IE
+
+* Possible bug (null pointer exception in ServiceController): when
+_url and non _url result is in a specific order (needs to wait until
+it happens again)
+
+* check getInputPanels method of the org.soaplab.clients.spinet.Service class
+  why it is producing undefined elements (at least for IE) in the array TESTS? 
+
+---
+* memory management
+  - after all - make some state-fullness - at least when the local protocol is used
+  - what about scope in useBean...
+  - allow to use also a non-local protocol?
+
+* file upload: try to have these files not to go through the memory;
+  (share files? - no, better to use Streaming API and pass around input streams and not Files)
+
+* file upload with a garbage file name CAN be tested by sending
+additionally a (hidden) element - only when the upload field is not
+empty - so the server knows that there was *an intention* to send a
+file
+
+* file=upload - dealing with binary data!
+
+* terminating jobs needs more attention (why only report is displayed)
+* NotFound should be reported more decently (and not as 500)
+---
+* do we need to protect against browser caching?
+---
+
+
+--------------------------
+Perhaps later (if at all):
+--------------------------
+
+* A "developer's" mode (only on demand when a property is set during
+deployment):
+  - call describe() - to get full XML;
+  - ability to replace run.jsp by show.jsp (showing parameters)
+
+* perhaps better validation according to 'format' (inc. precision)
+  - wait also for having solved "dependency rules"
+
+* EMBOSS showdb lists only selectively, by sequence type
+
+* Result bar generates results into an iframe. It would be nice to use
+javascript to change its dimension according the current result page
+and avoid to have two scrollbars (which is confusing).

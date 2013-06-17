@@ -1,0 +1,32 @@
+appl: UseDefaults [
+  documentation: "Testing DEFAULTS attribute"
+  groups: "TUnit"
+  nonemboss: "Y"
+  executable: "echo"
+  comment: defaults
+]
+
+# --- this prameters does not use its default value
+#     (regardless what is defined on the application level)
+string: param1 [
+  default: 1
+  comment: "defaults no"
+]
+
+# --- this prameters inherits DEFAULTS from the application level
+string: param2 [
+  default: 2
+]
+
+# --- this prameters uses its default value
+#     (regardless what is defined on the application level)
+string: param3 [
+  default: 3
+  comment: defaults
+]
+
+outfile: output [
+  additional: "Y"
+  default: "stdout"
+]
+

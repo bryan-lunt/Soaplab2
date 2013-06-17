@@ -1,0 +1,5 @@
+Release 2.3.1 is a bug-fix release. Bugs (or missing features) are
+related to the character encoding of Soaplab2's services inputs and
+outputs.
+
+Details are in the file "docs/ChangeLog".

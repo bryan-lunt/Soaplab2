@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://soaplab.org/_APP_NAME_.sa"
+	xmlns:tns="http://soaplab.org/_APP_NAME_.sa"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:sawsdl="http://www.w3.org/ns/sawsdl"
+	xmlns:emboss="http://emboss.org/common">
+	<xs:annotation>
+		<xs:documentation>input/output types for '_APP_NAME_' Web Service</xs:documentation>
+	</xs:annotation>
+
+	<xs:import namespace="http://emboss.org/common"
+		schemaLocation="sequence_input.xsd" />
+
+	<!-- ****** Inputs ****** -->
+
+	<xs:complexType name="appInputs">
+		<xs:sequence>
+			<!-- INPUT ELEMENTS -->
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- ****** Outputs ****** -->
+
+	<xs:complexType name="appResults">
+		<xs:sequence>
+			<!-- OUTPUT ELEMENTS -->
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="run" type="tns:appInputs" />
+	<xs:element name="runAndWaitFor" type="tns:RunAndWaitFor" />
+	<xs:element name="runAndWaitForResponse" type="tns:RunAndWaitForResponse" />
+	<xs:element name="getResultsResponse" type="tns:appResults" />
+	
+	<xs:complexType name="RunAndWaitFor">
+        <xs:complexContent>
+            <xs:extension base="tns:appInputs"></xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+	<xs:complexType name="RunAndWaitForResponse">
+        <xs:complexContent>
+            <xs:extension base="tns:appResults"></xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+	
+</xs:schema>

@@ -1,0 +1,64 @@
+<html> <head>
+<title>Soaplab2: How to provide own metadata</title>
+
+<link rel="shortcut icon" href="images/favicon.ico" >
+<link rel="icon" href="images/animated_favicon1.gif" type="image/gif" >
+<link rel="stylesheet" href="images/stylesheet.css" type="text/css">
+
+</head>
+
+<body>
+<h1>Soaplab2 Developers Guide</h1>
+<h2>How to provide Soaplab2 metadata in your own way</h2>
+
+<img src="images/software_developer.jpg" border=0 align="left"/>
+
+<div>
+
+Soaplab2 uses two kinds of metadata: one describing list of available
+(provided) services, and one describing individual services. By
+default, they are both expressed as XML files: the analysis list
+according to the <a href="SoaplabList.dtd">SoaplabList.dtd</a>, the
+service metadata complying with the <a
+href="SoaplabAnalysis.dtd">SoaplabAnalysis.dtd</a>. <p>
+
+If you want to have your own format, or storage, of any of these
+kinds, you can. For example, you can store the XML metadata files in
+the database instead of having them in the local file system. Or, you
+can have your own format, perhaps a non-XML one, for all or just some
+of your Soaplab services. <p>
+
+In order to accomplish it, you need to write some implementation
+classes. This <em>How-To</em> document explains what is needed and
+where to put it.
+
+<div class="note">
+
+Actually, the main reason of this How-To document is to create a
+description what classes are being used and how they are connected in
+order to make the future Soaplab2 maintenance easier. But one never
+knows...
+
+</div>
+
+</div>
+
+Not yet finished...
+<p>
+
+
+<iframe id="maintoc" src="TOC.html" scrolling="auto"></iframe>
+
+
+<div align=right><font size=-2>
+<!-- hhmts start -->
+Last modified: Mon Oct 29 01:31:47 2007
+<!-- hhmts end -->
+</font></div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1011961-1";
+urchinTracker();
+</script>
+</body> </html>

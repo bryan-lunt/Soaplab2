@@ -1,0 +1,58 @@
+> We will use JSPs to generate the presentation layer and servlets as
+> the controllers
+>
+   I think it is enough to say "use JSPs". Because JSPs *are* already
+servlets. I do not think that you wish to create any piece of the
+dashboard as a "pure" servlet (by implementing the HTTPServletRequest
+interface). I would not recommend it.
+
+> The dashboard will include the following basic components.
+>
+   That's okay - I would like just to add that the dashboard will be
+designed in a way that adding a new component (not listed in your
+description) will be possible (and hopefully easy - like a plugin, or
+a pluglet).
+
+> -- Service Editor
+> This component will present users an HTML form that can be used to
+> provide the definition of a new service. When the form is submitted, the
+> dashboard Servlet will generate the files required by Axis2 and will
+> then pack them in a Web Service archive.
+>
+   That's not I see it. The editor output should be an ACD file, or
+bot an ACD and XML file. What you just described is part of the
+deployment.
+
+> The information to be provided using the form will basically include the
+> following.
+>
+   I do not think that this list is complete. It must provide
+everything what is possible to put in the ACD files.
+        
+
+> -- Deployment component
+>
+   You are describing in details *how* to deploy a service (I would
+not call it a component). But you should rather to say *what* this
+deployment contains. But anyway, I think that we have the same
+understanding of what to be done here.
+   I would suggest to do it similarly as in the Tomcat manager (where
+a war file can be deployed either from the server file or uploaded
+from a user machine).
+
+> One issue regarding the Soaplab service archive files; it would be wise
+> to have the Soaplab library and other libraries used by Soaplab, in the
+> shared libraries directory of the Axis2 repository rather than in the
+> service archive file.
+>
+  This could be an option in the deployment Dashboard component.
+
+> -- Service explorer
+> This component will basically be used for exploring and calling Soaplab
+> services.
+>
+   I would separate it into two components: One for normal service
+users calling Soaplab services, and one for Soaplab admins calling a
+separate, usually not public, admin interface (which I/we have to
+define yet). "Service client" and "Service administrator".
+

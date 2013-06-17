@@ -1,0 +1,92 @@
+digraph Soaplab2 {
+   rankdir=TB;
+   node [shape="box"];
+
+   {rank=same; ProtocolLayer ProtocolToolkit;}
+   {rank=same; AnalysisListService AnalysisService;}
+
+   Clients             [label="Requests\nfrom clients" shape="egg"
+                        color="azure2" style="filled"];
+   ProtocolLayer       [label="Protocol layer\n(various SOAPs, REST,...)"];
+   ProtocolToolkit     [label="ProtocolToolkit"];
+
+#   ProtocolAxis        [label="ProtocolToolkitAxis\n(ProtocolToolkit)"
+#                        color="khaki" style="filled"];
+
+   AnalysisService     [label="AnalysisService\n(Analysis)"
+                        color="cyan" style="filled"];
+   MetadataFactory     [label="SPI MetadataAccessorFactory"
+                        color="yellow" style="filled"];
+   DefaultFactory      [label="DefaultMetadataAccessorFactory\n(MetadataAccessorFactory)"
+                        color="khaki" style="filled"];
+   MetadataXML         [label="MetadataAccessorXML\n(MetadataAccessor)"
+                        color="khaki" style="filled"];
+
+   JobManager          [label="JobManager"];
+   Job                 [label="AbstractJob\n(Job)"
+                        color="cyan" style="filled"];
+   Reporter            [label="Reporter"];
+
+   EventManager        [label="EventManager"]
+   EventListener       [label="SPI EventListener"
+                        color="yellow" style="filled"];
+   DefEventListener    [label="DefaultEventListener\n(EventListener)"
+                        color="khaki" style="filled"];
+
+   PersistenceManager  [label="PersistenceManager"];
+   PersistentStorage   [label="SPI PersistentStorage"
+                        color="yellow" style="filled"];
+   FileStorage         [label="FileStorage\n(PersistentStorage)"
+                        color="khaki" style="filled"];
+   DBStorage           [label="DBStorage\n(PersistentStorage)"
+                        color="khaki" style="filled"];
+
+   AnalysisListService [label="AnalysisListService\n(AnalysisList)"
+                        color="cyan" style="filled"];
+   InventoryProvider   [label="AnalysisInventoryProvider"];
+   AnalysisInventory   [label="SPI AnalysisInventory"
+                        color="yellow" style="filled"];
+   DefaultInventory    [label="DefaultAnalysisInventory\n(AnalysisInventory)"
+                        color="khaki" style="filled"];
+
+   ServiceMetadata     [label="XML" shapefile="workset_wiz.gif"];
+   ListMetadata        [label="XML" shapefile="workset_wiz.gif"];
+
+   Clients -> ProtocolLayer;
+   ProtocolLayer->AnalysisService;
+   ProtocolLayer->AnalysisListService [label="instantiates"];
+#   ProtocolLayer->ProtocolToolkit [label="chooses"];
+   AnalysisService->ProtocolToolkit [label="implements"];
+
+   AnalysisListService->InventoryProvider [label="uses"];
+   InventoryProvider->AnalysisInventory;
+   AnalysisInventory->DefaultInventory  [label="discovers"];
+
+   AnalysisService->InventoryProvider [label="exist?"];
+   AnalysisService->JobManager [label="uses"];
+   AnalysisService->MetadataFactory [label="uses"];
+   MetadataFactory->DefaultFactory [label="discovers"];
+   DefaultFactory->MetadataXML [label="creates"];
+   AnalysisService->MetadataXML [label="reads"];
+   AnalysisService->Job [label="runs"];
+
+   JobManager->Job [label="creates"];
+   JobManager->PersistenceManager [label="creates"];
+   JobManager->Reporter;
+   Job->Reporter [label="uses"];
+   JobManager->EventManager [label="creates"];
+   Reporter->PersistenceManager [label="sets/gets\nresults"];
+
+   EventManager->EventListener [label="uses"];
+   EventListener->DefEventListener [label="discovers"];
+
+   PersistenceManager->PersistentStorage [label="uses"];
+   PersistentStorage->FileStorage [label="discovers"];
+   PersistentStorage->DBStorage [label="discovers"];
+
+   Reporter->EventManager [label="passes job events"];
+
+   DefaultInventory->ListMetadata;
+   MetadataXML->ServiceMetadata;
+
+}

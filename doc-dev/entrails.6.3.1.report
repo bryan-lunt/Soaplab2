@@ -1,0 +1,890 @@
+
+# ACD Types
+# Name           Group      Description
+#     Attribute       Type       Default      Comment
+#     Qualifier       Type       Default      Helptext
+AcdType {
+  align          output     "Alignment output file"
+    qualifiers {
+      aformat         string     ""           "Alignment format"
+      aextension      string     ""           "File name extension"
+      adirectory      string     ""           "Output directory"
+      aname           string     ""           "Base file name"
+      awidth          integer    "0"          "Alignment width"
+      aaccshow        boolean    "N"          "Show accession number in the header"
+      adesshow        boolean    "N"          "Show description in the header"
+      ausashow        boolean    "N"          "Show the full USA in the alignment"
+      aglobal         boolean    "N"          "Show the full sequence in alignment"
+    }
+  array          simple     "List of floating point numbers"
+  boolean        simple     "Boolean value Yes/No"
+  codon          input      "Codon usage file in EMBOSS data path"
+    qualifiers {
+      format          string     ""           "Data format"
+    }
+  cpdb           input      "Clean PDB file"
+    qualifiers {
+      format          string     ""           "Data format"
+    }
+  datafile       input      "Data file"
+  directory      input      "Directory"
+    qualifiers {
+      extension       string     ""           "Default file extension"
+    }
+  dirlist        input      "Directory with files"
+    qualifiers {
+      extension       string     ""           "Default file extension"
+    }
+  discretestates input      "Discrete states file"
+  distances      input      "Distance matrix"
+  featout        output     "Writeable feature table"
+    qualifiers {
+      offormat        string     ""           "Output feature format"
+      ofopenfile      string     ""           "Features file name"
+      ofextension     string     ""           "File name extension"
+      ofdirectory     string     ""           "Output directory"
+      ofname          string     ""           "Base file name"
+      ofsingle        boolean    "N"          "Separate file for each entry"
+    }
+  features       input      "Readable feature table"
+    qualifiers {
+      fformat         string     ""           "Features format"
+      fopenfile       string     ""           "Features file name"
+      fask            boolean    "N"          "Prompt for begin/end/reverse"
+      fbegin          integer    "0"          "Start of the features to be used"
+      fend            integer    "0"          "End of the features to be used"
+      freverse        boolean    "N"          "Reverse (if DNA)"
+    }
+  filelist       input      "Comma-separated file list"
+  float          simple     "Floating point number"
+  frequencies    input      "Frequency value(s)"
+  graph          graph      "Graph device for a general graph"
+    qualifiers {
+      gprompt         boolean    "N"          "Graph prompting"
+      gdesc           string     ""           "Graph description"
+      gtitle          string     ""           "Graph title"
+      gsubtitle       string     ""           "Graph subtitle"
+      gxtitle         string     ""           "Graph x axis title"
+      gytitle         string     ""           "Graph y axis title"
+      goutfile        string     ""           "Output file for non interactive displays"
+      gdirectory      string     ""           "Output directory"
+    }
+  infile         input      "Input file"
+  integer        simple     "Integer"
+  list           selection  "Choose from menu list of values"
+  matrix         input      "Comparison matrix file in EMBOSS data path"
+  matrixf        input      "Comparison matrix file in EMBOSS data path"
+  outcodon       output     "Codon usage file"
+    qualifiers {
+      odirectory      string     ""           "Output directory"
+      oformat         string     ""           "Output format specific to this data type"
+    }
+  outcpdb        output     "Cleaned PDB file"
+  outdata        output     "Formatted output file"
+    qualifiers {
+      odirectory      string     ""           "Output directory"
+      oformat         string     ""           "Output format specific to this data type"
+    }
+  outdir         output     "Output directory"
+    qualifiers {
+      extension       string     ""           "Default file extension"
+    }
+  outdiscrete    output     "Discrete states file"
+    qualifiers {
+      odirectory      string     ""           "Output directory"
+      oformat         string     ""           "Output format specific to this data type"
+    }
+  outdistance    output     "Distance matrix"
+  outfile        output     "Output file"
+    qualifiers {
+      odirectory      string     ""           "Output directory"
+    }
+  outfreq        output     "Frequency value(s)"
+    qualifiers {
+      odirectory      string     ""           "Output directory"
+      oformat         string     ""           "Output format specific to this data type"
+    }
+  outmatrix      output     "Comparison matrix file"
+    qualifiers {
+      odirectory      string     ""           "Output directory"
+      oformat         string     ""           "Output format specific to this data type"
+    }
+  outmatrixf     output     "Comparison matrix file"
+    qualifiers {
+      odirectory      string     ""           "Output directory"
+      oformat         string     ""           "Output format specific to this data type"
+    }
+  outproperties  output     "Property value(s)"
+    qualifiers {
+      odirectory      string     ""           "Output directory"
+      oformat         string     ""           "Output format specific to this data type"
+    }
+  outscop        output     "Scop entry"
+    qualifiers {
+      odirectory      string     ""           "Output directory"
+      oformat         string     ""           "Output format specific to this data type"
+    }
+  outtree        output     "Phylogenetic tree"
+    qualifiers {
+      odirectory      string     ""           "Output directory"
+      oformat         string     ""           "Output format specific to this data type"
+    }
+  pattern        input      "Property value(s)"
+    qualifiers {
+      pformat         string     ""           "File format"
+      pmismatch       integer    "0"          "Pattern mismatch"
+      pname           string     ""           "Pattern base name"
+    }
+  properties     input      "Property value(s)"
+  range          simple     "Sequence range"
+  regexp         input      "Regular expression pattern"
+    qualifiers {
+      pformat         string     ""           "File format"
+      pname           string     ""           "Pattern base name"
+    }
+  report         output     "Report output file"
+    qualifiers {
+      rformat         string     ""           "Report format"
+      rname           string     ""           "Base file name"
+      rextension      string     ""           "File name extension"
+      rdirectory      string     ""           "Output directory"
+      raccshow        boolean    "N"          "Show accession number in the report"
+      rdesshow        boolean    "N"          "Show description in the report"
+      rscoreshow      boolean    "Y"          "Show the score in the report"
+      rstrandshow     boolean    "Y"          "Show the nucleotide strand in the report"
+      rusashow        boolean    "N"          "Show the full USA in the report"
+      rmaxall         integer    "0"          "Maximum total hits to report"
+      rmaxseq         integer    "0"          "Maximum hits to report for one sequence"
+    }
+  scop           input      "Clean PDB file"
+    qualifiers {
+      format          string     ""           "Data format"
+    }
+  selection      selection  "Choose from selection list of values"
+  sequence       input      "Readable sequence"
+    qualifiers {
+      sbegin          integer    "0"          "Start of the sequence to be used"
+      send            integer    "0"          "End of the sequence to be used"
+      sreverse        boolean    "N"          "Reverse (if DNA)"
+      sask            boolean    "N"          "Ask for begin/end/reverse"
+      snucleotide     boolean    "N"          "Sequence is nucleotide"
+      sprotein        boolean    "N"          "Sequence is protein"
+      slower          boolean    "N"          "Make lower case"
+      supper          boolean    "N"          "Make upper case"
+      sformat         string     ""           "Input sequence format"
+      sdbname         string     ""           "Database name"
+      sid             string     ""           "Entryname"
+      ufo             string     ""           "UFO features"
+      fformat         string     ""           "Features format"
+      fopenfile       string     ""           "Features file name"
+    }
+  seqall         input      "Readable sequence(s)"
+    qualifiers {
+      sbegin          integer    "0"          "Start of each sequence to be used"
+      send            integer    "0"          "End of each sequence to be used"
+      sreverse        boolean    "N"          "Reverse (if DNA)"
+      sask            boolean    "N"          "Ask for begin/end/reverse"
+      snucleotide     boolean    "N"          "Sequence is nucleotide"
+      sprotein        boolean    "N"          "Sequence is protein"
+      slower          boolean    "N"          "Make lower case"
+      supper          boolean    "N"          "Make upper case"
+      sformat         string     ""           "Input sequence format"
+      sdbname         string     ""           "Database name"
+      sid             string     ""           "Entryname"
+      ufo             string     ""           "UFO features"
+      fformat         string     ""           "Features format"
+      fopenfile       string     ""           "Features file name"
+    }
+  seqout         output     "Writeable sequence"
+    qualifiers {
+      osformat        string     ""           "Output seq format"
+      osextension     string     ""           "File name extension"
+      osname          string     ""           "Base file name"
+      osdirectory     string     ""           "Output directory"
+      osdbname        string     ""           "Database name to add"
+      ossingle        boolean    "N"          "Separate file for each entry"
+      oufo            string     ""           "UFO features"
+      offormat        string     ""           "Features format"
+      ofname          string     ""           "Features file name"
+      ofdirectory     string     ""           "Output directory"
+    }
+  seqoutall      output     "Writeable sequence(s)"
+    qualifiers {
+      osformat        string     ""           "Output seq format"
+      osextension     string     ""           "File name extension"
+      osname          string     ""           "Base file name"
+      osdirectory     string     ""           "Output directory"
+      osdbname        string     ""           "Database name to add"
+      ossingle        boolean    "N"          "Separate file for each entry"
+      oufo            string     ""           "UFO features"
+      offormat        string     ""           "Features format"
+      ofname          string     ""           "Features file name"
+      ofdirectory     string     ""           "Output directory"
+    }
+  seqoutset      output     "Writeable sequences"
+    qualifiers {
+      osformat        string     ""           "Output seq format"
+      osextension     string     ""           "File name extension"
+      osname          string     ""           "Base file name"
+      osdirectory     string     ""           "Output directory"
+      osdbname        string     ""           "Database name to add"
+      ossingle        boolean    "N"          "Separate file for each entry"
+      oufo            string     ""           "UFO features"
+      offormat        string     ""           "Features format"
+      ofname          string     ""           "Features file name"
+      ofdirectory     string     ""           "Output directory"
+    }
+  seqset         input      "Readable set of sequences"
+    qualifiers {
+      sbegin          integer    "0"          "Start of each sequence to be used"
+      send            integer    "0"          "End of each sequence to be used"
+      sreverse        boolean    "N"          "Reverse (if DNA)"
+      sask            boolean    "N"          "Ask for begin/end/reverse"
+      snucleotide     boolean    "N"          "Sequence is nucleotide"
+      sprotein        boolean    "N"          "Sequence is protein"
+      slower          boolean    "N"          "Make lower case"
+      supper          boolean    "N"          "Make upper case"
+      sformat         string     ""           "Input sequence format"
+      sdbname         string     ""           "Database name"
+      sid             string     ""           "Entryname"
+      ufo             string     ""           "UFO features"
+      fformat         string     ""           "Features format"
+      fopenfile       string     ""           "Features file name"
+    }
+  seqsetall      input      "Readable sets of sequences"
+    qualifiers {
+      sbegin          integer    "0"          "Start of each sequence to be used"
+      send            integer    "0"          "End of each sequence to be used"
+      sreverse        boolean    "N"          "Reverse (if DNA)"
+      sask            boolean    "N"          "Ask for begin/end/reverse"
+      snucleotide     boolean    "N"          "Sequence is nucleotide"
+      sprotein        boolean    "N"          "Sequence is protein"
+      slower          boolean    "N"          "Make lower case"
+      supper          boolean    "N"          "Make upper case"
+      sformat         string     ""           "Input sequence format"
+      sdbname         string     ""           "Database name"
+      sid             string     ""           "Entryname"
+      ufo             string     ""           "UFO features"
+      fformat         string     ""           "Features format"
+      fopenfile       string     ""           "Features file name"
+    }
+  string         simple     "String value"
+  toggle         simple     "Toggle value Yes/No"
+  tree           input      "Phylogenetic tree"
+  xygraph        graph      "Graph device for a 2D graph"
+    qualifiers {
+      gprompt         boolean    "N"          "Graph prompting"
+      gdesc           string     ""           "Graph description"
+      gtitle          string     ""           "Graph title"
+      gsubtitle       string     ""           "Graph subtitle"
+      gxtitle         string     ""           "Graph x axis title"
+      gytitle         string     ""           "Graph y axis title"
+      goutfile        string     ""           "Output file for non interactive displays"
+      gdirectory      string     ""           "Output directory"
+    }
+}
+# ACD Default attributes
+# Name             Type     Default        Comment
+  default          string     ""           "Default value"
+  information      string     ""           "Information for menus etc., and default prompt"
+  prompt           string     ""           "Prompt (if information string is unclear)"
+  code             string     ""           "Code name for information/prompt to be looked up in standard table"
+  help             string     ""           "Text for help documentation"
+  parameter        boolean    "N"          "Command line parameter. Can be on the command line with no qualifier name. Implies 'standard' qualifier"
+  standard         boolean    "N"          "Standard qualifier, value required. Interactive prompt if missing"
+  additional       boolean    "N"          "Additional qualifier. Value required if -options is on the command line, or set by default"
+  missing          boolean    "N"          "Allow with no value on the command line to set to ''"
+  valid            string     ""           "Help: String description of allowed values for -help output, used if the default help is nuclear"
+  expected         string     ""           "Help: String description of the expected value for -help output, used if the default help is nuclear"
+  needed           boolean    "y"          "Include in GUI form, used to hide options if they are unclear in GUIs"
+  knowntype        string     ""           "Known standard type, used to define input and output types for workflows"
+  relations        string     ""           "Relationships between this ACD item and others, defined as specially formatted text"
+  outputmodifier   boolean    "N"          "Modifies the output in ways that can break parsers"
+  style            string     ""           "Style for SoapLab's ACD files"
+  qualifier        string     ""           "Qualifier name for SoapLab's ACD files"
+  template         string     ""           "Commandline template for SoapLab's ACD files"
+  comment          string     ""           "Comment for SoapLab's ACD files"
+
+# ACD Calculated attributes
+# Name
+#     Attribute      Type       Default              Comment
+  distances
+    attributes {
+      distancecount  integer    ""                   "Number of distance matrices"
+      distancesize   integer    ""                   "Number of distance rows"
+      replicates     boolean    ""                   "Replicates data found in input"
+      hasmissing     boolean    ""                   "Missing values found (replicates=N)"
+    }
+  features
+    attributes {
+      fbegin         integer    "(0 if unspecified)" "Start of the features to be used"
+      fend           integer    "(0 if unspecified)" "End of the features to be used"
+      flength        integer    ""                   "Total length of sequence (fsize is feature count)"
+      fprotein       boolean    ""                   "Feature table is protein"
+      fnucleic       boolean    ""                   "Feature table is nucleotide"
+      fname          string     ""                   "The name of the feature table"
+      fsize          integer    ""                   "Number of features"
+    }
+  frequencies
+    attributes {
+      freqlength     integer    ""                   "Number of frequency values per set"
+      freqsize       integer    ""                   "Number of frequency sets"
+      freqloci       integer    ""                   "Number of frequency loci"
+      freqgenedata   boolean    ""                   "Gene frequency data"
+      freqcontinuous boolean    ""                   "Continuous frequency data"
+      freqwithin     boolean    ""                   "Individual within species frequency data"
+    }
+  properties
+    attributes {
+      propertylength integer    ""                   "Number of property values per set"
+      propertysize   integer    ""                   "Number of property sets"
+    }
+  regexp
+    attributes {
+      length         integer    ""                   "The length of the regular expression"
+    }
+  sequence
+    attributes {
+      begin          integer    ""                   "Start of the sequence used"
+      end            integer    ""                   "End of the sequence used"
+      length         integer    ""                   "Total length of the sequence"
+      protein        boolean    ""                   "Sequence is protein"
+      nucleic        boolean    ""                   "Sequence is nucleotide"
+      name           string     ""                   "The name/ID/accession of the sequence"
+      usa            string     ""                   "The USA of the sequence"
+    }
+  seqall
+    attributes {
+      begin          integer    ""                   "Start of the first sequence used"
+      end            integer    ""                   "End of the first sequence used"
+      length         integer    ""                   "Total length of the first sequence"
+      protein        boolean    ""                   "Sequence is protein"
+      nucleic        boolean    ""                   "Sequence is nucleotide"
+      name           string     ""                   "The name/ID/accession of the sequence"
+      usa            string     ""                   "The USA of the sequence"
+    }
+  seqset
+    attributes {
+      begin          integer    ""                   "The beginning of the selection of the sequence"
+      end            integer    ""                   "The end of the selection of the sequence"
+      length         integer    ""                   "The maximum length of the sequence set"
+      protein        boolean    ""                   "Sequence set is protein"
+      nucleic        boolean    ""                   "Sequence set is nucleotide"
+      name           string     ""                   "The name of the sequence set"
+      usa            string     ""                   "The USA of the sequence set"
+      totweight      float      ""                   "Total sequence weight for a set"
+      count          integer    ""                   "Number of sequences in the set"
+    }
+  seqsetall
+    attributes {
+      begin          integer    ""                   "The beginning of the selection of the sequence"
+      end            integer    ""                   "The end of the selection of the sequence"
+      length         integer    ""                   "The maximum length of the sequence set"
+      protein        boolean    ""                   "Sequence set is protein"
+      nucleic        boolean    ""                   "Sequence set is nucleotide"
+      name           string     ""                   "The name of the sequence set"
+      usa            string     ""                   "The USA of the sequence set"
+      totweight      float      ""                   "Total sequence weight for each set"
+      count          integer    ""                   "Number of sequences in each set"
+      multicount     integer    ""                   "Number of sets of sequences"
+    }
+  string
+    attributes {
+      length         integer    ""                   "The length of the string"
+    }
+  tree
+    attributes {
+      treecount      integer    ""                   "Number of trees"
+      speciescount   integer    ""                   "Number of species"
+      haslengths     boolean    ""                   "Branch lengths defined"
+    }
+
+
+# ACD Application Qualifiers
+# Qualifier       Type        Default     Helptext
+QualAppl {
+  auto            boolean     "N"         "Turn off prompts"
+  stdout          boolean     "N"         "Write first file to standard output"
+  filter          boolean     "N"         "Read first file from standard input, write first file to standard output"
+  options         boolean     "N"         "Prompt for standard and additional values"
+  debug           boolean     "N"         "Write debug output to program.dbg"
+  verbose         boolean     "N"         "Report some/full command line options"
+  help            boolean     "N"         "Report command line options and exit. More information on associated and general qualifiers can be found with -help -verbose"
+  warning         boolean     "Y"         "Report warnings"
+  error           boolean     "Y"         "Report errors"
+  fatal           boolean     "Y"         "Report fatal errors"
+  die             boolean     "Y"         "Report dying program messages"
+  version         boolean     "N"         "Report version number and exit"
+}
+
+
+# ACD Application Attributes
+# Attribute       Type       Default      Helptext
+AttrAppl {
+  documentation   string     ""           "Short description of the application function"
+  groups          string     ""           "Standard application group(s) for wossname and GUIs"
+  keywords        string     ""           "Standard application keyword(s) for wossname and GUIs"
+  gui             string     ""           "Suitability for launching in a GUI"
+  batch           string     ""           "Suitability for running in batch"
+  obsolete        string     ""           "Reason for obsolete status"
+  embassy         string     ""           "EMBASSY package name"
+  external        string     ""           "Third party tool(s) required by this program"
+  cpu             string     ""           "Estimated maximum CPU usage"
+  supplier        string     ""           "Supplier name"
+  versionnumber   string     ""           "Version number"
+  nonemboss       string     ""           "Non-emboss application name for SoapLab"
+  executable      string     ""           "Non-emboss executable for SoapLab"
+  template        string     ""           "Commandline template for SoapLab's ACD files"
+  comment         string     ""           "Comment for SoapLab's ACD files"
+  relations       string     ""           "Relationships between this ACD item and others, defined as specially formatted text"
+}
+
+
+# sequence input formats
+# Name  Format name (or alias)
+# Alias Alias name
+# Try   Test for unknown input files
+# Nuc   Can read nucleotide input
+# Pro   Can read protein input
+# Feat  Can read feature annotation
+# Gap   Can read gap characters
+# Mset  Can read seqsetall (multiple seqsets)
+# Name         Alias Try  Nuc  Pro Feat  Gap MSet Description
+InFormat {
+  unknown         No  No  Yes  Yes  Yes  Yes   No "Unknown format"
+  gcg             No Yes  Yes  Yes   No  Yes   No "GCG sequence format"
+  embl            No Yes  Yes   No  Yes  Yes   No "EMBL entry format"
+  swiss           No Yes   No  Yes  Yes  Yes   No "Swissprot entry format"
+  nbrf            No Yes  Yes  Yes  Yes  Yes   No "NBRF/PIR entry format"
+  pdb             No Yes   No  Yes   No   No   No "PDB protein databank format ATOM lines"
+  pdbseq          No Yes   No  Yes   No   No   No "PDB protein databank format SEQRES lines"
+  pdbnuc          No  No  Yes   No   No   No   No "PDB protein databank format nucleotide ATOM lines"
+  pdbnucseq       No  No  Yes   No   No   No   No "PDB protein databank format nucleotide SEQRES lines"
+  fasta           No Yes  Yes  Yes   No  Yes   No "FASTA format including NCBI-style IDs"
+  gifasta         No  No  Yes  Yes   No  Yes   No "FASTA format including NCBI-style GIs (alias)"
+  pearson         No Yes  Yes  Yes   No  Yes   No "Plain old fasta format with IDs not parsed further"
+  fastq           No Yes  Yes   No   No   No   No "FASTQ short read format ignoring quality scores"
+  fastq-sanger    No  No  Yes   No   No   No   No "FASTQ short read format with phred quality"
+  fastq-illumina    No  No  Yes   No   No   No   No "FASTQ Illumina 1.3 short read format"
+  fastq-solexa    No  No  Yes   No   No   No   No "FASTQ Solexa/Illumina 1.0 short read format"
+  sam             No Yes  Yes  Yes   No  Yes   No "Sequence Alignment/Map (SAM) format"
+  genbank         No Yes  Yes   No  Yes  Yes   No "Genbank entry format"
+  refseqp         No  No   No  Yes  Yes  Yes   No "Refseq protein entry format"
+  genpept         No  No   No  Yes   No  Yes   No "Refseq protein entry format (alias)"
+  codata          No Yes  Yes  Yes  Yes  Yes   No "Codata entry format"
+  strider         No Yes  Yes  Yes   No  Yes   No "DNA strider output format"
+  clustal         No Yes  Yes  Yes   No  Yes   No "Clustalw output format"
+  phylip          No Yes  Yes  Yes   No  Yes  Yes "Phylip interleaved and non-interleaved formats"
+  phylipnon       No  No  Yes  Yes   No  Yes  Yes "Phylip non-interleaved format"
+  ace             No Yes  Yes   No   No  Yes   No "ACE sequence format"
+  acedb           No Yes  Yes  Yes   No  Yes   No "ACEDB sequence format"
+  dbid            No  No  Yes  Yes   No  Yes   No "Fasta format variant with database name before ID"
+  msf             No Yes  Yes  Yes   No  Yes   No "GCG MSF (multiple sequence file) file format"
+  hennig86        No Yes  Yes  Yes   No  Yes   No "Hennig86 output format"
+  jackknifer      No Yes  Yes  Yes   No  Yes   No "Jackknifer interleaved and non-interleaved formats"
+  nexus           No Yes  Yes  Yes   No  Yes   No "Nexus/paup interleaved format"
+  treecon         No Yes  Yes  Yes   No  Yes   No "Treecon output format"
+  mega            No Yes  Yes  Yes   No  Yes   No "Mega interleaved and non-interleaved formats"
+  igstrict        No Yes  Yes  Yes   No  Yes   No "Intelligenetics sequence format strict parser"
+  ig              No  No  Yes  Yes   No  Yes   No "Intelligenetics sequence format"
+  staden          No  No  Yes  Yes   No  Yes   No "Old staden package sequence format"
+  text            No  No  Yes  Yes   No  Yes   No "Plain text"
+  gff2            No Yes  Yes  Yes  Yes  Yes   No "GFF feature file with sequence in the header"
+  gff3            No Yes  Yes  Yes  Yes  Yes   No "GFF3 feature file with sequence"
+  stockholm       No Yes  Yes  Yes   No  Yes   No "Stockholm (pfam) format"
+  selex           No  No  Yes  Yes   No  Yes   No "Selex format"
+  fitch           No Yes  Yes  Yes   No  Yes   No "Fitch program format"
+  biomart         No Yes  Yes  Yes   No  Yes   No "Biomart tab-delimited results"
+  mase            No  No  Yes  Yes   No  Yes   No "Mase program format"
+  raw             No Yes  Yes  Yes   No   No   No "Raw sequence with no non-sequence characters"
+  experiment      No Yes  Yes  Yes   No  Yes   No "Staden experiment file"
+  abi             No Yes  Yes  Yes   No  Yes   No "ABI trace file"
+  bam             No Yes  Yes  Yes   No  Yes   No "Binary Sequence Alignment/Map (BAM) format"
+  ensembl         No  No  Yes  Yes  Yes  Yes   No "Ensembl SQL format"
+}
+
+
+# sequence output formats
+# Alias Alias name
+# Single: If true, write each sequence to new file
+# Save: If true, save sequences, write when closed
+# Nuc   Can read nucleotide input
+# Pro   Can read protein input
+# Feat  Can read feature annotation
+# Gap   Can read gap characters
+# Mset  Can read seqsetall (multiple seqsets)
+# Name          Alias Single Save  Pro  Nuc Feat  Gap MSet Description
+
+OutFormat {
+  unknown          No     No   No  Yes  Yes   No  Yes   No "Unknown format"
+  gcg              No     No   No  Yes  Yes   No  Yes   No "GCG sequence format"
+  gcg8            Yes     No   No  Yes  Yes   No  Yes   No "GCG old (version 8) sequence format"
+  embl             No     No   No  Yes   No  Yes  Yes   No "EMBL entry format"
+  emold           Yes     No   No  Yes   No  Yes  Yes   No "EMBL entry format (alias)"
+  emblold         Yes     No   No  Yes   No  Yes  Yes   No "EMBL entry format (alias)"
+  em              Yes     No   No  Yes   No  Yes  Yes   No "EMBL entry format (alias)"
+  emblnew         Yes     No   No  Yes   No  Yes  Yes   No "EMBL new entry format"
+  swiss            No     No   No   No  Yes  Yes  Yes   No "Swissprot entry format"
+  swold           Yes     No   No   No  Yes  Yes  Yes   No "Swissprot entry format"
+  swissold        Yes     No   No   No  Yes  Yes  Yes   No "Swissprot entry format"
+  swissprotold    Yes     No   No   No  Yes  Yes  Yes   No "Swissprot entry format"
+  sw              Yes     No   No   No  Yes  Yes  Yes   No "Swissprot entry format(alias)"
+  swissprot       Yes     No   No   No  Yes  Yes  Yes   No "Swissprot entry format(alias)"
+  swissnew        Yes     No   No   No  Yes  Yes  Yes   No "Swissprot entry format"
+  swnew           Yes     No   No   No  Yes  Yes  Yes   No "Swissprot entry format(alias)"
+  swissprotnew    Yes     No   No   No  Yes  Yes  Yes   No "Swissprot entry format(alias)"
+  fasta            No     No   No  Yes  Yes   No  Yes   No "FASTA format"
+  pearson         Yes     No   No  Yes  Yes   No  Yes   No "FASTA format (alias)"
+  ncbi             No     No   No  Yes  Yes   No  Yes   No "NCBI fasta format with NCBI-style IDs"
+  gifasta          No     No   No  Yes  Yes   No  Yes   No "NCBI fasta format with NCBI-style IDs using GI number"
+  nbrf             No     No   No  Yes  Yes  Yes  Yes   No "NBRF/PIR entry format"
+  pir             Yes     No   No  Yes  Yes  Yes  Yes   No "NBRF/PIR entry format (alias)"
+  genbank          No     No   No  Yes  Yes  Yes  Yes   No "Genbank entry format"
+  gb              Yes     No   No  Yes   No  Yes  Yes   No "Genbank entry format (alias)"
+  ddbj            Yes     No   No  Yes   No  Yes  Yes   No "Genbank/DDBJ entry format (alias)"
+  genpept          No     No   No  Yes  Yes  Yes  Yes   No "Genpept entry format"
+  refseq           No     No   No  Yes   No  Yes  Yes   No "Refseq entry format"
+  refseqp          No     No   No   No  Yes  Yes  Yes   No "Refseqp entry format"
+  gff2             No     No   No  Yes  Yes  Yes  Yes   No "GFF2 feature file with sequence in the header"
+  gff3             No     No   No  Yes  Yes  Yes  Yes   No "GFF3 feature file with sequence in FASTA format after"
+  gff             Yes     No   No  Yes  Yes  Yes  Yes   No "GFF3 feature file with sequence in FASTA format after"
+  ig               No     No   No  Yes  Yes   No  Yes   No "Intelligenetics sequence format"
+  codata           No     No   No  Yes  Yes   No  Yes   No "Codata entry format"
+  strider          No     No   No  Yes  Yes   No  Yes   No "DNA strider output format"
+  acedb            No     No   No  Yes  Yes   No  Yes   No "ACEDB sequence format"
+  experiment       No     No   No  Yes  Yes   No  Yes   No "Staden experiment file"
+  staden           No     No   No  Yes  Yes   No  Yes   No "Old staden package sequence format"
+  text             No     No   No  Yes  Yes   No  Yes   No "Plain text"
+  plain           Yes     No   No  Yes  Yes   No  Yes   No "Plain text (alias)"
+  raw             Yes     No   No  Yes  Yes   No  Yes   No "Plain text (alias)"
+  fitch            No     No   No  Yes  Yes   No  Yes   No "Fitch program format"
+  msf              No     No  Yes  Yes  Yes   No  Yes   No "GCG MSF (multiple sequence file) file format"
+  clustal          No     No  Yes  Yes  Yes   No  Yes   No "Clustalw multiple alignment format"
+  aln             Yes     No  Yes  Yes  Yes   No  Yes   No "Clustalw output format (alias)"
+  selex            No     No  Yes  Yes  Yes   No  Yes   No "Selex format"
+  phylip           No     No  Yes  Yes  Yes   No  Yes  Yes "Phylip interleaved format"
+  phylipnon        No     No  Yes  Yes  Yes   No  Yes   No "Phylip non-interleaved format"
+  phylip3         Yes     No  Yes  Yes  Yes   No  Yes   No "Phylip non-interleaved format (alias)"
+  asn1             No     No   No  Yes  Yes   No  Yes   No "NCBI ASN.1 format"
+  hennig86         No     No  Yes  Yes  Yes   No  Yes   No "Hennig86 output format"
+  mega             No     No  Yes  Yes  Yes   No  Yes   No "Mega interleaved output format"
+  meganon          No     No  Yes  Yes  Yes   No  Yes   No "Mega non-interleaved output format"
+  nexus            No     No  Yes  Yes  Yes   No  Yes   No "Nexus/paup interleaved format"
+  paup            Yes     No  Yes  Yes  Yes   No  Yes   No "Nexus/paup interleaved format (alias)"
+  nexusnon         No     No  Yes  Yes  Yes   No  Yes   No "Nexus/paup non-interleaved format"
+  paupnon         Yes     No  Yes  Yes  Yes   No  Yes   No "Nexus/paup non-interleaved format (alias)"
+  jackknifer       No     No  Yes  Yes  Yes   No  Yes   No "Jackknifer output interleaved format"
+  jackknifernon    No     No  Yes  Yes  Yes   No  Yes   No "Jackknifer output non-interleaved format"
+  treecon          No     No  Yes  Yes  Yes   No  Yes   No "Treecon output format"
+  mase             No     No   No  Yes  Yes   No  Yes   No "Mase program format"
+  dasdna           No     No   No  Yes   No   No  Yes   No "DASDNA DAS nucleotide-only sequence"
+  das              No     No   No  Yes  Yes   No  Yes   No "DASSEQUENCE DAS any sequence"
+  fastq-sanger     No     No   No  Yes   No   No   No   No "FASTQ short read format with phred quality"
+  fastq           Yes     No   No  Yes   No   No   No   No "FASTQ short read format with phred quality"
+  fastq-illumina   No     No   No  Yes   No   No   No   No "FASTQ Illumina 1.3 short read format"
+  fastq-solexa     No     No   No  Yes   No   No   No   No "FASTQ Solexa/Illumina 1.0 short read format"
+  sam              No     No   No  Yes  Yes   No   No   No "Sequence alignment/map (SAM) format"
+  bam              No     No   No  Yes  Yes   No   No   No "Binary sequence alignment/map (BAM) format"
+  debug            No     No   No  Yes  Yes   No  Yes   No "Debugging trace of full internal data content"
+}
+
+
+# Sequence Types
+# Name                 Gap Ambig N/P From     To       Description
+seqType {
+  any                   No   Yes ANY "?"      "X"      "any valid sequence"
+  gapany               Yes   Yes ANY "?"      "X"      "any valid sequence with gaps"
+  dna                   No   Yes NUC "?XxUu"  "NNnTt"  "DNA sequence"
+  puredna               No    No NUC "Uu"     "Tt"     "DNA sequence, bases ACGT only"
+  gapdna               Yes   Yes NUC "?XxUu"  "NNnTt"  "DNA sequence with gaps"
+  gapdnaphylo          Yes   Yes NUC "Uu"     "Tt"     "DNA sequence with gaps and queries"
+  rna                   No   Yes NUC "?XxTt"  "NNnUu"  "RNA sequence"
+  purerna               No    No NUC "Tt"     "Uu"     "RNA sequence, bases ACGU only"
+  gaprna               Yes   Yes NUC "?XxTt"  "NNnUu"  "RNA sequence with gaps"
+  gaprnaphylo          Yes   Yes NUC "Tt"     "Uu"     "RNA sequence with gaps and queries"
+  nucleotide            No   Yes NUC "?Xx"    "NNn"    "nucleotide sequence"
+  purenucleotide        No    No NUC ""       ""       "nucleotide sequence, bases ACGTU only"
+  gapnucleotide        Yes   Yes NUC "?Xx"    "NNn"    "nucleotide sequence with gaps"
+  gapnucleotidephylo   Yes   Yes NUC ""       ""       "nucleotide sequence with gaps and queries"
+  gapnucleotidesimple  Yes   Yes NUC "BbDdHhKkMmRrSsVvWwXxYy?" "NnNnNnNnNnNnNnNnNnNnNnN" "nucleotide sequence with gaps but only N for ambiguity"
+  protein               No   Yes PRO "?*"     "XX"     "protein sequence"
+  pureprotein           No    No PRO ""       ""       "protein sequence without BZ U X or *"
+  stopprotein           No   Yes PRO "?"      "X"      "protein sequence with possible stops"
+  gapprotein           Yes   Yes PRO "?*"     "XX"     "protein sequence with gaps"
+  gapstopprotein       Yes   Yes PRO "?"      "X"      "protein sequence with gaps and possible stops"
+  gapproteinphylo      Yes   Yes PRO ""       ""       "protein sequence with gaps, stops and queries"
+  proteinstandard       No   Yes PRO "?*UuJjOo" "XXXxXxXx" "protein sequence with no selenocysteine"
+  stopproteinstandard   No   Yes PRO "?UuJjOo" "XXxXxXx" "protein sequence with a possible stop but no selenocysteine"
+  gapproteinstandard   Yes   Yes PRO "?*UuJjOo" "XXXxXxXx" "protein sequence with gaps but no selenocysteine"
+  gapproteinsimple     Yes   Yes PRO "?*BbZzUuJjOo" "XXXxXxXxXxXx" "protein sequence with gaps but no selenocysteine"
+}
+
+# sequence access methods
+# Name       Alias Entry Query   All Description
+
+method {
+  dbfetch       No   Yes    No    No "retrieve in text format from EBI dbfetch REST services"
+  emboss        No   Yes   Yes   Yes "dbx program indexed"
+  emblcd        No   Yes   Yes   Yes "use EMBL-CD index from dbi programs or Staden"
+  entrez        No   Yes   Yes   Yes "use NCBI Entrez services"
+  seqhound      No   Yes   Yes   Yes "use BluePrint seqhound services"
+  mrs           No   Yes    No    No "retrieve in text format from CMBI MRS server (MRS2 syntax)"
+  mrs3          No   Yes    No    No "retrieve in text format from CMBI MRS3 server"
+  srs           No   Yes   Yes   Yes "retrieve in text format from a local SRS installation"
+  srsfasta      No   Yes   Yes   Yes "retrieve in FASTA format from a local SRS installation"
+  srswww        No   Yes   Yes   Yes "retrieve in text format from an SRS webserver"
+  url           No   Yes   Yes   Yes "retrieve a URL from a remote webserver"
+  app           No   Yes   Yes   Yes "call an external application"
+  direct        No   Yes   Yes   Yes "reading the original files unindexed"
+  gcg           No   Yes   Yes   Yes "emboss dbigcg indexed"
+  embossgcg     No   Yes   Yes   Yes "emboss dbxgcg indexed"
+  blast         No   Yes   Yes   Yes "blast database format version 2 or 3"
+  biomart       No   Yes    No    No "retrieve a single entry from a BioMart server"
+  sql           No   Yes   Yes   Yes "retrieve from a SQL server"
+  ensembl       No   Yes    No    No "retrieve a single entry from an Ensembl Database server"
+}
+
+# Database attributes
+# Attribute       Default      Comment
+namDbAttrs {
+  format          ""           "database entry format (required, at some level)"
+  method          ""           "access method (required, at some level)"
+  type            ""           "database type 'Nucleotide', 'Protein', etc (required)"
+  accession       ""           "secondary identifier field"
+  app             ""           "external application commandline (APP, EXTERNAL)"
+  appall          ""           "external commandline for 'methodall' (APP, EXTERNAL)"
+  appentry        ""           "external commandline for 'methodentry' (APP, EXTERNAL)"
+  appquery        ""           "external commandline for 'methodquery' (APP, EXTERNAL)"
+  caseidmatch     "N"          "match exact case of entry identifier"
+  comment         ""           "text comment for the DB definition"
+  dbalias         ""           "database name to be used by access method if different"
+  directory       ""           "data directory"
+  exclude         ""           "wildcard filenames to exclude from 'filename'"
+  fields          ""           "extra database query fields, ID and ACC are standard"
+  filters         ""           "database query filters to apply to all retrievals"
+  filename        ""           "(wildcard) database filename"
+  formatall       ""           "database entry format for 'methodall' access"
+  formatentry     ""           "database entry format for 'methodentry' access"
+  formatquery     ""           "database query format for 'methodquery' access"
+  hasaccession    "Y"          "database has an acc field as an alternate id"
+  httpversion     ""           "HTTP version for GET requests (URL, SRSWWW)"
+  identifier      ""           "standard identifier field"
+  indexdirectory  ""           "Index directory, defaults to data 'directory'"
+  methodall       ""           "access method for all entries"
+  methodentry     ""           "access method for single entry"
+  methodquery     ""           "access method for query (several entries)"
+  proxy           ""           "http proxy server, or ':' to cancel a global proxy (URL, SRSWWW)"
+  release         ""           "release of the database, comment only"
+  return          ""           "names fields to be returned"
+  sequence        ""           "sequence field to be returned"
+  url             ""           "URL skeleton for entry level access (URL, SRSWWW)"
+  serverversion   ""           "Version of database server"
+}
+
+# Resource attributes
+# Attribute       Default      Comment
+namRsAttrs {
+  type            ""           "resource type (required)"
+  release         ""           "release of the resource"
+  idlen           ""           "maximum ID length"
+  acclen          ""           "maximum AC length"
+  svlen           ""           "maximum SV length"
+  keylen          ""           "maximum KW length"
+  deslen          ""           "maximum DE length"
+  orglen          ""           "maximum TX length"
+  idpagesize      ""           "ID pagesize"
+  accpagesize     ""           "AC pagesize"
+  svpagesize      ""           "SV pagesize"
+  keypagesize     ""           "KW pagesize"
+  despagesize     ""           "DE pagesize"
+  orgpagesize     ""           "TX pagesize"
+  idcachesize     ""           "ID cachesize"
+  acccachesize    ""           "AC cachesize"
+  svcachesize     ""           "SV cachesize"
+  keycachesize    ""           "KW cachesize"
+  descachesize    ""           "DE cachesize"
+  orgcachesize    ""           "TX cachesize"
+  value           ""           "value appropriate to the resource type"
+}
+
+
+# feature input formats
+# Name  Format name (or alias)
+# Alias Name is an alias
+# Nuc   Valid for nucleotide sequences
+# Pro   Valid for protein sequences
+# Name         Alias   Nuc   Pro Description
+InFormat {
+  unknown         No    No    No "unknown format"
+  embl            No   Yes    No "embl/genbank/ddbj format"
+  refseq          No   Yes    No "embl/genbank/ddbj format"
+  refseqp         No    No   Yes "RefSeq protein format"
+  genpept         No    No   Yes "genpept format"
+  gff3            No   Yes   Yes "GFF version 3"
+  gff2            No   Yes   Yes "GFF version 1 or 2"
+  swiss           No    No   Yes "SwissProt format"
+  pir             No    No   Yes "PIR format"
+}
+
+# feature output formats
+# Name  Format name (or alias)
+# Alias Name is an alias
+# Nuc   Valid for nucleotide sequences
+# Pro   Valid for protein sequences
+# Name         Alias   Nuc   Pro Description
+OutFormat {
+  unknown         No    No    No "unknown format"
+  gff             No   Yes   Yes "GFF version 3"
+  gff2            No   Yes   Yes "GFF version 2"
+  embl            No   Yes    No "embl format"
+  genbank         No   Yes    No "genbank format"
+  ddbj            No   Yes    No "ddbj format"
+  pir             No    No   Yes "PIR format"
+  swiss           No    No   Yes "SwissProt format"
+  dasgff          No   Yes   Yes "DAS GFF format"
+  debug           No   Yes   Yes "Debugging trace of full internal data content"
+}
+
+
+# alignment output formats
+# Name    Format name (or alias)
+# Minseq  Minimum number of sequences
+# Maxseq  Minimum number of sequences
+# Nuc     Valid for nucleotide sequences
+# Pro     Valid for protein sequences
+# Header  Include standard header/footer blocks
+# Desc    Format description
+# Name         Alias Nuc Nuc Pro Minseq Maxseq Description
+
+AFormat {
+  unknown         No  No  No Yes       0      0 "Unknown format"
+  fasta           No Yes Yes  No       0      0 "Fasta format sequence"
+  msf             No Yes Yes  No       0      0 "MSF format sequence"
+  clustal         No Yes Yes  No       0      0 "clustalw format sequence"
+  mega            No Yes Yes  No       0      0 "Mega format sequence"
+  meganon         No Yes Yes  No       0      0 "Mega non-interleaved format sequence"
+  nexus           No Yes Yes  No       0      0 "nexus/paup format sequence"
+  nexusnon        No Yes Yes  No       0      0 "nexus/paup non-interleaved format sequence"
+  phylip          No Yes Yes  No       0      0 "phylip format sequence"
+  phylipnon       No Yes Yes  No       0      0 "phylip non-interleaved format sequence"
+  selex           No Yes Yes  No       0      0 "SELEX format sequence"
+  treecon         No Yes Yes  No       0      0 "Treecon format sequence"
+  debug           No Yes Yes Yes       0      0 "Debugging trace of full internal data content"
+  markx0          No Yes Yes Yes       2      2 "Pearson MARKX0 format"
+  markx1          No Yes Yes Yes       2      2 "Pearson MARKX1 format"
+  markx2          No Yes Yes Yes       2      2 "Pearson MARKX2 format"
+  markx3          No Yes Yes Yes       2      2 "Pearson MARKX3 format"
+  markx10         No Yes Yes Yes       2      2 "Pearson MARKX10 format"
+  match           No Yes Yes Yes       2      2 "Start and end of matches between sequence pairs"
+  pair            No Yes Yes Yes       2      2 "Simple pairwise alignment"
+  simple          No Yes Yes Yes       0      0 "Simple multiple alignment"
+  sam             No Yes Yes  No       2      2 "Sequence alignent/map (SAM) format"
+  bam             No Yes Yes  No       2      2 "Binary sequence alignent/map (BAM) format"
+  score           No Yes Yes Yes       2      2 "Score values for pairs of sequences"
+  srs             No Yes Yes Yes       0      0 "Simple multiple sequence format for SRS"
+  srspair         No Yes Yes Yes       2      2 "Simple pairwise sequence format for SRS"
+  tcoffee         No Yes Yes  No       0      0 "TCOFFEE program format"
+}
+
+
+# report output formats
+# Name    Format name (or alias)
+# Alias   Alias name
+# Nuc     Valid for nucleotide sequences
+# Pro     Valid for protein sequences
+# Head    Include standard header/footer blocks
+# Mintags Minimum number of tags to be specified (0 for all)
+# Showseq Includes sequence
+# Desc    Format description
+# Name          Alias Nuc Pro Head Mintags Showseq Description
+
+RFormat {
+  simple          No Yes Yes Yes        0      No "Simple report"
+  embl            No Yes  No  No        0      No "EMBL feature format"
+  genbank         No Yes  No  No        0      No "Genbank feature format"
+  gff             No Yes Yes  No        0      No "GFF3 feature format"
+  pir             No  No Yes  No        0      No "PIR feature format"
+  swiss           No  No Yes  No        0      No "Swissprot feature format"
+  dasgff          No Yes Yes  No        0      No "DAS GFF feature format"
+  debug           No Yes Yes Yes        0     Yes "Debugging trace of full internal data content"
+  listfile        No Yes Yes Yes        0      No "EMBOSS list file of sequence USAs with ranges"
+  dbmotif         No Yes Yes Yes        0     Yes "Motif database hits"
+  diffseq         No Yes Yes Yes        7     Yes "Differences between a pair of sequences"
+  excel           No Yes Yes  No        0      No "Tab-delimited file for import to Microsoft Excel"
+  feattable       No Yes Yes  No        0      No "EMBL format feature table with internal tags"
+  motif           No Yes Yes Yes        0     Yes "Motif report"
+  nametable       No Yes Yes Yes        0      No "Simple table with sequence name"
+  regions         No Yes Yes Yes        0      No "Annotated sequence regions"
+  seqtable        No Yes Yes Yes        0     Yes "Simple table with sequence on each line"
+  srs             No Yes Yes Yes        0      No "Simple report format for SRS"
+  table           No Yes Yes Yes        0      No "Simple table"
+  tagseq          No Yes Yes Yes        0      No "Sequence with features marked below"
+}
+
+
+# codon usage input formats
+# Name  Format name (or alias)
+# Try   Test for unknown input files
+# Desc  Format description
+# Name         Try Description
+
+Format {
+  emboss       Yes "EMBOSS codon usage file"
+  cut           No "EMBOSS codon usage file"
+  gcg          Yes "GCG codon usage file"
+  cutg         Yes "CUTG codon usage file"
+  cutgaa        No "CUTG codon usage file with aminoacids"
+  spsum        Yes "CUTG species summary file"
+  cherry        No "Mike Cherry codonusage database file"
+  transterm     No "TransTerm database file"
+  codehop      Yes "FHCRC codehop program codon usage file"
+  staden       Yes "Staden package codon usage file with numbers"
+  numstaden     No "Staden package codon usage file with numbers"
+}
+
+
+# codon usage output formats
+# Name  Format name (or alias)
+# Desc  Format description
+# Name         Description
+
+OFormat {
+  emboss       "EMBOSS codon usage file"
+  cut          "EMBOSS codon usage file"
+  gcg          "GCG codon usage file"
+  cutg         "CUTG codon usage file"
+  cutgaa       "CUTG codon usage file with aminoacids"
+  spsum        "CUTG species summary file"
+  cherry       "Mike Cherry codonusage database file"
+  transterm    "TransTerm database file"
+  codehop      "FHCRC codehop program codon usage file"
+  staden       "Staden package codon usage file with numbers"
+  numstaden    "Staden package codon usage file with numbers"
+}
+
+
+# Graphics Devices
+# Name     Name
+# Alias    Alias name
+# Device   Device name
+# Extension Filename extension (null if no file created)
+# Description
+# Name       Alias Device     Extension Description
+GraphType {
+  ps            No ps         .ps        "Postscript"
+  hpgl          No lj_hpgl    .hpgl      "HPGL general"
+  hp7470        No hp7470     .hpgl      "HPGL 7470 pen plotter"
+  hp7580        No hp7580     .hpgl      "HPGL 7580 pen plotter"
+  meta          No plmeta     .meta      "Metafile"
+  cps           No psc        .ps        "Colour postscript"
+  x11           No xwin       null       "X11 in new window"
+  tek           No tek4107t   null       "Tektronix screen graphics"
+  tekt          No tekt       null       "Tektronix screen graphics"
+  none          No null       null       "No output"
+  data          No data       .dat       "Data file for Staden package"
+  das           No das        .das       "Data file for DAS server"
+  xterm         No xterm      null       "Xterm screen graphics"
+  png           No png        .png       "PNG graphics files"
+  gif           No gif        .gif       "GIF graphics files"
+  svg           No svg        .svg       "SVG graphics files"
+}

@@ -1,0 +1,220 @@
+* various notes from slips of papers:
+  - why does a Reporter need to make another copy of a local file?
+  - XSLT processing for Gowlab is not finished
+    (check out also http://www.iopus.com/imacros/firefox - useful for us?)
+  - Can we set maximum memory limit for the executables?
+    For example running the EMBOSS dotpath application with wordsize 4 
+    freezes a fedora 8 server with 1 GB memory.
+    (LSF supports specifying maximum memory use for the submitted jobs)  
+  - walk through TBD's
+  - empty protocol property should result in no protocol, not the default one
+    (in ServiceLocator)
+
+  - When the WEB-INF/classes/soaplab.properties file of a running 
+    soaplab web application is modified tomcat unloads the previous instance
+    of the web application and then reloads the web application again.
+    We have noticed that when tomcat unloads the previously running soaplab web
+    application it doesn't automatically terminates the threads already spawned by
+    that soaplab web application. However after unloading the web application,
+    all(we observe) static fields available to the previously spawned threads
+    become null. Based on this observation if the log fields of the ServiceCleaning
+    and JobCleaning threads are null we decide the threads belong to an unloaded
+    Soaplab web application and they are terminated.
+    There should however be better ways of terminating the
+    previously spawned threads when tomcat unloads a web application.
+
+
+  - [full] format validation of inputs (use class Formatter for %f... formats)
+  - is property runtime.dir really reloadable? (try in Tomcat)
+
+  - perhaps do not show result_url if the original result is empty
+
+  - display.showdb - how to send 'boolean false' (e.g. comment false)
+    (perhaps problem with "calculated fields"?
+     0r, with not (yet) supporting -noXXX options?)
+
+  - make sure that 'tagsepar' is well documented (why doe sit use
+    '='?, why not just 'tagsepar +'? [then update MetadataGuide.html]
+
+----
+Testing, debugging:
+
+* more junit
+* some junit test for JobState and FileStorage synchronization
+
+----
+Documentation:
+
+  - Gowlab.html
+  - update DevelopersGuide.html
+    - document user-defined parameters (see SERVER_CLASS in CmdLineJob...,
+      an example can be a boolean argument with tags prefixed by '+' and '-')
+    - examples of a simple implementation of a Job, and DataAdaptor, and Parameter
+    - JobFactory is missing there
+
+  - API
+    * update javadoc, at least in the main interfaces
+    * what should be in the generated API? better package.html's
+
+  - activate _no_report.html cookies
+
+  - create a Wikipedia article
+
+
+
+----
+Bug in gowlab:
+   parameter: "Y"
+     and
+   query=oryze (only works with method?)
+
+   * why list does not work in gowlab?
+   * there is a problem with using the word 'format' in th method
+
+----
+   - Maven
+     - uploading to maven had problems
+----
+
+   - 'method' problems: try [$greeting]... and it separate square
+      brackets as separate argument...
+      - also -m option in ExploreParameters did not work for me
+
+=======================================
+
+* OMII
+
+* renew the idea of distributing war files with pre-packed services
+
+* what event filters for events?
+* channel notification & negotiation
+* an example how to extend JobState by my own states [low priority]
+* DB Storage handler
+  - incl. new db connections pools
+
+* a BeanShell Job
+
+* derived services
+
+* Tom's comments:
+  - analysis categories: more levels
+  - input data (even paramneters) should be a structure: data and a type where
+    type says "the data re direct" or "the data are a reference"
+
+* Gowlab with authentication?
+  - would need a special input parameters (username, password)
+    that would be treated differently from the other parameters
+
+* admin/ExploreMetadata
+  - prints more than -ii;
+  - also where are metadata read from, how old is its file, etc.
+
+* dependency rules
+
+* in the new version of ACD/XML generator:
+  - specify the role of (or remove) options 'datatype', etc.
+  - remove <event...> tag
+
+* to have a separate output adaptor for the URL-based results (in
+  order to add there some hyperlinks)
+
+* patch war utility?
+
+* IOParameter - use ThreadLocal for List<IOData> variable
+  (but make this change only after creating junit tests)
+
+* input/output data adapter interfaces
+  - add there feature to change direct data to indirect
+    (e.g. input is a list of files - a byte[][] - and I need on the
+     command-line a comma-separated list of these files;
+     which means that for IOData the returned value from the adaptor
+should be a reference, so the IOData just puts in on the command-line,
+but the metadata still says that the input is direct data - that's how
+the input was given to the adaptor)
+
+* should we allow a direct_url for filelists?
+
+* listfile, dirlist...
+
+* truevalue? (in gowlab)
+
+* Open again the issue how to distinguish/send binary files as inputs
+  (and also implications of binary outputs);
+  how/if "comment: bindata" works
+
+* referring to the real values of other parameters in ACD file
+  (e.g. graphics.dot:
+   # the 'extension' works but it may be confusing
+   # if the wanted format is different; the best
+   # would be (TBD) to use: extension: ${format})
+
+* JSP client to run services (not only o list them)
+
+* dealing with repeatables:
+
+  - what env. vars create when ENVAR and more repetitions?
+  - test ACD for repeatability (min should be 0 or 1?)
+  - example ACD file for repeates
+  - 'repeatibility' should be in AnalysesSpec - it is important for clients to know...
+  - repeatable (min, max) are not always propagated from an ACD file
+    to XML
+
+* perhaps to return to the idea to disribute war files
+
+* Metadata:
+  - attribute 'datatype' should be also present by those inputs that are
+    either only direct or only URL (as it is for inputs allowing both,
+    direct data and reference)
+  - and also for all emboss "additional" files (such as matrices)
+  - type=long is lost (send, sbegin, etc.) - we should rectify it
+
+  - re-write the whole XML parsing by using JAXB?
+    - InputPropertyDef should also have 'allowed_values_shown_as'
+      (this is now hidden in the analysis extension part; it
+       will be easier to get it when JAXB is used)
+      - when this is done, use it in Spinet to fill the select list
+        with '...shown_as' texts
+
+  - 'separator' in 'lists' (choice_list tag) is used correctly but it
+    does not seem correct in the XML file (see testing.lists)
+
+* When calling ant axis1war target the service-list call using
+CmdLineClient uses the metadata directory property set for the
+war file being prepared and fails with errors as it could not find
+the metadata directory. This errors are also printed into the 
+wsdd file being generated which should normally be printed
+on the screen so user aware of the problem. 
+
+===============
+
+* input files are written twice, test/debug using the following example
+
+  input_direct_data testing12345 list ::data/file.list -protocol local
+
+* Is it possible to set in soaplab2 a queue size for runs? (Eric Perche)
+  Because we have some workflows which call lot of web servcices in parallel
+  and it could be critical for the stability of the OS.
+
+===============
+
+These are notes that I am not anymore sure what I meant...
+----------------------------------------------------------
+
+* in CmdLineJob constructor, about sharedAttributes: "...||
+jobRecreated" is correct? Why? I can perhaps have more recreated jbs
+in the same JVM, so why to call init() for each of them?...
+
+---
+
+Sourceforge:
+
+You don't have an active shell at this time.  For basic file transfers and
+management, use web.sourceforge.net -- it allows rsync, sftp, and scp access.
+
+If you would like to create a shell, use ssh to login using a USER,PROJECT
+username with the "create" command.  If you tell ssh to allocate a tty
+(e.g. using -t), an interactive shell will be opened when the create is
+done.  Otherwise, the create command will exit when the shell becomes
+ready for use.  An example create that enters the shell when ready:
+
+    ssh -t USER,PROJECT@shell.sourceforge.net create

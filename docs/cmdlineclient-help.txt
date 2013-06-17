@@ -1,0 +1,159 @@
+CmdLineClient
+=============
+
+Usage:
+   build/run/run-cmdline-client -h[elp]
+   build/run/run-cmdline-client <find-arguments> <list-options>
+   build/run/run-cmdline-client <find-arguments> [options] [inputs] [results] 
+
+where:
+
+  -h[elp]  ... print this help
+  -q       ... quiet mode (useful when you want to redirect
+               a result into a file)
+  -stack   ... in case of any error it prints the stack trace
+               (without this option, it prints it only when a
+                serious runtime error occures)
+
+where <find-arguments> defines what service to use, where to find it
+and what protocol to use to access it (some of these parameters may
+also be specified in the Soaplab client configuration property file -
+by default named soaplab.client.properties and put on the CLASSPATH):
+
+   -protocol jaxws   ... service will be accessed as a Web Service,
+                         using JAX-WS toolkit (default protocol)
+   -protocol local   ... service will be accessed as local class
+                         (no remote server or any Web Service used)
+   -protocol axis1   ... service will be accessed as a Web Service,
+                         using old Axis 1 toolkit (such protocol may
+                         not be supported by the given Soaplab server)
+
+   -host <host>      ... host name (default: localhost)
+   -port <port>      ... port number (defaullt: 8080)
+   -ctx <context>    ... context part of the URL (default: soaplab2)
+
+ For Analysis service requests:
+
+   -name <service>   ... a name of a service to be called
+                         (mostly mandatory, unless -e given or
+                          only <list-options> used)
+
+   -e <url>          ... a full service URL (an endpoint);
+                         if given it has precedence over -host, -port,
+                         -ctx, and -name;
+                         default is created from other parameters as:
+                         http://<host>:<port>/<context>/services/<service>
+
+ For List service requests:
+
+   -lname <service>  ... a name of a list service to be called
+                         (default   'AnalysisFactory' for axis1 protocol,
+                          otherwise 'list')
+
+   -el <url>         ... a full List service URL (an endpoint);
+                         if given it has precedence over -host, -port, -ctx,
+                         and -lname;
+                         default is created from other parameters as:
+                         http://<host>:<port>/<context>/services/<list-service>
+
+   -sl <filename>    ... where to save produced lists;
+                         by default the lists are shown on standard
+                         output (which is usually a screen)
+
+
+where <list-options> defines list request:
+
+   -l                ... show all analyses and categories
+   -la               ... show all analyses
+   -lad              ... show all analyses with short descriptions
+   -lc               ... show all categories
+   -category <category-name>
+                     show analyses of the given category
+
+where the main <options> are one of the following (the behaviour may
+depend on whether also parameter '-job' is given):
+
+   -j                ... create a job, but not start it
+   -x                ... create a job and start it, but do not wait for it
+   -x -job <job-ID>  ... start given job, do not wait for it
+                         (note that the options -j and -x have none or only
+                          limited use for '-protocol local')
+   -w                ... create a job, start it, wait for its completion
+   -w -job <job-ID>  ... wait for completion of the given job
+   -k -job <job-ID>  ... kill the given job
+   -jp <file>        ... store a job ID into given file
+                         (default: print it on standard error)
+
+where other <options> are (they are associated either with a job
+created in the same invocation, or with a job defined by a '-job' parameter):
+
+   -s                ... print job status
+   -c                ... print job time characteristics
+   -le               ... print the last event associated with a job
+                         (TBD: more options related to notification)
+   -clean            ... destroy given job and all its resources
+                         (which includes removing also results)
+
+where options showing metadata (not associated with any particular job) are:
+
+   -d                ... show analysis full description
+                         (it prints an XML file with all details)
+   -t                ... show analysis type and few other properties
+   -i                ... show names of analysis inputs
+   -ii               ... show names and attributes of analysis inputs
+   -o                ... show names of possible results
+   -oo               ... show names and types of possible results
+
+where <inputs> is a list of input names and its values:
+      available names can be found using option -i,
+
+   <input-name> <input-value>
+      for boolean inputs the <input-value> should be
+      'true' or 'false' (but see also below -<input-name>);
+
+      some inputs allow multiple (repetitive) values - they can be
+      entered using a bar character as separator '|', for example:
+         name 'Kim|Blanka'
+      (note that the quote characters must be there to avoid the UNIX
+       shell to misinterpret the bar character);
+      you need to quote the value if the bar character should be part
+      of the value, for example (again, double quoting is because of
+      the UNIX shell):
+         name "'this|is|not|a|pipe'"  (means just single value)
+                     
+   <input-name> :<input-value>
+      a value starting with ':' is treated as a file name
+      and the contents of this file is used as an input;
+
+      multiple (repetitive) values with file names are also allowed:
+         name ':file1|:file2|not-a-file'
+
+   <input-name> ::<input-value>
+      a value starting with two colons ('::') is treated as a file
+      name whose contents is a list of line-separated file names;
+      these files are read and their contents is sent as an array
+      to the service as an input (of course, it works only for the
+      services that expects such input);
+
+      Note that this feature cannot be combined with a
+      repeatable value;
+
+   -<input-name>
+      can be used for boolean parameters and it means the same as:
+        <input-name> true
+
+
+
+where <results> defines if any results will be returned back:
+
+   -ri                ... return info (such as size) about all results
+   -r                 ... return all results
+   -r <list of names> ... what results to retrieve,
+                          available result names can be found using option -o
+                          (no list means getting all available results);
+                          Note: the binary results are written into a file,
+                                or into several files, with unique names
+                                (unless given an almost undocumented
+                                 "binary print" option -bp) 
+   -sr                    saves results (except 'report') to the current
+                          working directory

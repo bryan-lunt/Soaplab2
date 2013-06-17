@@ -1,0 +1,2371 @@
+<html> <head>
+<title>Soaplab2: Metadata</title>
+
+<link rel="shortcut icon" href="images/favicon.ico" >
+<link rel="icon" href="images/animated_favicon1.gif" type="image/gif" >
+<link rel="stylesheet" href="images/stylesheet.css" type="text/css">
+
+</head>
+
+<body>
+<h1>Metadata Guide</h1>
+<img class="motto-img" src="images/motto-metadata-guide.jpg" border=0 align="left"/>
+
+Metadata are information about Soaplab2 services. Such as service
+name, what inputs a service can consume, what types of results it can
+produce, and much more. Metadata are cornerstones of Soaplab2: A
+Soaplab2 service provider does not need to program anything but she
+needs to know how to describe her services by using metadata. <p>
+
+Metadata are everywhere around us - and they are expressed in many
+incompatible formats. Metadata are the <em>Tower of Babel</em> of the
+current world. Let's concentrate on the Soaplab2's contribution to the
+world chaos. <p>
+
+<br clear="all"/>
+
+Soaplab2 uses two major types of metadata:
+
+<ul>
+  
+  <li class="tiny"> Metadata containing a list of available Soaplab2 services and
+how they are grouped together, <p>
+
+  <li class="tiny"> and metadata containing details about each Soaplab2 service. <p>
+
+</ul>
+
+The former one is a very simple XML file (its DTD is in <a
+href="SoaplabList.dtd"><tt>SoaplabList.dtd</tt></a>) that a casual
+service provider does not need to know much (if anything) about
+because this metadata file is created automatically when services are
+being deployed. Therefore, its contents is sketched only in the <a
+href="DevelopersGuide.html#standard-list">developers guide</a>. A
+service provider just needs to know which such lists to include in the
+Soaplab2 configuration - that part is described in the <a
+href="ConfigurationGuide.html">configuration guide</a> (look there for
+the property <pn>applist</pn>). <p>
+
+The latter one (metadata describing individual services) is the main
+topic of this document. <p>
+
+Each service has to be described. In the run time (when Soaplab2
+services are serving the world) such description is also expressed in
+the XML format - but a service provider can (and usually does) use a
+simpler, more "human-readable" (and better editable) format - the ACD
+format (more about its origin a bit later). Soaplab2 converts (in the
+build, deployment time) the ACD files to its native XML files. <p>
+
+<div class="note">At the moment, this conversion is the only remaining
+part of Soaplab2 that is not pure Java. The ACD to XML converter is
+still written in Perl. Which does not matter much on the Linux
+machines but may be a disadvantage under Windows operating
+systems. The pure Java converter is, however, coming, hopefully sooner
+than later. </div>
+
+
+<div class="doctoc">
+<dl>
+  <dt> <a href="#acd">ACD metadata files</a>
+       <dl>
+	 <dt> <a href="#start">Getting started with the ACD syntax</a>
+	 <dt> <a href="#attrs">Application attributes</a>
+	 <dt> <a href="#general">General attributes for all data types</a>
+	      <dl>
+		<dt> <a href="#mandatory">How to say that a parameter is mandatory</a>
+		<dt> <a href="#default">How to use default values</a>
+		<dt> <a href="#semantics">How to specify semantics</a>
+		<dt> <a href="#method">Building the command-line or request</a>
+	      </dl>
+	 <dt> <a href="#datatypes">Data types and their specific attributes</a>
+	      <dl>
+		<dt> <a href="#infiles">Data types for input <em>real</em> data (like files)</a>
+		<dt> <a href="#args">Data types for input arguments</a>
+		<dt> <a href="#outfiles">Data types for outputs</a>
+	      </dl>
+	 <dt> <a href="#issues">(Some) known issues</a>
+       </dl>
+  <dt> <a href="#build">Building metadata</a>
+       <dl>
+	 <dt> <a href="#where">Where to create metadata</a>
+	 <dt> <a href="#convert">How to convert ACD to XML files</a>
+	 <dt> <a href="#applist">How to tell Soaplab about XML files</a>
+       </dl>
+</dl>
+</div>
+
+
+<a name="acd"></a>
+<h2>ACD metadata files</h2>
+
+The ACD files are files describing parameters and behavior of the
+Soaplab2 services, using format introduced by <a
+href="http://www.emboss.org" target="_blank">EMBOSS</a>. The format is
+flexible enough to be used also for non-EMBOSS applications. Such
+files can be created relatively easily by manual editing. <p>
+
+<div class="note"> The term "created relatively easily" is a relative
+term, of course. There is an ongoing effort to add an interactive
+editor for ACD files to Soaplab2. But it is not a high priority, at
+least not at the moment. Any takers? </div>
+
+Another advantage of using the ACD format is that all EMBOSS tools
+already are described by the ACD files (the EMBOSS distribution
+includes all their ACD files). Therefore, deploying EMBOSS
+applications as Web services is a question of few clicks or commands -
+after all, that was the main motivation behind Soaplab from its
+beginning. <p>
+
+Here is an example of a simple ACD file for the classic
+<em>HelloWorld</em> application:
+
+<pre class="code">
+appl: HelloWorld [
+  documentation: "Classic greeting from the beginning of the UNIX epoch"
+  groups: "Classic, Simple"
+  nonemboss: "Y"
+  executable: "echo"
+]
+
+string: greeting  [
+  additional: "Y"
+  parameter: "Y"
+  default: "Hello World"
+  comment: "defaults"
+]
+
+outfile: output  [
+  additional: "Y"
+  default: "stdout"
+]
+</pre>
+
+The example above defines a service <em>HelloWorld</em>
+
+<ul>
+
+  <li class="tiny"> that is visible to the world as a Web service
+<tt>classic.helloworld</tt> or <tt>simple.helloworld</tt> (each
+application can be qualified as part of several different groups), <p>
+
+
+  <li class="tiny"> that is represented by a command-line program
+<tt>echo</tt> (which will run fine on any Linux machine but may have
+problems under Windows where there is no such program usually), <p>
+
+  <li class="tiny"> that has one optional (additional) parameter named
+<em>greeting</em> whose default value ("Hello World") is always echoed
+by the command-line program (the service user can change the value by
+sending a different greeting value), and <p>
+
+  <li class="tiny"> that the output (the greeting itself) is produced
+on the standard output (of the <tt>echo</tt> program). Of course, Web
+services do not have "standard output" - but that is already a task of
+Soaplab to catch the output from <tt>echo</tt> and deliver it to the
+client machine as a result.
+
+</ul><p>
+
+The XML file representing the same metadata (and created by the ACD to
+XML converter from the file above) is much less human-readable and you
+do not want/need to <a href="helloworld_al.xml">see it</a> (for
+developers: its DTD is <a href="SoaplabAnalysis.dtd">also
+available</a>). <p>
+
+<a name="start"></a>
+<h3>Getting started with the ACD syntax</h3>
+
+The original documentation of the ACD syntax is, obviously, available
+from the <a
+href="http://emboss.sourceforge.net/developers/acd/">EMBOSS</a>. But
+keep in mind two things:
+
+<ul>
+
+  <li class="tiny"> The EMBOSS uses many more parameters and
+attributes than is needed for the non-EMBOSS programs (for example, it
+recognizes an important, but EMBOSS specific, parameter type
+<em>sequence</em>). Soaplab2 understands and uses these parameters -
+but only for EMBOSS applications. And because it is unlikely that you
+would need to create ACD files for EMBOSS yourselves, you do not need
+to know these parameters. Therefore, if you read the original EMBOSS
+documentation on the ACD syntax, keep in mind that you can use only a
+subset of available parameters (the subset is described later in this
+document). <p>
+
+  <li class="tiny"> On the other hand, the non-EMBOSS applications
+need attributes that were never introduced to EMBOSS programs (for
+example, the attribute <em>make_url</em> for creating a reference to
+the service output, or the attribute <em>method</em> for creating more
+complex command lines). These new attributes are (usually) added to
+the ACD files as "comments" - this way the original EMBOSS parser and
+validator of the ACD files ignores them without complaining. The
+EMBOSS documentation obviously does not include these new attributes -
+you can find them only in this document. <p>
+
+</ul>
+<p>
+
+The original purpose of Soaplab was to wrap the command-line programs
+as Web services. That's why on many places in this documentation we
+relate ACD files to the command-line options. But as Soaplab evolved
+it became clear that the ACD files could describe not only
+command-line tools but other type of programs, as well. Soaplab2 can
+make Web services around regular web pages (see a sub-project <a
+href="Gowlab.html">Gowlab</a>) or on top of other Web services (for
+example, the wrappers around the Web services provided by EBI are
+distributed together with Soaplab2 as plug-ins). <p>
+
+It would be, therefore, more precise to talk about "inputs",
+"parameters" and/or "outputs", instead of "command-line parameters
+and/or options". Adapt your mind please when reading this document. By
+<em>applications</em>, we mean here a command-line program, or
+anything else that can be wrapped as a Web service and that needs some
+input data and can produce some resulting data. <p>
+
+Now, we can finally start with the syntactical rules...<p>
+
+Each application is defined by one ACD file. The ACD file names will
+be used as a (part of) names of the Soaplab2 services. The ACD files
+use the extension '.acd'. <p>
+
+ACD files can have comments. They start with "#" and continue to the
+end of the line. Empty lines are ignored. <p>
+
+Each application has zero or more parameters. In an ACD
+file, each of them is defined by a single token followed by either a
+colon ':' (preferred) or an equal sign '=' which in turn is followed
+by a second token. The definition of the parameter is delimited by a
+pair of square brackets '[ ]', which can span multiple lines:
+
+<pre class="code">
+token: token [
+
+   definition
+
+]
+</pre>
+
+Tokens representing keywords can be abbreviated up to the point where
+they are not ambiguous. For example, <tt>default:</tt> can be
+abbreviated to <tt>def:</tt>. <p>
+
+The first definition in any ACD file must start with token
+<tt>application</tt> (usually abbreviated to <tt>appl</tt>) followed
+by a token representing the application name, and by attributes
+describing the whole application (not just an individual parameter):
+
+<pre class="code">
+appl: <em>appname</em> [ 
+
+    application attributes
+
+]
+</pre>
+
+Then follow definitions of the application's parameters. The first
+token in these definitions is a <em>datatype</em>. The data type is a
+keyword and must be from the pre-defined set of data types. The second
+token is the name by which this parameter is going to be known. The
+definition contains parameter-specific attributes (various data types
+may have different set of allowed attributes):
+
+<pre class="code">
+<em>datatype</em>: <em>parameter_name</em> [ 
+
+   parameter attributes
+
+  ]
+</pre>
+
+Both application and parameter attributes consist of a name (a keyword
+from a pre-defined set of names), followed by a colon and a
+value. Values can be delimited by single or double quotes. A value
+representing a boolean value should be either <tt>Y</tt> or
+<tt>N</tt>. <p>
+
+<div class="note"> The ACD syntax also allows to group parameter
+definitions into several sections (input parameters, output
+parameters, advanced parameters and perhaps other). The Soaplab2
+ignores sections - so they are not shown in the examples in this
+document. However, if you look into available ACD files for the EMBOSS
+programs you will notice them. </div>
+
+As already mentioned, Soaplab2 uses attribute <tt>comment</tt> to add
+its own (non-EMBOSS) attributes (options). The syntax for the values
+of such attributes is a name followed by a space, followed by its
+<em>real</em> value (both must be together quoted). For example, here
+is an attribute (an option) <tt>tagsepar</tt> with its value
+<tt>-</tt> (minus):
+
+<pre class="code">
+infile: library  [
+  additional: "Y"
+  information: "A custom  PostScript  library file"
+  <b>comment: "tagsepar -"</b>
+]
+</pre>
+
+If there is no <em>real</em> value (meaning: nothing separated by a
+space) the resulting Soaplab2 option is considered to be boolean with
+the value <em>true</em> (and the quotes are not needed), as in this
+example:
+
+<pre class="code">
+comment: bindata
+</pre>
+
+An ACD file may have any number of such <tt>comment</tt>
+attributes. If you are a developer creating your own plug-in, you can
+use the <tt>comment</tt> attributes for passing any options or any
+additional metadata. Of course, if you do so, only the selected
+clients will be able to use such additional information - but Soaplab2
+does not stop to propagate unknown options to the XML metadata. <p>
+
+
+<a name="attrs"></a>
+<h3>Application attributes</h3>
+
+The first token of an ACD file must be <tt>application</tt> (or
+abbreviated, usually as <tt>appl</tt>), followed by the application
+name. The application name is used as the name of the executable
+command-line program - unless there is an attribute
+<tt>executable</tt>. For example, here the command-line program name
+is <tt>dot</tt>:
+
+<pre class="code">
+appl: dot [
+   ...
+]
+</pre>
+
+When the wrapped resource is not a command-line program (but, for
+example, a web page) the application name is not used (but must be
+present). <p>
+
+Here is a list of recognized application attributes (note that those
+known only to Soaplab2 are already shown as part of the
+<tt>comment</tt> attribute): <p>
+
+<dl>
+  <dt> <span class="hitt">documentation</span>
+
+  <dd> A string describing briefly the function of the program. In
+some cases only the first part (up to the first dot) is used. <p>
+
+  <dt> <span class="hitt">groups</span>
+  <dd> This attribute allows grouping programs together based on their
+functionality. Its value contains one or more group names. When an
+application belongs to more then one group, the group names must be
+separated by either a comma or semi-colon. <p>
+
+       The group name, together with the ACD base file name, creates
+the Soaplab2 service name (using a dot as a separator and making
+everything lower-case). If a tool belongs to more groups, more
+Soaplab2 services are created (even though they are identical in their
+behaviour). For example:
+
+<pre class="code">
+appl: HelloWorld [
+  documentation: "Classic greeting from the beginning of the UNIX epoch"
+  <b>groups: "Classic, Simple"</b>
+  ...
+]
+</pre>
+       
+       If the lines above are from a file <tt>helloworld.acd</tt>, two
+Soaplab services will be created:
+
+<pre class="script">
+classic.helloworld
+simple.helloworld
+</pre>
+
+       <div class="note"> Even though these two services have
+different names, they both have the identical XML metadata (even in
+two separate files in two different directories). </div>
+       
+  <dt> <span class="hitt">relations</span>
+
+  <dd> This attribute is conceptually similar to the <tt>groups</tt>
+  attribute. It allows to describe application semantics - more about
+  it in <a href="#semantics">how to specify semantics</a>. </dd><p/>
+
+  <dt> <span class="hitt">supplier</span>
+       
+  <dd> It identifies, in free-text, who is supplying this
+application. For <a href="Gowlab.html">Gowlab</a> it has a special
+(and important) purpose: it contains a URL of a web resource that is
+being wrapped (it is a mandatory attribute for Gowlab).  <p>
+
+       
+  <dt> <span class="hitt">version</span>
+       
+  <dd> A version of this application, a free-text. <p>
+
+       
+  <dt> <span class="hitt">executable</span>
+       
+  <dd> A name of an executable program (or a script) representing this
+application. If missing, the application name (as specified in the
+<tt>appl</tt> line) is used instead. If the name of the executable has
+non-alphabetic characters, it must be specified here because the
+application name does not allow them. <p>
+
+       It is not recommended to put here the full path of the
+executable - it would make the ACD file non-portable. The path can be
+added later, as a run-time configuration property (look for the
+property <tt>addtopath.dir</tt> in the <a
+href="ConfigurationGuide.html">configuration guide</a> for
+details). <p>
+
+       An example was given above for the <tt>hellowold</tt>
+application where the executable was the Unix program <tt>echo</tt>.
+<p>
+
+  <dt> <span class="hitt">nonemboss</span>
+
+  <dd> A boolean attribute that should be always used and should have
+always value <tt>Y</tt>. By default, all ACD files are assumed to
+describe EMBOSS applications. But Soaplab (precisely the generator of
+the metadata XML files) does slightly different things for EMBOSS and
+non-EMBOSS programs - so it needs to know what kind of application is
+being described. This is quite important attribute.  <p>
+
+       
+  <dt> <span class="hitt">comment: "method &lt;template&gt;"</span>
+       
+  <dd> It defines how to create the whole command-line if the default
+appearance (tagged parameters with the qualifiers prefixed by minus)
+is not sufficient. It refers to individual parameters by constructs
+<tt>${parameter-name}</tt>. The <tt>method</tt> can be one of the most
+complex ACD attributes. It is explained (together with the similar
+parameter attribute and with examples ) in a <a
+href="#method">separate section below</a>. <p>
+
+       
+  <dt> <span class="hitt">comment: "help &lt;URL-with-a-help-page&gt;"</span>
+       
+  <dd> A URL pointing to a web page explaining the whole
+application. Soaplab2 does not use this attribute but it is included
+in the metadata because it can enhance various Soaplab2 clients (for
+example Taverna client uses it). <p>
+
+
+  <dt> <span class="hitt">comment: "class &lt;class-name&gt;"</span>
+       
+  <dd> Any Soaplab2 plug-in can specify here a class name that
+implements interface <tt>org.soaplab.services.JobFactory</tt> and thus
+Soaplab2 can load this particular plug-in. Read more about this way of
+extending Soaplab2 in the <a
+href="DevelopersGuide.html#class-plugin">developers guide</a>. For
+example, the plug-in wrapping EBI Web services (this plug-in is part
+of the Soaplab2 distribution) has in the ACD files:
+
+<pre class="code">
+comment: "class org.soaplab.ebi.WSJobFactory"
+</pre>
+
+
+  <dt> <span class="hitt">comment: "launcher &lt;parameter&gt;"</span>
+       
+  <dd> For regular Soaplab2 services, the launcher attribute is
+usually not needed.
+
+       <div class="note"> Historically, in Soaplab1 it was used to
+define a Perl (or shell) script that inter-mediated command-line tools
+and Java Soaplab server, especially when they were invoked under
+particular environment, such as starting them in a queuing system. In
+Soaplab2, in the pure Java implementation, it is not needed
+(supported) anymore. </div>
+
+       It may be, however, used by particular Soaplab2 plug-ins: <p>
+       <ul>
+
+	 <li class="tiny"> <a href="Gowlab.html">Gowlab</a> defines
+here whether its remote web resource (web page) should be accessed by
+HTTP <em>GET</em> or <em>POST</em> method (the 'get' is default, thus
+it can be omitted):
+
+<pre class="code">
+comment: "launcher get"
+comment: "launcher post"
+</pre>
+
+	 <li class="tiny"> The plug-in wrapping the EBI Web services
+uses this attribute to specify a class name implementing the
+<tt>org.soaplab.services.Job</tt> interface. Which means that this
+particular plug-in uses both, attribute <tt>class</tt> (for the job
+factory) and attribute <tt>launcher</tt> for individual job
+classes. See examples in <tt>src/etc/acd/ebi/</tt> directory.
+	 
+       </ul><p>
+
+  <dt> <span class="hitt">comment: "tagsepar &lt;value&gt;"</span>
+  <dt> <span class="hitt">comment: "defaults"</span>
+       
+  <dd> Some parameter attributes may be also used as application
+attributes. If so, the value specified here is used for <em>all</em>
+parameters unless there is the same parameter attribute used, as
+well. It is like having a default value for parameter attributes valid
+for the whole ACD file. <p>
+
+       Look for individual attribute details in the parameter
+attribute section. <p>
+       
+
+</dl>
+
+
+<a name="general"></a>
+<h3>General attributes for all data types</h3>
+
+You may recall that each parameter in an ACD file is defined by this
+construct:
+
+<pre class="code">
+<em>datatype</em>: <em>parameter_name</em> [ 
+
+   parameter attributes
+
+  ]
+</pre>
+
+This section describes the parameter attributes that can be used for
+any data type (data type is here just another name for a <em>parameter
+type</em>).
+
+<div class="note"> Well, syntactically, these attributes can be used
+for any data type, indeed. But for some of them, especially for the
+"outfile" one, they may not be that useful or used. </div>
+
+<dl>
+  
+  <dt> <span class="hitt">standard</span>
+       
+  <dd> A boolean attribute. Value <tt>Y</tt> indicates that this is a
+mandatory parameter. <p>
+
+       
+  <dt> <span class="hitt">additional</span>
+       
+  <dd> A boolean attribute. Value <tt>Y</tt> indicates that this is an
+optional parameter. <p>
+
+       
+  <dt> <span class="hitt">parameter</span>
+       
+  <dd> A boolean attribute. Value <tt>Y</tt> indicates that this
+parameter appears on the command line without its name as a
+qualifier. Also implies that its value is required. <p>
+
+       Any parameter without this attribute will appear (unless an
+attribute <tt>template</tt> is specified) on the command line as a
+<em>tagged</em> value:
+
+<pre class="script">
+-&lt;parameter-name&gt; &lt;parameter-value&gt;
+</pre>
+
+       With this attribute it will appear as a simple value without
+any qualifier (i.e. the parameter name will not appear on the
+resulting command line). <p>
+
+       
+  <dt> <span class="hitt">default</span>
+       
+  <dd> It defines the default value for this parameter. Even though it
+sounds straightforwards it may not be. Check, therefore, also
+attribute <tt>defaults</tt> (below) and a small section <a
+href="#default">how to use default value</a>. <p>
+
+</dl><p>
+
+The above general attributes are the most used ones. There may be
+however situations where their combinations are unclear. This is
+caused by the EMBOSS legacy: EMBOSS has more ways how to define
+whether its parameter is optional or not. Therefore, <a
+href="#mandatory">below</a> are the possible (useful) combinations of
+the these parameters, explained by examples. <p>
+
+
+<dl>
+  
+  <dt> <span class="hitt">prompt</span>
+       
+  <dd> Defines briefly what this parameter means. <p>
+
+       
+  <dt> <span class="hitt">information</span>
+       
+  <dd> More detail information about this parameter.  <p>
+
+       
+  <dt> <span class="hitt">help</span>
+       
+  <dd> Very detail information, preferably containing a URL pointing
+to a complex description. <p>
+
+       
+  <dt> <span class="hitt">knowntype</span>
+       
+  <dd> A term, usually an ontology term, defining semantic of the data
+described by this parameter. It may be used by component-based
+software to find how can individual programs be bound together (what
+data flows between them are valid).  <p>
+
+       <div class="note"> This attribute may not be that useful (and
+used) as it seems. Mainly because some applications (especially
+EMBOSS) can consume data (and produce results) of several different
+types. Caveat lector...</div>
+
+       
+  <dt> <span class="hitt">template</span>
+  <dt> <span class="hitt">comment: method</span>
+       
+  <dd> Normally a parameter (its value) is put on the command line in
+one of the following ways: <p>
+
+       <ul>
+
+	 <li class="tiny"> As a <em>tagged</em> value:
+
+<pre class="script">
+-&lt;parameter-name&gt; &lt;parameter-value&gt;
+</pre>
+
+	 where the space between parameter name and parameter value
+can be changed to something else by the attribute <tt>tagsepar</tt>,
+or <p>
+	 
+	 <li class="tiny"> As a value without parameter name (and
+without any minus sign). This happens when attribute <tt>parameter:
+Y</tt> is used. <p>
+
+       </ul><p>
+
+       If none of these cases is good enough, the attribute
+<tt>template</tt> can be used. It defines a string with special tokens
+that will be replaced by parameter name and parameter value. This
+attribute is similar in function to the application attribute
+<tt>method</tt>. The difference is that here the template is just for
+one parameter, while the <tt>method</tt> defines a template string for
+the whole command-line. Details of both are covered <a
+href="#method">below</a>.  <p>
+
+       
+  <dt> <span class="hitt">tagsepar</span>
+       
+  <dd> A character separating parameter name and parameter value in
+the resulting command-line parameter. Its default value is a space -
+which leads to this result (having a parameter <em>greeting</em> with
+value "Hello"): <p>
+
+<pre class="script">
+-greeting Hello
+</pre>
+
+       If this attribute is specified, the parameter name is not
+anymore started with the <em>minus</em> sign. For example, having
+this in an ACD file:
+       
+<pre class="code">
+string: greeting  [
+   comment: "tagsepar *"
+   ...
+   ]
+</pre>
+
+       and with a sent value "Hello" leads to the command line:
+       
+<pre class="script">
+greeting*Hello
+</pre>
+
+       From the historical syntactical reasons (legacy), use slightly
+different syntax when the <tt>tagsepar</tt> should be an
+<em>equal</em> sign (which is probably the most common case after the
+space). This ACD file:
+
+<pre class="code">
+string: greeting  [
+   comment: "tagsepar = ="
+   ...
+   ]
+</pre>
+
+       leads to the command line:
+       
+<pre class="script">
+greeting=Hello
+</pre>
+
+       You can also use the same syntax for other separators. The
+first example above can be written also as:
+       
+<pre class="code">
+string: greeting  [
+   comment: "tagsepar = *"
+   ...
+   ]
+</pre>
+
+       Because usually the same tag separator is used for all
+parameters, the <tt>tagsepar</tt> may be used also as an application
+attribute - and, therefore, propagated to all parameters. If in such
+case you need for some parameters to return to the default tag
+separator (a space), use there a <tt>tagsepar</tt> without any
+value. Here is an example with all possibilities:
+
+<pre class="code">
+appl: Tagsepar [
+  documentation: "Testing TAGSEPAR attribute"
+  groups: "Testing"
+  nonemboss: "Y"
+  executable: "echo"
+  comment: defaults
+  comment: "tagsepar = ="
+]
+
+# --- this prameters gets TAGSEPAR from the application level
+string: param1 [
+  default: 1
+]
+
+# --- this prameters has its own TAGSEPAR
+string: param2 [
+  comment: "tagsepar = -"
+  default: 2
+]
+
+# --- this prameters wants to have an original (default) TAGSEPAR
+string: param3 [
+  default: 3
+  comment: tagsepar
+]
+
+outfile: output [
+  additional: "Y"
+  default: "stdout"
+]
+</pre>
+
+       
+  <dt> <span class="hitt">comment: defaults</span>
+       
+  <dd> A boolean option. If defined it says "put on the command line
+the value of this parameter even if the value is a default one". By
+default, the default values are not put on the command-line. See also
+<a href="#default">below</a>, how it is related to the attribute
+<tt>default</tt>. <p>
+
+       This attribute is ignored for data types <tt>boolean</tt>,
+<tt>infile</tt>, <tt>filelist</tt> and <tt>outfile</tt>. <p>
+
+       
+  <dt> <span class="hitt">qualifier</span>
+       
+  <dd> A default way how to create a command-line argument from an ACD
+parameter is to use parameter name as a name on the command-line. But
+remember that the parameter name is also used by users/clients to send
+parameter value. For example: <p>
+
+<pre class="code">
+string: g  [
+]
+</pre>
+
+       The user/client must send a value for this parameter under the
+name <tt>g</tt>. Assuming that she sent a value "hello", the command
+line will look like this:
+
+<pre class="script">
+-g hello
+</pre>
+
+This works fine but it is hard for the client to remember the purpose
+of a non-descriptive parameter name <tt>g</tt>. In order to make it
+easier for client, one can use attribute <tt>qualifier</tt>. Once
+present, it is used on the command line instead of the parameter name
+(and the parameter name is still used to identify client value). The
+example above can be re-written like this:
+
+<pre class="code">
+string: greeting  [
+   qualifier: g
+]
+</pre>
+
+       The user sends now her "hello" under the better name
+<tt>greeting</tt> but the command line is created as before, using the
+qualifier <tt>g</tt>. <p>
+
+
+  <dt> <span class="hitt">comment: "display false"</span>
+       
+  <dd> Some parameters may be hidden to the users (but still used when
+creating a command line). This attribute hides the parameter (the
+client does not get its name, at all). <p>
+
+       By default, parameters are not hidden. Except for the data type
+<tt>outfile</tt> that is always hidden (which means that the clients
+do not specify the name of the output file that will be created on the
+command line - it is the Soaplab2's task to do so). <p>
+
+       This attribute is often used for <a
+href="Gowlab.html">Gowlab</a> services - where HTML forms may have
+some "hidden" variables. <p>
+
+       
+  <dt> <span class="hitt">comment: envar</span>
+       
+  <dd> A boolean attribute. It indicates that the value of this
+parameter should not be put on the command line but instead an
+environment variable should be created before the underlying
+application is executed. For example:
+
+<pre class="code">
+boolean: bool_env  [
+   information: "b4: A boolean that becomes an environment"
+   qualifier: "b4"
+   <b>comment: envar</b>
+]
+string: str_env  [
+   information: "str: A string that becomes an environment ENVVAR"
+   additional: "Y"
+   qualifier: ENVVAR
+   default: "Ciao mundi"
+   <b>comment: envar</b>
+   comment: "defaults"
+]
+</pre>       
+
+       This attribute is ignored for data type <tt>infile</tt>,
+<tt>filelist</tt> and <tt>outfile</tt>. <p>
+
+  <dt> <span class="hitt">relations</span>
+
+  <dd> This attribute allows to describe parameter semantics - more about
+  it in <a href="#semantics">how to specify semantics</a>. </dd><p/>
+
+
+</dl>
+<p>
+
+
+<a name="mandatory"></a>
+<h4>How to say that a parameter is mandatory</h4>
+
+<ul>
+
+  <li class="acount"> This means that the <tt>param</tt> is
+mandatory. It will appear on the command-line with its tag/qualifier,
+e.g. as <tt>-param value</tt>:
+
+<pre class="code">
+string: param [
+   standard: "Y"
+]
+</pre>
+  
+  <li class="acount"> This also means that the <tt>param</tt> is
+mandatory. It appears on the command-line without any tags, e.g. as
+<tt>value</tt>:
+
+<pre class="code">
+string: param [
+   parameter: "Y"
+]
+</pre>
+
+</ul>
+
+You can change their mandatorness by swapping <tt>Y</tt> to <tt>N</tt>,
+in any of the above cases. If they are missing completely, it is the
+same as if they have <tt>N</tt>. Therefore, this construct means the
+<tt>param</tt> is not mandatory:
+
+<pre class="code">
+string: param [
+]
+</pre>
+
+Note, that the following construct (a bit against the common sense)
+<em>DOES NOT</em> mean that the <tt>param</tt> is mandatory:
+
+<pre class="code">
+string: param [
+   additional: "N"
+]
+</pre>
+
+The both constructs a) and b) become <em>NOT mandatory</em> if the
+definitions include a default value:
+
+<pre class="code">
+string: param [
+   standard: "Y"
+   default: "a default value"
+]
+</pre>
+
+or
+
+<pre class="code">
+string: param [
+   parameter: "Y"
+   default: "a default value"
+]
+</pre>
+
+Or, if the same definition has also <tt>additional Y</tt>. <p>
+
+<div class="note"> In EMBOSS, the parameters in ACD files are divided
+into sections - and the parameters being in the "required" section may
+have some implication on whether they are considered mandatory or
+not. But you will never create an ACD file for an EMBOSS application,
+will you? </div>
+
+<a name="default"></a>
+<h4>How to use default values</h4>
+
+The ACD/XML files can provide default value(s) for service
+parameters. They are defined by the <tt>default</tt> attribute. <p>
+
+The first purpose of this attribute is that its presence makes the
+parameter optional (as explained <a href="#mandatory">above</a>). <p>
+
+The second (and the main) purpose, of course, is to tell what value
+will be used if the user does not send any value for a particular
+parameter. The question is, however, should such default value be used
+(e.g. should it be put on the command-line), or not? The answer is: it
+depends. <p>
+
+Soaplab2 has the following rules for that (for the situation that no
+value was sent by the user for a particular parameter): <p>
+
+<ul>
+  
+  <li class="dcount"> For the input parameters (those representing
+input files, both with direct data and with the data references), the
+default (if exists) is always used. <p>
+
+  <li class="dcount"> For others, unless there is an attribute
+<tt>defaults</tt>, it is never used (it is up to the
+service/application itself to know what default value should be
+used). This is the most frequent case. For these cases, the default
+value is defined in the ACD/XML files more or less as an indication to
+the users (clients) but it is not really used by Soaplab2. <p>
+
+  <li class="dcount"> If a parameter has an attribute
+<tt>defaults</tt> (set to true), the default value is really used
+(e.g. it appears physically on the command-line). This is the case
+where the application does not have any real default (like the program
+<tt>echo</tt> in the HelloWorld example at the beginning of this
+document) - but a Soaplab2 service provider wants to give some default
+value. Or a case, where the application has a different default value
+than the Soaplab2 service provider wants to use (e.g. the graphical
+program <tt>dot</tt> - see its ACD file
+<tt>src/etc/acd/sowa/dot.acd</tt>). <p>
+
+</ul>
+
+<a name="semantics"></a>
+<h4>How to specify semantics</h4>
+
+<p>Every application and each of its parameters (especially its inputs
+and outputs, but also other parameters) can have its meaning
+explicitly specified by ontology terms. Simply speaking, an ontology
+is a controlled vocabulary with terms pre-defined and agreed on by
+domain experts. Additionally to such simple vocabulary, an ontology
+can have (and usually has) defined relationships between its terms
+(saying, for example, which terms are more general and which are
+specific). The ontology terms do not influence how the application is
+invoked and what it does but can be useful, for example, for
+discovering which application to use for your particular data
+types.</p>
+
+<p>In an ACD file, the ontology terms can be specified by one or more
+<tt>relations</tt> attribute(s). Such attribute can be used both as an
+application attribute or as a parameter attribute. There are two
+possible formats for the value of this attribute (the second one is,
+however, recommended):
+
+<pre class="code">
+  relations: "/edam/operation/0001813 Sequence retrieval"
+</pre>
+<pre class="code">
+  relations: "EDAM:0001813 operation Sequence retrieval"  
+</pre>
+
+Both examples above say that this application (or this parameter) has
+semantics defined by an <em>ontology term identifier</em>
+<b><tt>EDAM:0001813</tt></b> and that this term is defined in an
+<em>ontology namespace</em> <b><tt>operation</tt></b>. Additionally,
+more or less for convenience (because the same data could be obtained
+directly from the ontology itself by using the ontology term
+identifier), there is also an <em>ontology term name</em>
+<b><tt>Sequence retrieval</tt></b>.  </p>
+
+<p>You may use any ontology, of course. But one strong candidate is
+the <a href="http://edamontology.sourceforge.net/"
+target="_blank">EDAM ontology</a> that is closely related to the
+EMBOSS and, therefore, all EMBOSS applications (ACD files) already are
+annotated by relations from this ontology.</p>
+
+<a name="method"></a>
+<h4>Building the command-line or request</h4>
+
+To build a command-line, or to create an HTTP request with correct
+parameters, or to prepare some other kind of request (used perhaps by
+a Soaplab2 plug-in), is obviously an ultimate feature of Soaplab2. <p>
+
+The usual way is to build the command-line from the individual
+parameters, each of them can be created either as a <em>tagged</em>
+value:
+
+<pre class="script">
+-&lt;parameter-name&gt; &lt;parameter-value&gt;
+</pre>
+
+or as a <em>non-tagged</em> value (when the parameter attribute
+<tt>parameter</tt> is set to true):
+
+<pre class="script">
+&lt;parameter-value&gt;
+</pre>
+
+The first form can be further modified by the <tt>tagsepar</tt>
+attribute, resulting, for example, in this:
+
+<pre class="script">
+&lt;parameter-name&gt;=&lt;parameter-value&gt;
+</pre>
+
+If this is not enough, a parameter can have an attribute
+<tt>template</tt> that defines how the parameter should be built. The
+<tt>template</tt> value is a string that contains special tokens
+(e.g. "$$" or "&&"). The tokens will be substituted by the real
+parameter value (sent by a client) or by a parameter name (the latter
+substitution is not that crucial because you can yourself include the
+parameter name directly; but it helps with the maintenance of ACD
+files if you have the parameter name only in one place). <p>
+
+If a parameter does not have any value (a client sent nothing, and
+there is no default value), nothing is built for this parameter. In
+other words, the template string is not used at all (even if it has
+some constant text there). <p>
+
+<h5>Admin tool: <tt>ExploreParameters</tt></h5>
+
+The <tt>template</tt> attribute may be complex, especially when you
+consider a <em>global</em> template (an application attribute; more
+about it in a minute). Therefore, there is an <a
+href="AdminTools.html#params">admin tool</a>, a command-line client,
+that can help to test templates without modifying ACD files and
+converting them in the XML metadata each time you try a new
+template. <p>
+
+<h5>Separation of resulting arguments</h5>
+
+A slightly confusing (but quite powerful) concept of the templates is
+how to <em>cut result string into the pieces</em>. In templates you
+define exactly how parameters should be separated (into individual
+command-line arguments) before being sent to an application. An
+example explains it better: <p>
+
+Let's have a service that has one input named <em>greeting</em>, and a
+client sends there a value "I wish you luck, mate". <p>
+
+Without templates and with the following ACD parameter:
+
+<pre class="code">
+string: greeting  [
+]
+</pre>
+
+we are getting a command line with exactly two elements (it is shown
+in the format used by the admin tool for exploring parameters,
+mentioned above):
+
+<pre class="script">
+Command line
+------------
+        ( 1) -greeting
+        ( 2) I wish you luck, mate!
+</pre>
+
+You can see that Soaplab2 took care and made sure that the whole sent
+value is not separated by white-spaces. <p>
+
+However, if you use a template, you have to tell whether you wish or
+not to wish to separate by white-spaces. Let's have now the same
+parameter with a template:
+
+<pre class="code">
+string: greeting  [
+   template: "-greeting $$"
+]
+</pre>
+
+The token "$$" is replaced by the client value. The result is now,
+however, different - the command line suddenly gets six elements:
+
+<pre class="script">
+Command line
+------------
+        ( 1) -greeting
+        ( 2) I
+        ( 3) wish
+        ( 4) you
+        ( 5) luck,
+        ( 6) mate!
+</pre>
+
+In order to get the same result as without a template, you need to use
+a slightly different token (a double-quoted $$):
+
+<pre class="code">
+string: greeting  [
+   template: '-greeting $"$"'
+]
+</pre>
+
+Now, we are getting the same command line with just two elements:
+
+<pre class="script">
+Command line
+------------
+        ( 1) -greeting
+        ( 2) I wish you luck, mate!
+</pre>
+
+
+<h5>Application and parameter attributes</h5>
+
+The template can be used both as an application attribute and a
+parameter attribute. Historically, however, the syntax of these two is
+slightly different. <p>
+
+A template as an application attribute is specified as:
+
+<pre class="code">
+appl <em>name</em> [
+   ...
+   <b>comment: "method &lt;string&gt;"</b>
+   ...
+]
+</pre>
+
+
+And a  template as a parameter attribute is specified as:
+
+<pre class="code">
+<em>data-type</em> <em>name</em> [
+   ...
+   <b>template: "&lt;string&gt;"</b>
+   ...
+]
+</pre>
+
+Some tokens can be abbreviated ("$$", "&amp;&amp;", etc.). This abbreviation
+cannot be used for the application attribute (because the abbreviated
+form does not tell which parameter is the token meant for). <p>
+
+<h5>Parameter ordering</h5>
+
+The resulting command-line is created with the parameters in the order
+as they are define in the ACD file. Unless there is a template as an
+application attribute that changes the order (by listing parameters in
+a different order).
+
+<h5>Template tokens</h5>
+
+
+<table border=3 cellpadding=5>
+
+<tr bgcolor="#DFDFDF">
+<th> Token </th>
+<th> Will be replaced by </th>
+<th> Explanation </th>
+</tr>
+
+<tr>
+<td colspan=3 align="center" bgcolor="#F2F2F2">Parameters' <em>values</em></td>
+</tr>
+
+<tr>
+<td><span class="hitt">$id</span></td>
+<td>value of parameter 'id'</td>
+<td>&nbsp;</td>
+</tr>
+
+<tr>
+<td><span class="hitt">${id}</span></td>
+<td>value of parameter 'id'</td>
+<td>used when the construct is followed immediately by a letter (like in ${id}A)</td>
+</tr>
+
+<tr>
+<td><span class="hitt">$"id"</span></td>
+<td>value of parameter 'id'</td>
+
+<td>value will not be separated into several pieces even if it
+contains white-spaces</td>
+
+</tr>
+
+<tr>
+<td><span class="hitt">${"id"}</span></td>
+<td>value of parameter 'id'</td>
+<td>ditto as above</td>
+</tr>
+
+<tr>
+<td><span class="hitt">$$</span></td>
+<td>value of the current element</td>
+<td>a simpler notation for $id; cannot be used in application attribute</td>
+</tr>
+
+<tr>
+<td><span class="hitt">$"$"</span></td>
+<td>value of the current element</td>
+
+<td>a simpler notation for $"id"; cannot be used in application attribute</td>
+
+</tr>
+
+
+<tr>
+<td colspan=3 align="center" bgcolor="#F2F2F2">Parameters' <em>names</em></td>
+</tr>
+
+<tr>
+<td><span class="hitt">&amp;id</span></td>
+<td>name of parameter 'id'</td>
+<td>&nbsp;</td>
+</tr>
+
+<tr>
+<td><span class="hitt">&amp;{id}</span></td>
+<td>name of parameter 'id'</td>
+
+<td>the same as &amp;id but this protects from being mixed with the
+subsequent letters</td>
+
+</tr>
+
+<tr>
+<td><span class="hitt">&amp;&amp;</span></td>
+<td>name of the current parameter</td>
+
+<td>a simpler notation for &amp;id; cannot be used in application attribute</td>
+
+</tr>
+
+
+</table>
+
+<div class="note"> In templates, there are more tokens and more
+features when so-called "repeatable" parameter values are
+used. Soaplab2 does not yet fully implement them in all places. The
+table above may be, therefore, extended in the future. </div>
+
+<h5>Examples</h5>
+
+Here is an example with a template as an application attribute:
+
+<pre class="code">
+appl: MedlineSRS [
+  documentation: "Get MEDLINE citation (in XML)"
+  groups: "Testing"
+  nonemboss: "Y"
+  supplier: "http://srs.ebi.ac.uk/srsbin/cgi-bin/wgetz"
+  <b>comment: "method -e+[MEDLINE:'$pmid']+-ascii"</b>
+]
+
+string: pmid  [
+  parameter: "Y"
+]
+
+outfile: result  [
+]
+</pre>
+
+The example is from <a href="Gowlab.html">Gowlab</a>: it fetches a
+publication from bibliographic database Medline via SRS at EBI. <p>
+
+And here is a short example with a template as a parameter attribute:
+
+<pre class="code">
+string: greeting  [
+  additional: "Y"
+  default: "Hello World"
+  comment: "defaults"
+  <b>template: "Soaplab2 sends you regards: $$"</b>
+]
+</pre>
+
+The result command line will be:
+
+<pre class="script">
+Program and parameters:
+/home/senger/soaplab2/run/echo
+Soaplab2
+sends
+you
+regards:
+Hello
+World
+--- end of parameters
+</pre>
+
+The same example with a slightly changed template (in order not to
+separate by white-spaces):
+
+<pre class="code">
+string: greeting  [
+  additional: "Y"
+  default: "Hello World"
+  comment: "defaults"
+  <b>template: '"Soaplab2 sends you regards:" $"$"'</b>
+]
+</pre>
+
+Now the result command line is:
+
+<pre class="script">
+Program and parameters:
+/home/senger/soaplab2/run/echo
+Soaplab2 sends you regards:
+Hello World
+--- end of parameters
+</pre>
+
+
+<a name="datatypes"></a>
+<h3>Data types and their specific attributes</h3>
+
+Each application usually has some inputs and always produces some
+outputs. The inputs include both real data (outside of the Web
+services context, they are often referred to as <em>input files</em>)
+and <em>parameters</em> (or options, or arguments). <p>
+
+In an ACD file, every input and output is described in a separate
+construct that starts with a <em>data type</em>:
+
+<pre class="code">
+<em>datatype</em>: <em>parameter_name</em> [ 
+
+   parameter attributes
+
+  ]
+</pre>
+
+There are not many data types (EMBOSS applications have much more of
+them - but we are not creating ACD files for EMBOSS native
+applications because they already come with the ACD files).
+
+<a name="infiles"></a>
+<h4>Data types for input <em>real</em> data (like files)</h4>
+
+<dl>
+  
+  <dt> <span class="hitt">infile</span>
+       
+  <dd> It defines an input data. For the command-line application, it
+is an input file. Soaplab2 gets data from the user and creates an
+input file on the server side and informs the application about this
+file. <p>
+
+       Specific attributes for this data type are: <p>
+
+       <dl>
+
+	 <dt> <span class="hitt">comment: "data direct"</span>
+	 <dt> <span class="hitt">comment: "data filename"</span>
+       
+	 <dd> The input can be of two forms: direct input or a
+reference to an input. Both of these forms are defined by one ACD
+parameter - and this optional attribute can limit which form should be
+used. <p>
+
+	      If this attribute is not specified then both, direct and
+reference input are acceptable:
+
+<pre class="code">
+infile: input  [
+]
+</pre>
+
+	      In the example above, a client sees (and can use)
+<em>two input names</em> (both are created from this one ACD
+parameter):
+
+<pre class="script">
+&lt;parameter-name&gt;_direct_data
+&lt;parameter-name&gt;_url
+</pre>
+
+	      The parameter name is extended by fixed suffixes. The
+<tt>_direct_data</tt> means that a user is sending directly data, the
+<tt>_url</tt> means that a user is sending a reference to the
+data. The reference should be a URL where the input data can be
+fetched from. Usual protocols (http, ftp) are supported. <p>
+
+	      <div class="note"> From historical, legacy reasons there
+is a naming discrepancy: The names on the user/client site use
+suffixes '_direct_data' and '_url', but the ACD parameter attribute
+uses for the same purpose values 'direct' and 'filename'.</div>
+
+	      Thus, in the example above, the user can send direct
+data under the name <tt>input_direct_data</tt> or a URL under the name
+<tt>input_url</tt>. <p>
+
+	      For EMBOSS, the reference data (on the client site) has
+suffix <tt>_usa</tt> instead of <tt>_url</tt> (see what <a
+href="FAQ.html#001">USA in EMBOSS</a> means). <p>
+	      
+
+	      If this attribute has the value <tt>direct</tt>, only
+direct data can be sent by a client. In this case, the input name is
+identical with the parameter name (<tt>input</tt> in our example), no
+suffixes are used:
+
+<pre class="code">
+infile: input [
+  comment: "data direct"
+]
+</pre>
+	      
+	      Similarly, if this attribute has the value <tt>filename</tt>, only
+reference data can be sent by a client. Again in this case, the input name is
+identical with the parameter name (<tt>input</tt> in our example), no
+suffixes are used:
+
+<pre class="code">
+infile: input [
+  comment: "data filename"
+]
+</pre>
+
+
+              <dt> <span class="hitt">comment: default_for_direct</span>
+       
+	      <dd> For cases when both input forms (direct and
+reference) are allowed, and if there is an attribute <tt>default</tt>,
+it would not be clear what this default value represents. Therefore,
+here is a role for this boolean attribute
+<tt>default_for_direct</tt>. If set to true, the default value is used
+for direct data, otherwise the default value is used for reference
+data. For example: <p>
+
+<pre class="code">
+infile: input [
+  additional: "Y"
+  default: "this is my default"
+  comment: default_for_direct
+]
+</pre>
+
+		   <div class="note"> There is no way to specify
+default values for both, direct and reference data, for the same parameter. </div>
+
+
+	      <dt> <span class="hitt">default</span>
+       
+	      <dd> This attribute was already explained. Just one
+specific comment for using this attribute within an <tt>infile</tt>
+data type: If its value is <tt>stdin</tt>, it is not used as a default
+value but it indicates that the underlying application expects this
+input as its standard input stream.
+
+		   <div class="note"> And yes, you are right: there is
+no way to specify a default value for the standard input
+stream. </div>
+
+	      <dt> <span class="hitt">comment: bindata</span>
+       
+	      <dd> A boolean attribute. Its true value specifies that
+the input data should be treated as binary data
+(e.g. images). Otherwise the data are considered text data. <p>
+
+		   
+	      <dt> <span class="hitt">comment: "input_adaptor &lt;class-name&gt;"</span>
+       
+	      <dd> It allows to extend Soaplab2 by a class that will
+be called to adapt input data when they arrive to the Soaplab2 server
+and before they are used by the usual Soaplab2 mechanism. This class
+should implement interface <a
+href="API/org/soaplab/services/adaptor/DataAdaptor.html"><tt>org.soaplab.services.adaptor.DataAdaptor</tt></a>.
+
+	    </dl><p>
+       
+  <dt> <span class="hitt">filelist</span>
+       
+  <dd> It specifies that the input should be an array (a list) of
+input data. Soaplab2 treats all such inputs as binary data. When data
+arrives to the Soaplab2 server, they are again stored in local files
+and a new file - with the names of the local files; each file on a
+separate line - is created and provided to the underlying
+application. Which means that the application must be able to read
+such file list. Here is an example of such application (a Perl script):
+<p>
+
+<pre class="smallercode">
+#!/usr/bin/perl -w
+#
+# It copies a file (-i) (if given) to STDOUT.
+# Then it adds to STDOUT contents of files given by names
+# by the -l option.
+#
+# Usage: copy-files.pl -i &lt;input-file&gt; -l &lt;list-file&gt;
+# 
+# ---------------------------------------------
+
+use strict;
+use warnings;
+use File::Copy;
+use File::Basename;
+
+use Getopt::Std;
+my %opts;
+getopt ('il', \%opts);
+
+exit 0 unless $opts{i} or $opts{l};
+
+copy ($opts{i}, \*STDOUT) if $opts{i};
+if ($opts{l}) {
+    my $dir = dirname ($opts{l});
+    $ARGV[0] = $opts{l};
+    while (&lt;&gt;) {
+	chomp;
+        copy ($_, \*STDOUT) or copy ("$dir/$_", \*STDOUT) or warn "Copy of $_ failed: $!\n";
+    }
+}
+</pre>
+
+
+       And here is a full ACD for the "application" above:
+
+<pre class="code">
+appl: Files [
+  documentation: "Copying and merging files to standard output"
+  groups: "Testing"
+  nonemboss: "Y"
+  executable: "copy-files.pl"
+]
+
+infile: input  [
+  additional: "Y"
+  qualifier: "i"
+]
+
+filelist: list [
+  additional: "Y"
+  qualifier: "l"
+]
+
+outfile: output  [
+  default: "stdout"
+]
+</pre>
+       
+       In the <tt>filelist</tt> data type, all input data are
+considered direct data. If you need a list of reference data, you
+would need to write your own input adaptor (see the <tt>comment
+"input_adaptor &lt;class-name&gt;"</tt> above, and look for
+inspiration in the existing input adaptor
+<tt>org.soaplab.services.adaptor.InputManyFiles</tt> - the one
+actually used to implement the functionality of the <tt>filelist</tt>
+data type).
+
+
+</dl>
+
+
+<a name="args"></a>
+<h4>Data types for input arguments</h4>
+
+<dl>
+  
+  <dt> <span class="hitt">string</span>
+       
+  <dd> The most common data type. It does not have any specific
+attributes (just the general ones, described above). <p>
+
+       
+  <dt> <span class="hitt">boolean</span>
+       
+  <dd> A data type that does not have any real value. Its presence
+(i.e. when sent by a client) is indicated on the command line as a
+toggle (an option). It does not have any specific attributes. <p>
+
+  <dt> <span class="hitt">integer</span>
+       
+  <dd> A data type representing an integer. Its value is checked if it
+is a valid integer. It does not have any specific attributes. <p>
+
+  <dt> <span class="hitt">float</span>
+       
+  <dd> A data type representing a decimal-point number. Its value is checked if it
+is a valid integer or a decimal-point number. <p>
+
+       A specific attribute for this data type is: <p>
+
+       <dl>
+
+	 <dt> <span class="hitt">precision: &lt;number&gt;</span>
+
+	 <dd> The <tt>number</tt> specifies maximum number of decimal
+points. <p>
+
+       </dl>
+
+
+</dl><p>
+
+Here is an example showing the input data types:
+
+<pre class="code">
+string: text [
+  additional: "Y"
+  default: "this is a default"
+  prompt: "An optional string with a default value"
+]
+
+string: text_no_default [
+  standard: "Y"
+  prompt: "A mandatory string input"
+]
+
+integer: number_int  [
+  additional: "Y"
+  default: 42
+]
+
+float: number_float  [
+  additional: "Y"
+  precision: 2
+  default: 30.12
+]
+
+boolean: bool_false [
+  additional: "Y"
+  default: false
+]
+boolean: bool_true [
+  additional: "Y"
+  default: true
+]
+boolean: bool_no_default [
+  additional: "Y"
+]
+</pre>
+
+You can try a service created from the above - the service name (in
+the default Soaplab2 distribution) is <tt>testing.inputtypes</tt>.
+
+<dl>
+
+  <dt> <span class="hitt">list</span>
+       
+  <dd> A data type that allows to list all possible values for a
+parameter. The result (how this parameter appears on the command line)
+is quite different depending on which values for attributes
+<tt>minimum</tt> and <tt>maximum</tt> are used: <p>
+
+       <ul>
+
+	 <li> If <tt>minimum</tt> is 1 and <tt>maximum</tt> is also 1,
+then only one value can be sent by a client. For example, if a value
+"F" is sent for a list named "menu" (the full ACD is shown below), the
+created parameter will be:
+
+<pre class="script">
+-menu F
+</pre>
+
+	 <li> Otherwise, a client can send more (boolean) values (as
+many as possible values are specified in the attribute
+<tt>values</tt>). The names for these input values are concatenation
+of the parameter name, underscore and a possible value. The resulting
+parameter will be a list separated by character defined by the
+attribute <tt>separator</tt>. For example, if a client sent two
+boolean values "format_jpg" and "format_svg", the resulting parameter
+will be:
+	      
+<pre class="script">
+-format jpg,svg
+</pre>
+
+       </ul><p>
+
+       The specific attributes for this data type are: <p>
+
+       <dl>
+
+	 <dt> <span class="hitt">minimum: &lt;number&gt;</span>
+	 <dt> <span class="hitt">maximum: &lt;number&gt;</span>
+
+	 <dd> A minimal and maximal number of accepted values for this
+data type. The number should be a positive integer, and the maximum
+not smaller than the minimum. <p>
+
+	      <div class="note"> Minimum value one is misleading: it
+seems to mean 'at least' one value is required. But it is not (the
+mandatorness is defined differently, by other attributes). Also, a
+missing minimum should have a default value one - but it has
+not. Consider these irregularities a bug in Soaplab2 that hopefully
+will be solved in the future. </div>
+
+
+	 <dt> <span class="hitt">separator: "&lt;character&gt;"</span>
+
+	 <dd> This attribute is used only when <tt>maximum</tt> is
+greater than 1 (or <tt>minimum</tt> missing - see the bug note
+above). In this case, when a user sends more values, the resulting
+command-line parameter uses this attribute to separate sent
+values. An example was shown above. <p>
+
+	      Do not confuse it with attributes <tt>delimiter</tt> and
+<tt>codedelimiter</tt> - they both define how to write values in an
+ACD file but not how the resulting parameter will look like. <p>
+
+
+	 <dt> <span class="hitt">values: "&lt;list&gt;"</span>
+
+	 <dd> A mandatory attribute that specifies all possible values
+for this list. The values are separated by a character defined by the
+attribute <tt>delimiter</tt> (default is semicolon). Leading and trailing
+white-spaces of the individual values are trimmed. <p>
+
+	      Each individual value can be a bit more complex: it can
+consist of two values, separated by attribute <tt>codedelimiter</tt>
+(default is colon). The first value is the one that matters - one that
+is accepted from client and that appears in the resulting
+parameter. The second value is just a better human-readable text for
+the first value (that may be useful for some client's GUIs).
+
+	      <div class="note"> The XML created from ACD has both
+values, but the human-readable one is not that easy to access. It may
+changed in the future but for now the second value is rarely used,
+even the Soaplab2-native <a href="SpinetClient.html">Spinet client</a>
+does not show it. </div>
+
+	      If a list has a <tt>default</tt> attribute, its value
+should be one of the values from the <tt>values</tt> attribute (if the
+values are 'complex', use the first part for the <tt>default</tt>
+attribute). <p>
+
+
+	 <dt> <span class="hitt">delimiter: "&lt;characters&gt;"</span>
+
+	 <dd> The characters that separates individual values in the
+<tt>values</tt> attribute. Default value is a semicolon. <p>
+
+	 <dt> <span class="hitt">codedelimiter: "&lt;characters&gt;"</span>
+
+	 <dd> The characters that separates two parts of individual
+values in the <tt>values</tt> attribute. Default value is a colon. <p>
+
+       </dl>
+
+       Here is a full ACD for testing both kinds of lists: <p>
+
+<pre class="code">
+appl: Lists [
+  documentation: "How to use lists"
+  groups: "Testing"
+  nonemboss: "Y"
+  executable: "echo"
+  comment: defaults
+]
+
+list: format  [
+  additional: "Y"
+  default: "png"
+  values: "canon; dot; fig; gd; gif; hpgl; imap; jpg; mif; mp; pcl; pic; plain; png; ps; svg"
+  prompt: "Graphical format"
+  comment: "separator |"
+]
+
+list: menu [
+  default: "V"
+  minimum: "1"
+  maximum: "1"
+  values: "F--fungi,I--insect,P--plant,V--vertebrate,O--other,C--Custom"
+  delimiter: ","
+  codedelimiter: "--"
+  prompt: "Transcription Factor Class"
+  information: "Select class"
+]
+
+outfile: output  [
+  additional: "Y"
+  default: "stdout"
+]
+</pre>
+
+       If the service (created form the ACD above) is called (using
+the <a href="CmdLineClient.html">command-line client</a>) as:
+
+<pre class="script">
+build/run/run-cmdline-client -name testing.lists -w -r <b>-format_canon -format_fig menu F</b>
+</pre>
+
+       the resulting command line will look like:
+       
+<pre class="script">
+-format canon|fig -menu F
+</pre>
+
+</dl><p>
+
+
+<a name="outfiles"></a>
+<h4>Data types for outputs</h4>
+
+
+<dl>
+  
+  <dt> <span class="hitt">outfile</span>
+       
+  <dd> It defines an output data, a result. Each ACD file should have
+at least one of this data type. <p>
+
+       <div class="note"> Each Soaplab2 service always has two special
+outputs ("report" and "detailed_status") that are not defined in the
+ACD file, at all. Therefore, it would be less confusing if you do not
+use these names for your 'outfile' data type.</div>
+
+       Specific attributes for this data type are: <p>
+
+       <dl>
+
+	 <dt> <span class="hitt">default: stdout</span>
+	 <dt> <span class="hitt">default: stderr</span>
+
+	 <dd> Soaplab2 outputs do not have really any default
+values. Therefore, this attribute is used here (as in <tt>infile</tt>)
+to indicate that a standard stream should be used (instead of an
+output file with its name specified on the command line). <p>
+
+	      For example, here is an ACD file with all possible
+streams defined. The application (a Perl script) is distributed with
+Soaplab2 in file <tt>run/all-streams.pl</tt>.
+
+<pre class="code">	      
+appl: Streams [
+  documentation: "Filtering stdin into stdout and stderr streams"
+  groups: "Testing"
+  nonemboss: "Y"
+  executable: "all-streams.pl"
+]
+infile: input  [
+  additional: "Y"
+  default: "stdin"
+]
+outfile: std_output  [
+  additional: "Y"
+  default: "stdout"
+]
+outfile: std_errors  [
+  additional: "Y"
+  default: "stderr"
+]
+</pre>
+
+	 <dt> <span class="hitt">comment: bindata</span>
+       
+	 <dd> A boolean attribute. Its true value specifies that the
+output data are binary data (e.g. images). Otherwise the data are
+considered text data. <p>
+
+		   
+	 <dt> <span class="hitt">extension</span>
+
+	 <dd> It defines a "file extension" for this output. The Web
+services do not use really files but data streams. The file extension
+is, however, a valuable source of information about the data in a
+particular output. The extension is, for example, useful for results
+that are shown directly in a web browser (like it is in the <a
+href="SpinetClient.html">Spinet</a> client). <p>
+
+	 <dt> <span class="hitt">comment: "mimetype &lt;value&gt;"</span>
+
+	 <dd> It defines a MIME type of this output. This plays
+similar role as the <tt>extension</tt> above: it tells us something
+about syntax or semantics of an output. <p>
+
+	 <dt> <span class="hitt">comment: make_url</span>
+
+	 <dd> A boolean attribute whose default value is "yes"
+(true). Unless set to "no" (false) a reference (a URL) of this output
+will be created, as well. It allows to pass results by reference back
+to the clients. Because Soaplab2 allows sending the input data as a
+reference, too, these URLs can be conveniently combined if more services are
+executed in a chain, passing data from one service to another. <p>
+
+	      You can influence where these "URL results" will be
+served from by setting several run-time configuration properties (look
+for properties <pn>results.url.ignore</pn>,
+<pn>results.url.target.dir</pn> and <pn>results.url</pn> in the <a
+href="ConfigurationGuide.html">configuration guide</a>). <p>
+
+	 <dt> <span class="hitt">comment: "output_type String[]"</span>
+	 <dt> <span class="hitt">comment: "output_type byte[][]"</span>
+
+	 <dd> Soaplab2 recognizes four types of output: a string and
+a binary type, both of them either as a single item, or an array of
+items. Using the attribute <tt>output_type</tt>, you can define the
+type of output: the square brackets symbolize an array, <tt>byte</tt>
+indicates binary type. The string type is a default type (so no need
+to use this attribute). The individual binary output is usually
+specified (historically) rather by the attribute <tt>bindata</tt>. <p>
+
+	      Once you specify an output type, you should make sure
+that the underlying application produces such type. Soaplab2 itself
+treats data as binary data if the ACD file says so - but it does not
+create an array of data (except for graphical EMBOSS programs that
+produce images on several pages). If you want them you need to create
+your own plug-in. An example of such plug-in (doing nothing useful) is
+the class <tt>class org.soaplab.samples.OutputTypesJob</tt>. And here
+is a complete ACD file for it:
+
+<pre class="code">
+appl: AllOutputTypes [
+  documentation: "Showing how a plugin can create all kinds of outputs"
+  groups: "Plugins,Testing"
+  nonemboss: "Y"
+  comment: "class org.soaplab.samples.OutputTypesJobFactory"
+]
+
+infile: input  [
+  standard: "Y"
+  help: "This input will be copied to several outputs. &lt;p&gt;
+         For some of outputs, it will be even replicated
+         (how many times, it depends on the parameter &lt;em&gt;count&lt;/em&gt;)."
+]
+
+integer: count [
+  additional: "Y"
+  default: "3"
+  prompt: "How many times to replicate input in the array outputs"
+  comment: defaults
+]
+
+outfile: simple_text_output  [
+]
+outfile: simple_binary_output  [
+  comment: bindata
+]
+outfile: array_text_output  [
+  comment: "output_type String[]"
+]
+outfile: array_binary_output  [
+  comment: bindata
+  comment: "output_type byte[][]"
+]
+</pre>
+	      
+	 <dt> <span class="hitt">comment: "output_adaptor &lt;class-name&gt;"</span>
+       
+	 <dd> It allows to extend Soaplab2 by a class that will be
+called to adapt result data just before they are sent to the Soaplab2
+clients. This class should implement interface <a
+href="API/org/soaplab/services/adaptor/DataAdaptor.html"><tt>org.soaplab.services.adaptor.DataAdaptor</tt></a>. A
+testing example is in <tt>output_adaptor
+org.soaplab.services.testing.TestingDataAdaptor</tt> - it just cuts
+the results into individual words. Its ACD would look like this:
+
+<pre class="code">
+appl: Results [
+  documentation: "Testing an output adaptor"
+  groups: "Testing"
+  nonemboss: "Y"
+  executable: "echo"
+]
+
+string: param [
+  parameter: "Y"
+  default: "this is a result"
+  comment: defaults
+]
+
+outfile: output [
+  additional: "Y"
+  default: "stdout"
+  comment: "output_adaptor org.soaplab.services.testing.TestingDataAdaptor"
+]
+</pre>
+
+       </dl><p>
+</dl>
+
+<a name="issues"></a>
+<h3>(Some) known issues</h3>
+
+<ul>
+
+  <li> The main issue that should be supported in metadata definition
+(a feature introduced long time ago in EMBOSS) is to be able to refer
+to other parameters' values. <p>
+
+       For example, a parameter attribute <tt>extension</tt> for an
+output may depend on the value (sent by a client in the run-time) of
+an input parameter <em>format</em>. It would be nice to specify in the
+ACD file:
+       
+<pre class="code">
+outfile: output [
+   extension: ${format}
+]
+</pre>
+
+       <li> More examples and explanation should be done for
+so-called <em>repeatable</em> parameters. Also some of their features
+should be first implemented. <p>
+
+</ul>
+
+<a name="build"></a>
+<h2>Building metadata</h2>
+
+The previous chapter described how to create ACD files in order to
+describe parameters and (up to certain point) behaviour of
+applications (or resources) that will be accessed as Soaplab2 Web
+Services. What you need to know now is:
+
+<ul>
+
+  <li class="tiny"> where to create ACD files,
+  <li class="tiny"> how to convert them into XML files, and
+  <li class="tiny"> how to tell Soaplab2 about these XML files.
+
+</ul><p>
+
+If you are a client developer, you may wish to know also how the
+clients can access service metadata and how to benefit from them. <p>
+
+In any case, because this chapter is about the <em>building</em>, it
+is recommended to look first into the <a href="BuildGuide.html">build
+guide</a> what is the <em>Ant</em> tool, how to use it, and what are
+the <em>built-time</em> properties. <p>
+
+
+<a name="where"></a>
+<h3>Where to create metadata</h3>
+
+The easiest place is to create your new ACD files in the same place
+where Soaplab2 distribution already has its own ones - in the
+<tt>src/etc/acd/<em>&lt;directory&gt;</em></tt>. The
+<tt><em>&lt;directory&gt;</em></tt> depends on what application
+(resource) type your ACD file is going to describe. Soaplab2
+distribution comes with the following directories:
+
+<ul>
+
+  <li class="tiny"> Directory <tt>src/etc/acd/sowa</tt> is used for
+command-line applications. Which is often the main resource of
+Soaplab2 Web services. Use this if you are going to wrap existing
+command-line tools, or if you plan to have Soaplab2 Web services on
+top of your own scripts.
+
+  <div class="note"> This is what was covered in Soaplab1 by the old
+AppLab server. By the way, the name "sowa" means "SOaplab Without
+Applab". </div>
+  
+  <li class="tiny"> Directory <tt>src/etc/acd/gowlab</tt> is used for
+Soaplab2 Web services on top of various web pages. Project <a
+href="Gowlab.html">Gowlab</a> has more details. <p>
+  
+  <li class="tiny"> Directory <tt>src/etc/acd/ebi</tt> is used for ACD
+files that define how to access several Web services at the EBI. It is
+not likely that you are going to add your ACD files here - consider
+this directory rather like examples how to write a Soaplab2
+plug-in. <p>
+  
+  <li class="tiny"> Directory <tt>src/etc/acd/test</tt> is used for
+testing purposes. <p>
+
+</ul><p>
+
+If you are wondering where are the ACD files for EMBOSS, they are not
+part of the Soaplab2 distribution but part of the EMBOSS itself. More
+about using them is in the <a href="EmbossNotes.html">EMBOSS
+notes</a>. <p>
+
+Name your ACD files with names without spaces and other strange
+characters (that's because the file name become also part of the
+resulting Web service name). <p>
+
+Or, create your ACD files in your own directory and use
+<pn>...acd.dir</pn> built-time properties - as shown in the next
+section. <p>
+
+
+<a name="convert"></a>
+<h3>How to convert ACD to XML files</h3>
+
+<div class="note"> This chapter will be changed after Soaplab2 gets a
+new (pure Java) ACD to XML converter. But the basic principles (such
+the used built-time properties described below) will likely stay the
+same. </div>
+
+<h4>Other inputs than ACD files</h4>
+
+There are few attributes that can be included in the resulting XML
+metadata files without being in any particular ACD file. These sources
+are meant to be shared (used) by all applications (or at least by a
+group of applications). <p>
+
+They are in the converter's configuration file
+<tt>src/etc/config/generator.config.template</tt>. Every time a
+converter is invoked, this file is copied into
+<tt>metadata/old.generator/al.Cfg.pl</tt>. During this time, Ant will
+substitute some data there from the following built-time
+properties:
+
+<dl>
+  <dt> <span class="hitt">installation.name</span>
+	      
+  <dd> Attribute defining where your Soaplab2 is run (or
+installed). Default value is <em>Soaplab2 default
+installation</em>. <p>
+	      
+  <dt> <span class="hitt">gen.supplier</span>
+	      
+  <dd> Attribute defining who supplies applications (or
+services). Default value is an empty string. <p>
+	      
+  <dt> <span class="hitt">gen.version</span>
+	      
+  <dd> Attribute defining version of (all)
+applications. Default value is an empty string. <p>
+	      
+  <dt> <span class="hitt">gen.help.base.url</span>
+	      
+  <dd> In ACD files, you can specify (as an application
+attribute) a URL with a detailed help page for the application. For a
+group of applications of a similar provenience (like all EMBOSS
+applications), it is easier to have a more automated way how to define
+these URLs. You can put into this property a base URL, and the
+converter adds there individual application names. <p>
+	      
+  <dt> <span class="hitt">gen.disabled.apps</span>
+	      
+  <dd> Sometimes it is convenient to not generate XML files for
+some applications - even if there are ACD files for them. You can list
+such <em>disabled</em> ACD file names (just base names, without file
+extensions) in this property in a comma-separated list. An example of
+such list may be seen in <tt>xmls/emboss.xml</tt> file. <p>
+
+       This property can be used together with the built-time
+property <pn>sa</pn> (explained in the next section). Difference
+between these two is that property <pn>sa</pn> specifies <em>what to
+include</em> and <pn>gen.disabled.apps</pn> specifies <em>what to
+exclude</em>. <p>
+
+	      
+  <dt> <span class="hitt">gen.job.class</span>
+	      
+  <dd> This is an equivalent of the application attribute
+<tt>class</tt>. If you set it here, you do not need to replicate it in
+all ACD files belonging to the same type of services (to the same
+<em>plug-in</em>). <p>
+	      
+</dl><p>
+
+The same configuration file contains also a name of a directory
+where the XML files will be generated. There is, however, no property
+to change it. The target directory is <tt>metadata/generated</tt>. <p>
+
+
+<h4>Ant tasks: gen...</h4>
+
+To convert all ACD files (from the <tt>sowa</tt>, <tt>gowlab</tt> and
+<tt>ebi</tt> directories shown above) to XML files, use the Ant's task
+<tt>gen</tt>:
+
+<pre class="script">
+ant gen
+</pre>
+
+By the way, the task <tt>gen</tt> is also called when you install
+Soaplab2 (from the task <tt>install</tt>). <p>
+
+To convert only ACD files from some of those directories, use
+individual tasks:
+
+<pre class="script">
+ant gensowa
+ant gengowlab
+ant genebi
+ant gentest
+</pre>
+
+All the <tt>gen</tt> tasks create metadata in directory
+<tt>metadata/generated</tt>. For each category there will be a
+sub-directory. <p>
+
+
+The <tt>gen...</tt> tasks can by customized by setting some built-time
+properties:
+
+<dl>
+
+  <dt> <span class="hitt">sa</span>
+	      
+  <dd> Use this property, as a space-separated list of ACD file names
+(without file extensions), to specify which ACD files should be
+converted. By default, all ACD files from a given directory are
+processed (except the list given in the <pn>gen.disabled.apps</pn> -
+see above). For example:
+
+<pre class="script">
+ant "-Dsa=helloworld dot sleep" gensowa
+</pre>
+       
+       Be aware that the converter also creates an application
+list. If property <pn>sa</pn> is given, such list will contain only
+applications given in this property. And it forgets remaining
+applications - which may be fine for your testing period but perhaps
+at the end you wish to have all applications available as your
+Soaplab2 services. Therefore, run the <tt>gen...</tt> task again, or
+use property <pn>sl</pn> (see below) to create a list with a new
+name. <p>
+
+       The <pn>sa</pn> property should not be used with the general
+<tt>gen</tt> task. <p>
+
+
+  <dt> <span class="hitt">sl</span>
+  <dt> <span class="hitt">sowa.sl</span>
+  <dt> <span class="hitt">gowlab.sl</span>
+  <dt> <span class="hitt">ebi.sl</span>
+  <dt> <span class="hitt">test.sl</span>
+	      
+  <dd> A property defining a file name that will be used for a list of
+applications (services). This is the list that was mentioned at the
+very beginning of this document. The Soaplab2 will learn about this
+list from the run-time property <pn>applist</pn> - see about it the <a
+href="ConfigurationGuide.html">configuration guide</a> (there may be,
+and usually are, more such list files). <p>
+
+       The property <pn>sl</pn> should be used only with specific
+<tt>gen</tt> tasks (e.g. <tt>gensowa</tt>). If you use it with a
+general <tt>gen</tt> task, the list will include only the last part -
+that is not what you want. Therefore, do not do this:
+
+<img src="images/wrong.gif" border=0 align="left"/>
+<pre class="script">
+ant -Dsl=MyApps.xml gen
+</pre>
+<br clear="all"/>
+
+       The <pn>sl</pn> is just a shorter form. These two examples are
+identical:
+
+<pre class="script">
+ant -Dsl=MySowaApps.xml gensowa
+ant -Dsowa.sl=MySowaApps.xml gensowa
+</pre>
+       
+       With the general <tt>gen</tt> task, use the not-shortened
+properties:
+
+<pre class="script">
+ant -Dsowa.sl=MySApps.xml -Dgowlab.sl=MyGApps.xml -Debi.sl=MyEApps.xml gen
+</pre>
+
+       Default names are: <p>
+
+       <dl class="indent">
+	 <dt> for <pn>sowa.sl</pn>: <tt>OtherApplications.xml</tt>
+	 <dt> for <pn>gowlab.sl</pn>: <tt>GowlabApplications.xml</tt>
+	 <dt> for <pn>ebi.sl</pn>: <tt>EBIApplications.xml</tt>
+	 <dt> for <pn>test.sl</pn>: <tt>TUnitApplications.xml</tt>
+       </dl><p>
+
+       
+  <dt> <span class="hitt">acd.dir</span>
+  <dt> <span class="hitt">sowa.acd.dir</span>
+  <dt> <span class="hitt">gowlab.acd.dir</span>
+  <dt> <span class="hitt">ebi.acd.sl</span>
+  <dt> <span class="hitt">test.acd.sl</span>
+	      
+  <dd> Finally, properties you are probably waiting for: they define
+directory names where the ACD files are taken from. Again (as above),
+use the shortened form <pn>acd.dir</pn> only with the more specific
+<tt>gen...</tt>tasks. <p>
+
+       Typical example: Create your ACD files in a directory
+<tt>myacd</tt> (or copy there some existing ACDs from the Soaplab2
+distribution - as I did for this documentation). Then run:
+
+<pre class="script">
+ant -Dacd.dir=myacd -Dsl=MyApps.xml gensowa
+</pre>
+
+       You may see a similar report to this one:
+
+<pre class="sscript">
+_gen:
+     [copy] Copying 1 file to /home/senger/soaplab2/metadata/old.generator
+     [echo] /home/senger/soaplab2/metadata/old.generator/acd2xml -d -l MyApps.xml -p . -r myacd dot helloworld
+  [acd2xml] Processing dot...
+  [acd2xml]     using myacd/dot.acd
+  [acd2xml]     (generated into module graphics)
+  [acd2xml]     Created: /home/senger/soaplab2/metadata/generated/graphics/dot_al.xml
+  [acd2xml] Processing helloworld...
+  [acd2xml]     using myacd/helloworld.acd
+  [acd2xml]     (generated into module classic)
+  [acd2xml]     Created: /home/senger/soaplab2/metadata/generated/classic/helloworld_al.xml
+  [acd2xml] Created: /home/senger/soaplab2/metadata/generated/MyApps.xml
+
+BUILD SUCCESSFUL
+Total time: 4 seconds
+</pre>
+
+</dl><p>
+
+<a name="applist"></a>
+<h3>How to tell Soaplab about XML files</h3>
+
+This is more a run-time configuration topic - you should see,
+therefore, more details in the <a
+href="ConfigurationGuide.html">configuration guide</a>. <p>
+
+Once the ACD to XML converter has created metadata files, you have to
+put the names of the <em>application list</em> files (not the names of
+the individual service metadata files) in the run-time configuration
+file as one or more property <pn>applist</pn>. A typical example is:
+
+<pre class="code">
+base.dir = /home/senger/soaplab2
+metadata.dir = ${base.dir}/metadata/generated
+
+applist = ${metadata.dir}/OtherApplications.xml
+applist = ${metadata.dir}/GowlabApplications.xml
+applist = ${metadata.dir}/EBIApplications.xml
+applist = ${metadata.dir}/EMBOSSApplications.xml
+</pre>
+<p>
+
+       
+<p>
+<iframe id="maintoc" src="TOC.html" scrolling="auto"></iframe>
+
+<div align=right><font size=-2>
+<!-- hhmts start -->
+Last modified: Fri Aug  6 11:38:39 2010
+<!-- hhmts end -->
+</font></div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1011961-1";
+urchinTracker();
+</script>
+</body> </html>

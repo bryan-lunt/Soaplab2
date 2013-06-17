@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://org.soaplab.2" xmlns:tns="http://org.soaplab.2" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="getAvailableAnalyses" type="tns:getAvailableAnalyses"/>
+
+  <xs:element name="getAvailableAnalysesInCategory" type="tns:getAvailableAnalysesInCategory"/>
+
+  <xs:element name="getAvailableAnalysesInCategoryResponse" type="tns:getAvailableAnalysesInCategoryResponse"/>
+
+  <xs:element name="getAvailableAnalysesResponse" type="tns:getAvailableAnalysesResponse"/>
+
+  <xs:element name="getAvailableAnalysesWithDescription" type="tns:getAvailableAnalysesWithDescription"/>
+
+  <xs:element name="getAvailableAnalysesWithDescriptionResponse" type="tns:getAvailableAnalysesWithDescriptionResponse"/>
+
+  <xs:element name="getAvailableCategories" type="tns:getAvailableCategories"/>
+
+  <xs:element name="getAvailableCategoriesResponse" type="tns:getAvailableCategoriesResponse"/>
+
+  <xs:element name="getServiceLocation" type="tns:getServiceLocation"/>
+
+  <xs:element name="getServiceLocationResponse" type="tns:getServiceLocationResponse"/>
+
+  <xs:complexType name="getAvailableAnalyses">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getAvailableAnalysesResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getAvailableAnalysesInCategory">
+    <xs:sequence>
+      <xs:element name="arg0" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getAvailableAnalysesInCategoryResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getAvailableAnalysesWithDescription">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getAvailableAnalysesWithDescriptionResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:SoaplabMap" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="SoaplabMap">
+    <xs:sequence>
+      <xs:element name="entries" type="tns:MapEntry" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="MapEntry">
+    <xs:sequence>
+      <xs:element name="key" type="xs:string"/>
+      <xs:element name="value" type="tns:Value"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Value">
+    <xs:sequence>
+      <xs:element name="singleString" type="xs:string" minOccurs="0"/>
+      <xs:element name="stringArray" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="singleBinary" type="xs:base64Binary" minOccurs="0"/>
+      <xs:element name="binaryArray" type="xs:base64Binary" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getServiceLocation">
+    <xs:sequence>
+      <xs:element name="arg0" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getServiceLocationResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getAvailableCategories">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getAvailableCategoriesResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

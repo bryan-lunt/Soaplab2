@@ -1,0 +1,18 @@
+appl: HelloWorld [
+  documentation: "Classic greeting from the beginning of the UNIX epoch"
+  groups: "Classic, Simple"
+  nonemboss: "Y"
+  executable: "echo"
+]
+
+string: greeting  [
+  additional: "Y"
+  parameter: "Y"
+  default: "Hello World"
+  comment: "defaults"
+]
+
+outfile: output  [
+  additional: "Y"
+  default: "stdout"
+]

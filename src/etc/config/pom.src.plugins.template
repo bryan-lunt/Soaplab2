@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <parent>
+    <artifactId>${maven.project.artifactId}</artifactId>
+    <groupId>${maven.project.groupId}</groupId>
+    <version>${maven.project.version}</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>${maven.project.groupId}</groupId>
+  <artifactId>${maven.project.artifactId}-plugins</artifactId>
+  <name>${maven.project.artifactId}-plugins</name>
+  <version>${maven.project.version}</version>
+  <build>
+    <sourceDirectory>${src.plugins.java}</sourceDirectory>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>${maven.project.groupId}</groupId>
+      <artifactId>${maven.project.artifactId}-core</artifactId>
+      <version>${maven.project.version}</version>
+    </dependency>
+  </dependencies>
+</project>

@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<definitions targetNamespace="http://soaplab.org/_GROUP_NAME_/_APP_NAME_.sa"
+	name="_APP_NAME_Service" xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:emboss_APP_NAME_="http://soaplab.org/_APP_NAME_"
+	xmlns:tns="http://soaplab.org/_GROUP_NAME_/_APP_NAME_.sa"
+	xmlns:soaplab="http://soaplab.org/typedws"
+	xmlns:sawsdl="http://www.w3.org/ns/sawsdl"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+	<types>
+		<xsd:schema>
+			<xsd:import namespace="http://soaplab.org/_APP_NAME_"
+				schemaLocation="InputOutputTypesTemplate.xsd" />
+			<xsd:import namespace="http://soaplab.org/typedws" schemaLocation="requests_responses.xsd" />
+		</xsd:schema>
+    </types>
+	<message name="run">
+		<part name="parameters" element="emboss_APP_NAME_:run" />
+	</message>
+	    <message name="runResponse">
+        <part name="parameters" element="soaplab:runResponse" />
+    </message>
+    <message name="runAndWaitFor">
+        <part name="parameters" element="emboss_APP_NAME_:runAndWaitFor" />
+    </message>
+    <message name="runAndWaitForResponse">
+        <part name="parameters" element="emboss_APP_NAME_:runAndWaitForResponse" />
+    </message>
+    <message name="getStatus">
+        <part name="parameters" element="soaplab:getStatus"/>
+    </message>
+    <message name="getStatusResponse">
+        <part name="parameters" element="soaplab:getStatusResponse"/>
+    </message>
+    <message name="getResults">
+        <part name="parameters" element="soaplab:getResults"/>
+    </message>
+    <message name="getResultsResponse">
+        <part name="parameters" element="emboss_APP_NAME_:getResultsResponse"/>
+    </message>
+    <message name="getResultsInfoResponse">
+        <part name="parameters" element="soaplab:getResultsInfoResponse"/>
+    </message>
+	
+    <message name="terminateRequest">
+    	<part name="parameters" element="soaplab:terminate"></part>
+    </message>
+    
+    <message name="clearRequest">
+        <part name="parameters" element="soaplab:clear"></part>
+    </message>
+    
+    <message name="waitforRequest">
+        <part name="parameters" element="soaplab:waitfor"></part>
+    </message>
+
+    <message name="describeRequest">
+        <part name="parameters" element="soaplab:describe"></part>
+    </message>
+    <message name="describeResponse">
+        <part name="parameters" element="soaplab:describeResponse"/>
+    </message>
+
+    <message name="getLastEventRequest">
+        <part name="parameters" element="soaplab:getLastEvent"></part>
+    </message>
+    <message name="getLastEventResponse">
+        <part name="parameters" element="soaplab:getLastEventResponse"/>
+    </message>
+
+    <message name="getResultsInfo">
+        <part name="parameters" element="soaplab:getResultsInfo"></part>
+    </message>
+
+    <portType name="_APP_NAME_">
+		<operation name="run">
+			<documentation>starts a job and returns its job identifier</documentation>
+		    <sawsdl:attrExtensions  sawsdl:modelReference="_EDAM_OPERATION_"/>
+			<input message="tns:run" />
+			<output message="tns:runResponse" />
+		</operation>
+		<operation name="runAndWaitFor">
+			<documentation>starts a job, waits until it is completed and
+				returns the job results</documentation>
+		    <sawsdl:attrExtensions  sawsdl:modelReference="_EDAM_OPERATION_"/>
+			<input message="tns:runAndWaitFor" />
+			<output message="tns:runAndWaitForResponse" />
+		</operation>
+		<operation name="getStatus">
+			<documentation>returns status of a given job</documentation>
+			<input message="tns:getStatus" />
+			<output message="tns:getStatusResponse" />
+		</operation>
+		<operation name="getResults">
+			<documentation>returns all results of a given job</documentation>
+		    <sawsdl:attrExtensions  sawsdl:modelReference="_EDAM_OPERATION_"/>
+			<input message="tns:getResults" />
+			<output message="tns:getResultsResponse" />
+		</operation>
+
+		<operation name="terminate">
+		    <documentation>terminates the specified job</documentation>
+			<input message="tns:terminateRequest"></input>
+        </operation>
+        <operation name="clear">
+            <documentation>informs server that resources for the specified job can be cleared</documentation>
+            <input message="tns:clearRequest"></input>
+        </operation>
+        <operation name="waitfor">
+            <documentation>waits until the specified job terminates</documentation>
+            <input message="tns:waitforRequest"></input>
+        </operation>
+        <operation name="describe">
+            <documentation>returns a structured description of the service, in xml</documentation>
+            <input message="tns:describeRequest"></input>
+            <output message="tns:describeResponse" />
+        </operation>
+        <operation name="getLastEvent">
+            <input message="tns:getLastEventRequest"></input>
+            <output message="tns:getLastEventResponse" />
+        </operation>
+        <operation name="getResultsInfo">
+            <input message="tns:getResultsInfo"></input>
+            <output message="tns:getResultsInfoResponse" />
+        </operation>
+        
+    </portType>
+
+	<binding name="_APP_NAME_PortBinding" type="tns:_APP_NAME_">
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http"
+			style="document" />
+		<operation name="run">
+			<soap:operation soapAction="run"/>
+			<input>
+				<soap:body use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+			</output>
+		</operation>
+		<operation name="runAndWaitFor">
+		    <soap:operation soapAction="runAndWaitFor"/>
+			<input>
+				<soap:body use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+			</output>
+		</operation>
+		<operation name="getStatus">
+			<soap:operation soapAction="getStatus"/>
+			<input>
+				<soap:body use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+			</output>
+		</operation>
+        <operation name="terminate">
+            <soap:operation soapAction="terminate"/>
+            <input>
+                <soap:body use="literal" />
+            </input>
+        </operation>
+        <operation name="clear">
+            <soap:operation soapAction="clear"/>
+            <input>
+                <soap:body use="literal" />
+            </input>
+        </operation>
+        <operation name="waitfor">
+            <soap:operation soapAction="waitfor"/>
+            <input>
+                <soap:body use="literal" />
+            </input>
+        </operation>
+		<operation name="getResults">
+		    <soap:operation soapAction="getResults"/>
+			<input>
+				<soap:body use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+			</output>
+		</operation>
+		<operation name="describe">
+		    <soap:operation soapAction="describe"/>
+            <input>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+        </operation>
+        <operation name="getLastEvent">
+            <soap:operation soapAction="getLastEvent"/>
+            <input>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+        </operation>
+        <operation name="getResultsInfo">
+            <soap:operation soapAction="getResultsInfo"/>
+            <input>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+        </operation>
+	</binding>
+
+	<service name="_APP_NAME_.saService">
+	    <sawsdl:attrExtensions  sawsdl:modelReference="_EDAM_TOPIC_"/>
+		<port name="_APP_NAME_.saPort" binding="tns:_APP_NAME_PortBinding">
+			<documentation>_DESCRIPTION_
+			</documentation>
+			<soap:address location="REPLACE_WITH_ACTUAL_URL" />
+		</port>
+	</service>
+</definitions>
+

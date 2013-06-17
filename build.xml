@@ -1,0 +1,587 @@
+<?xml version="1.0"?>
+<!DOCTYPE project [
+  <!ENTITY maven        SYSTEM "xmls/maven.xml">
+  <!ENTITY upload2maven SYSTEM "xmls/upload2maven.xml">
+  <!ENTITY junit        SYSTEM "xmls/junit.xml">
+  <!ENTITY tomcat       SYSTEM "xmls/tomcat.xml">
+  <!ENTITY deployment   SYSTEM "xmls/deployment.xml">
+  <!ENTITY jaxws        SYSTEM "xmls/jaxws.xml">
+  <!ENTITY axis1        SYSTEM "xmls/axis1.xml">
+  <!ENTITY install      SYSTEM "xmls/install.xml">
+  <!ENTITY sql          SYSTEM "xmls/sql.xml">
+  <!ENTITY acd2xml      SYSTEM "xmls/acd2xml.xml">
+  <!ENTITY emboss       SYSTEM "xmls/emboss.xml">
+  <!ENTITY typedintrfc  SYSTEM "xmls/typedinterface.xml">
+  <!ENTITY run          SYSTEM "xmls/run.xml">
+]>
+
+<!-- ==================== Build for Soaplab2 ================= -->
+<!-- $Id: build.xml,v 1.70 2010/08/16 10:50:22 marsenger Exp $ -->
+
+<project name="Soaplab2: Analysis Web Services"
+  default="compile" basedir="."
+  xmlns:artifact="urn:maven-artifact-ant">
+
+  <description>
+Soaplab2 project aims to automate creation and usage of various
+kinds of Web Services, including those starting external tools,
+or fetching data from web resources. The project home page is at
+http://soaplab.sourceforge.net/soaplab2/.
+  </description>
+
+  <!-- ================================================================== -->
+  <!--                            Properties                              -->
+  <!-- ================================================================== -->
+
+  <!-- General properties -->
+  <property environment="env"/>
+  <property name="project.home" location="."/>
+  <!-- Give user a chance to override without editing this file
+       (and without typing -D each time it compiles it) -->
+  <property file="${project.home}/build.properties"/>
+  <property file="${user.home}/build.properties"/>
+
+  <!-- The directories containing sources and supporting files -->
+  <property name="src.root"           location="${project.home}/src"/>
+  <property name="src.main"           location="${src.root}/main"/>
+  <property name="src.plugins"        location="${src.root}/plugins"/>
+  <property name="src.plugins.java"   location="${src.plugins}/java"/>
+  <property name="src.plugins.xslt"   location="${src.plugins}/xslt"/>
+  <property name="src.test"           location="${src.root}/test/java"/>
+  <property name="src.etc"            location="${src.root}/etc"/>
+  <property name="src.scripts"        location="${src.etc}/scripts"/>
+  <property name="src.config"         location="${src.etc}/config"/>
+  <property name="src.sql"            location="${src.etc}/sql"/>
+  <property name="src.wsdl"           location="${src.etc}/wsdl"/>
+  <property name="src.webapps"        location="${src.etc}/webapps"/>
+  <property name="metadata.dir"       location="${project.home}/metadata"/>
+  <property name="metadata.generated" location="${metadata.dir}/generated"/>
+  
+  <!-- Properties for the documentation -->
+  <property name="docs.dir"            location="${project.home}/docs"/>
+  <property name="javadoc.dir"         location="${docs.dir}/API"/>
+
+  <!-- web application context (name of a war file) -->
+  <property name="context.name"  value="soaplab2"/>	
+  
+  <!-- The directory containing third-party libraries
+       (those that are not in a Maven repository) -->
+  <property name="lib.dir" location="${project.home}/lib"/>
+  
+  <!-- Temporary build directories -->
+  <property name="build.dir"              location="${project.home}/build"/>
+  <property name="build.classes"          location="${build.dir}/classes"/>
+  <property name="build.plugins"          location="${build.dir}/plugins"/>
+  <property name="build.test"             location="${build.dir}/test"/>
+  <property name="build.lib"              location="${build.dir}/lib"/>
+  <property name="build.run"              location="${build.dir}/run"/>
+  <property name="build.web"              location="${build.dir}/web"/>	
+  <property name="build.dist"             location="${build.dir}/dist"/>
+	
+  <!-- log4j properties -->
+  <property name="log4j.configuration"  location="${build.classes}/log4j.properties"/>
+
+  <!-- Classpath (without classes fetched from Maven repositories) -->
+  <path id="build.classpath">
+    <pathelement location="${build.classes}"/>
+    <pathelement location="${build.plugins}"/>
+    <fileset dir="${lib.dir}">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+  
+  <!-- Excludes for compilation and API documentation -->
+  <property name="project.excludes" value="**/notyet/*"/>
+
+  <!-- misc properties (used by more targets) -->
+  <property name="services.names.file" location="${project.home}/services.list"/>
+
+  <!-- basedir with unix file separator - for usage in various property files -->
+  <pathconvert property="basedir.unix" targetos="unix">
+    <path location="${basedir}"/>
+  </pathconvert>
+
+  <!-- ================================================================== -->
+  <!--                           My own tasks                             -->
+  <!-- ================================================================== -->
+
+  <typedef name="ls" classname="embl.ebi.tasks.TaskLs">
+    <classpath>
+      <fileset dir="${lib.dir}">
+        <include name="mytasks.jar"/>
+      </fileset>
+    </classpath>
+  </typedef>
+
+  <!-- ================================================================== -->
+  <!--                            Targets/Tasks                           -->
+  <!-- ================================================================== -->
+  &junit;      <!-- junit testing targets -->
+  &tomcat;     <!-- Tomcat server targets -->
+  &deployment; <!-- general deployment targets -->
+  &jaxws;      <!-- JAX-WS deployment targets -->
+  &axis1;      <!-- Axis-1 deployment targets -->
+  &acd2xml;    <!-- ACD parser targets -->
+  &sql;        <!-- database access targets -->
+  &install;    <!-- installation targets -->
+  &emboss;     <!-- EMBOSS targets -->
+  &typedintrfc;<!-- typed services -->
+  &run;        <!-- invoking command-line programs -->
+  
+  <!-- ================================================================== -->
+  <!--                            Maven                                   -->
+  <!-- ================================================================== -->
+  &maven;
+  &upload2maven;
+
+  <!-- ================================================================== -->
+  <!-- Initialize (whatever needs to be done)                             -->
+  <!-- ================================================================== -->
+  <target name="init" depends="initmaven">
+    <!-- Set current date/time -->
+    <tstamp>
+      <format property="TODAY_LONG"  pattern="EEE MMM d HH:mm:ss z yyyy"/>
+      <format property="TODAY_SHORT" pattern="yyyy-MM-dd"/>
+    </tstamp>
+    
+    <!--Test if JUNIT is present in ANT classpath-->
+    <available property="junit.is.present" classname="junit.framework.Test"/>
+
+    <!-- Create the build directories -->
+    <mkdir dir="${build.dir}"/>
+    <mkdir dir="${build.classes}"/>
+    <mkdir dir="${build.plugins}"/>
+    <mkdir dir="${build.lib}"/>
+    <mkdir dir="${build.run}"/>
+    <mkdir dir="${build.test}"/>
+    <mkdir dir="${build.web}"/>
+    <mkdir dir="${build.dist}"/>
+  	
+    <!-- Create .cvsignore files -->
+    <!-- [TBD: How can I do this by traversing directory tree automatically?] -->
+    <copy file="${basedir}/.cvsignore.template"
+      tofile="${basedir}/.cvsignore" failonerror="false"/>
+    <copy file="${basedir}/doc-dev/.cvsignore.template"
+      tofile="${basedir}/doc-dev/.cvsignore" failonerror="false"/>
+    <copy file="${javadoc.dir}/.cvsignore.template"
+      tofile="${javadoc.dir}/.cvsignore" failonerror="false"/>
+    <copy file="${docs.dir}/.cvsignore.template"
+      tofile="${docs.dir}/.cvsignore" failonerror="false"/>
+    <copy file="${docs.dir}/copies/.cvsignore.template"
+      tofile="${docs.dir}/copies/.cvsignore" failonerror="false"/>
+    <copy file="${lib.dir}/.cvsignore.template"
+      tofile="${lib.dir}/.cvsignore" failonerror="false"/>
+    <copy file="${metadata.dir}/old.generator/.cvsignore.template"
+      tofile="${metadata.dir}/old.generator/.cvsignore" failonerror="false"/>
+    <copy file="${metadata.generated}/.cvsignore.template"
+      tofile="${metadata.generated}/.cvsignore" failonerror="false"/>
+    <copy file="${src.main}/.cvsignore.template"
+      tofile="${src.main}/.cvsignore" failonerror="false"/>
+    <copy file="${src.plugins.java}/.cvsignore.template"
+      tofile="${src.plugins.java}/.cvsignore" failonerror="false"/>
+    <copy file="${basedir}/generated/.cvsignore.template"
+      tofile="${basedir}/generated/.cvsignore" failonerror="false"/>
+    
+    <!-- Make some non-obvious dependencies explicit -->
+    <dependset>
+      <srcfileset dir="${src.config}" includes="pom*.template"/>
+      <targetfileset dir="${basedir}" includes="**/pom.xml"/>
+    </dependset>
+
+    <!-- compilation options -->    
+    <property name="compile.debug"       value="true" />
+    <property name="compile.verbose"     value="false" />
+    <property name="compile.deprecation" value="false" />
+    <property name="compile.optimize"    value="false" />
+    <property name="compile.warnings"    value="false" />
+  	
+    <!-- For types interfaces -->
+    <condition property="includetypedinterface.true" value="true">
+      <istrue value="${typedinterface.enable}"></istrue>
+    </condition>
+
+  </target>
+
+  <!-- ================================================================== -->
+  <!-- Compiles everything                                                -->
+  <!-- ================================================================== -->
+  <target name="compile" depends="config"
+    description="Compile all source code (default)">
+
+    <condition property="xlint.param" value="-Xlint:unchecked" else="-Xlint:none">
+      <istrue value="${compile.warnings}"/>
+    </condition>
+
+    <javac
+      srcdir="${src.main}"
+      destdir="${build.classes}"
+      verbose="${compile.verbose}"
+      debug="${compile.debug}"
+      debuglevel="lines,vars,source"
+      deprecation="${compile.deprecation}"
+      optimize="${compile.optimize}"
+      excludes="${project.excludes}">
+      <classpath refid="build.classpath"/>
+      <classpath refid="dependency.classpath"/>
+      <compilerarg value="${xlint.param}"/>
+    </javac>
+    
+    <copy todir="${build.classes}">
+      <fileset dir="${src.main}" includes="**/help/"/>
+    </copy>
+    <copy todir="${build.classes}">
+      <fileset dir="${src.webapps}" includes="**/templates/"/>
+    </copy>
+    
+    <javac
+      srcdir="${src.plugins.java}"
+      destdir="${build.plugins}"
+      verbose="${compile.verbose}"
+      debug="${compile.debug}"
+      debuglevel="lines,vars,source"
+      deprecation="${compile.deprecation}"
+      optimize="${compile.optimize}"
+      excludes="${project.excludes}">
+      <classpath refid="build.classpath"/>
+      <classpath refid="dependency.classpath"/>
+      <compilerarg value="${xlint.param}"/>
+    </javac>
+
+    <copy todir="${build.plugins}">
+      <fileset dir="${src.plugins.java}" includes="**/*.xsl"/>
+    </copy>
+
+  </target>
+
+	
+  <!-- ================================================================== -->
+  <!-- Builds config files and run-time scripts                           -->
+  <!-- ================================================================== -->
+  <target name="config" depends="init,initeclipse"
+    description="Create all run-time scripts and configuration files.">
+
+    <property name="my.log4j.properties"
+      location="${src.config}/log4j.properties.template"/>
+    <copy
+      file="${my.log4j.properties}"
+      tofile="${build.classes}/log4j.properties">
+      <filterset>
+        <filter token="LOGDIR" value="${basedir.unix}"/>
+      </filterset>
+    </copy>
+
+    <!-- create run-time scripts -->    
+    <dependset> <!-- TBD: why this does not work? -->
+      <srcfileset file="${project.home}/build.properties" />
+      <srcfileset file="${user.home}/build.properties" />
+      <targetfileset dir="${build.run}" includes="run-* source.me* cp.bat"/>
+    </dependset>
+
+    <property name="user.lib.dir"     value=""/>
+    <property name="user.lib.include" value="*.jar"/>
+
+    <pathconvert property="libs.path" refid="dependency.fileset"
+      dirsep="${file.separator}"
+      pathsep="${path.separator}"
+      />
+    <pathconvert property="libs.path.2"
+      dirsep="${file.separator}"
+      pathsep="${path.separator}"
+      >
+      <path>
+        <fileset dir="${user.lib.dir}">
+          <include name="${user.lib.include}"/>
+        </fileset>
+        <fileset dir="${lib.dir}">
+          <include name="*.jar"/>
+          <exclude name="${maven.ant.file}"/>
+        </fileset>
+      </path>
+    </pathconvert>
+
+    <condition property="log4j.present">
+      <available file="${log4j.configuration}"/>
+    </condition>
+    <!-- having established existence or non-existence of log4j.configuration
+         we can create a proper piece of a command-line in log4j.value - that
+         is used to update run-scripts
+         -->
+    <condition property="log4j.value" value="&quot;-Dlog4j.configuration=file:${log4j.configuration}&quot;">
+      <isset property="log4j.present"/>
+    </condition>
+    <condition property="log4j.value" value="">
+      <not><isset property="log4j.present"/></not>
+    </condition>
+
+    <copy todir="${build.run}">
+      <fileset dir="${src.scripts}" includes="run-* source.me* cp.bat"/>
+      <filterset>
+        <filter token="PROJECT_HOME" value="${basedir.unix}"/>
+        <filter token="LOG4J"        value="${log4j.value}"/>
+        <filter token="PROJECT_DEPS" value="${libs.path}${path.separator}${libs.path.2}"/>
+      </filterset>
+    </copy>
+    <chmod dir="${build.run}" includes="run-*" perm="a+rx"/>
+
+    <!-- create jar file for SPI mechanism -->    
+    <property name="services.config.dir" location="${src.config}/services"/>
+    <property name="services.config.jar" value="soaplab-spi-config.jar"/>
+    <property name="released.date" value="${TODAY_SHORT}"/>
+    
+    <jar destfile="${build.lib}/${services.config.jar}">
+      <manifest>
+        <attribute name="Built-By" value="${user.name}"/>
+        <attribute name="Released-Date" value="${released.date}"/>
+      </manifest>
+      <fileset dir="${services.config.dir}"/>
+    </jar>
+
+    <!-- soaplab run-time properties - for SERVICES -->    
+    <property name="my.soaplab.properties"
+      location="${src.config}/soaplab.properties.template"/>
+
+    <copy
+      file="${my.soaplab.properties}"
+      tofile="${build.classes}/soaplab.properties">
+      <filterset>
+        <filter token="PROJECT_HOME" value="${basedir.unix}"/>
+        <filter token="METADATA_DIR" value="$${base.dir}/metadata/generated"/>
+        <filter token="RUNTIME_DIR"  value="$${base.dir}/_R_"/>
+        <filter token="SCRIPTS_DIR"  value="$${base.dir}/run"/>
+        <filter token="TOMCAT_HOST"  value="${tomcat.host}"/>
+        <filter token="TOMCAT_PORT"  value="${tomcat.port}"/>
+      </filterset>
+    </copy>
+    
+    <!-- soaplab run-time properties - for CLIENTS -->    
+    <property name="my.soaplab.client.properties"
+      location="${src.config}/soaplab.client.properties.template"/>
+
+    <copy
+      file="${my.soaplab.client.properties}"
+      tofile="${build.classes}/soaplab.client.properties">
+      <filterset>
+        <filter token="PROJECT_HOME" value="${basedir.unix}"/>
+        <filter token="TOMCAT_HOST"  value="${tomcat.host}"/>
+        <filter token="TOMCAT_PORT"  value="${tomcat.port}"/>
+      </filterset>
+    </copy>
+    
+    <!-- copy pre-generated wsdl files closer to their classes -->
+    <copy
+      todir="${build.classes}/org/soaplab/clients/wsdl">
+      <fileset dir="${src.wsdl}"/>
+    </copy>
+
+    <!-- pieces of docs -->
+    <copy
+      todir="${docs.dir}/copies">
+      <fileset dir="${project.home}/doc-dev" includes="NOTES,DISCUSSION,SPINET.NOTES"/>
+      <fileset dir="${project.home}/data" includes="ConvertedEMBOSSTutorial.xml"/>
+    </copy>
+
+  </target>
+  
+  <!-- ================================================================== -->
+  <!-- Clean-up                                                           -->
+  <!-- ================================================================== -->
+  <target name="clean" depends="cleanapi"
+    description="Remove all generated files.">
+    <delete dir="${build.dir}"/>
+  </target>
+  
+  <target name="cleanapi">
+    <delete quiet="true" includeEmptyDirs="true">
+      <fileset dir="${javadoc.dir}" excludes=".cvsignore*"/>
+    </delete>
+  </target>
+  
+  <target name="cleanjars">
+    <delete quiet="true">
+      <fileset dir="${build.lib}"/>
+    </delete>
+  </target>
+
+  <!-- ================================================================== -->
+  <!-- Builds jar files with Soaplab classes                              -->
+  <!-- ================================================================== -->
+  <target name="jars" depends="compile"
+    description="Create all jar files related to this project.">
+
+    <property name="released.date" value="${TODAY_SHORT}"/>
+    <property name="project.jar"
+      value="${maven.project.artifactId}-${maven.project.version}.jar"/>
+
+    <jar destfile="${build.lib}/${project.jar}"> 
+      <fileset dir="${build.classes}" excludes="*.properties"/>
+      <fileset dir="${build.plugins}"/>
+      <manifest>
+        <attribute name="Built-By" value="${user.name}"/>
+        <attribute name="Released-Date" value="${released.date}"/>
+      </manifest>
+    </jar>
+
+  </target>
+
+  <!-- ================================================================== -->
+  <!-- Creates taverna-client jar file                                    -->
+  <!-- ================================================================== -->	
+
+  <target name="tavernaclient-jar" depends="compile">
+    <artifact:pom id="maven.taverna-client" file="${taverna-client.deps.file}"/>
+    <property name="released.date" value="${TODAY_SHORT}"/>
+
+    <property name="taverna-client.jar"
+      value="${maven.taverna-client.artifactId}-${maven.taverna-client.version}.jar"/>
+
+    <jar destfile="${build.lib}/${taverna-client.jar}"> 
+      <fileset dir="${build.classes}">
+      	<include name="soaplab.client.properties"/>
+        <include name="org/soaplab/tools/**"/>
+        <include name="org/soaplab/share/**"/>
+        <include name="org/soaplab/clients/*"/>
+      	<include name="org/soaplab/clients/wsdl/*"/>
+        <include name="org/soaplab/clients/axis1/*"/>
+        <include name="org/soaplab/clients/jaxws/*"/>
+        <exclude name="org/soaplab/services/**"/>
+        <exclude name="org/soaplab/clients/CmdLine*"/>
+      </fileset>
+      <manifest>
+        <attribute name="Built-By" value="${user.name}"/>
+        <attribute name="Released-Date" value="${released.date}"/>
+      </manifest>
+    </jar>
+
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Creates documentation                                               -->
+  <!-- =================================================================== -->
+  <target name="docs" depends="api"
+    description="Generate documentation.">
+  </target>
+  
+  <!-- Generate general Soaplab2 API documentation -->
+  <target name="api" depends="compile">
+    
+    <property name="documented.packages"
+      value="org.soaplab.share,
+             org.soaplab.services.events,
+             org.soaplab.services.metadata"
+      />
+    <property name="documented.files"
+      value="${src.main}/org/soaplab/services/Config.java,
+             ${src.main}/org/soaplab/services/adaptor/DataAdaptor.java,
+             ${src.main}/org/soaplab/services/Job.java,
+             ${src.main}/org/soaplab/services/Reporter.java,
+             ${src.main}/org/soaplab/services/AnalysisInventory.java,
+             ${src.main}/org/soaplab/services/AbstractJob.java,
+             ${src.main}/org/soaplab/services/cmdline/CmdLineJob.java,
+             ${src.main}/org/soaplab/services/cmdline/Parameter.java,
+             ${src.main}/org/soaplab/services/cmdline/NamedValues.java,
+             ${src.main}/org/soaplab/services/storage/PersistentStorage.java,
+             ${src.main}/org/soaplab/services/protocol/ProtocolToolkit.java"
+      />
+    
+    <javadoc packagenames="${documented.packages}" 
+      sourcepath="${src.main}"
+      sourcefiles="${documented.files}"
+      destdir="${javadoc.dir}"
+      windowtitle="Soaplab2"
+      doctitle="SoapLab2 - Web Service for invoking remote analyses"
+      author="true"
+      version="true"
+      use="true"
+      nodeprecatedlist="true"
+      public="true">
+      <classpath refid="build.classpath"/>
+      <classpath refid="dependency.classpath"/>
+      <header><![CDATA[<font size="-1">Version: ${maven.project.version}</font>]]></header>
+      <bottom><![CDATA[<font size="-1">
+      <a href="mailto:martin.senger@gmail.com">Submit a bug or feature</a><BR>
+      Generated: ${TODAY_LONG}</font>]]></bottom>
+    </javadoc>
+    
+  </target>
+  
+  <!-- ================================================================== -->
+  <!-- pack Java API                                                      -->
+  <!-- ================================================================== -->
+
+  <!-- Pack together API docs so it can be moved somewhere else -->
+  <target name="packapi" depends="docs">
+    <property name="pack.api.file" value="soaplab.api"/>
+    <tar
+      destfile="${build.dir}/${pack.api.file}.tar.gz"
+      basedir="${javadoc.dir}"
+      excludes=".cvsignore*"
+      compression="gzip"
+      longfile="gnu"/>
+    <zip
+      destfile="${build.dir}/${pack.api.file}.zip"
+      excludes=".cvsignore*"
+      basedir="${javadoc.dir}"/>
+  </target>
+
+  <!-- ================================================================== -->
+  <!-- all: do everything (except deploying to Maven, and deploying docs) -->
+  <!-- ================================================================== -->
+  <target name="all" depends="clean,compile,jars,docs"
+    description="Clean, compile, etc.."/>
+
+  <!-- ================================================================== -->
+  <!-- Create a list of currently available service names                 -->
+  <!-- ================================================================== -->
+  <target name="info-list" depends="init"
+    description="Show a list of available services">
+    <antcall target="services-list"/>
+    <concat taskname="service">
+      <fileset file="${services.names.file}"/>
+    </concat>
+  </target>
+
+  <!-- it creates file whose name is in ${services.names.file} -->
+  <target name="services-list" depends="compile">
+
+    <!-- create a file with a list of service names -->
+    <java
+      classname="org.soaplab.clients.CmdLineClient"
+      failonerror="true"
+      fork="yes">
+
+      <classpath refid="build.classpath"/>
+      <classpath refid="dependency.classpath"/>
+      <classpath>
+        <fileset dir="${build.lib}">
+          <include name="*.jar"/>
+        </fileset>
+      </classpath>
+
+      <sysproperty key="log4j.configuration" value="file:${log4j.configuration}"/>
+
+      <arg value="-protocol"/>
+      <arg value="local"/>
+      <arg value="-la"/>
+      <arg value="-q"/>
+      <redirector output="${services.names.file}" errorproperty="list.errors"/>
+    </java>
+    <echo taskname="errors">${list.errors}</echo>
+  </target>
+
+
+  <!-- ================================================================== -->
+  <!-- Just for testing...                                                -->
+  <!-- ================================================================== -->
+  <target name="testing" depends="init">
+    <echo message="${log4j.configuration}"/>
+    <echo message="${TODAY_LONG}"/>
+    <echo message="${TODAY_SHORT}"/>
+    <echo message="Base: ${basedir}"/>
+    <echo message="Base (Unix): ${basedir.unix}"/>
+    <echo message="${ant.project.name}"/>
+    <echo message="${tomcat.host} and ${tomcat.port}"/>
+  </target>
+
+
+
+</project>

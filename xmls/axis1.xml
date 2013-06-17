@@ -1,0 +1,161 @@
+<!-- This is an XML entity included in main build.xml file  -->
+<!-- $Id: axis1.xml,v 1.11 2010/08/16 13:10:52 mahmutuludag Exp $ -->
+<!-- ====================================================== -->
+
+<!-- ====================================================== -->
+<!--                                                        -->
+<!-- Axis-1 targets - for SERVICES side                     -->
+<!--                                                        -->
+<!-- ====================================================== -->
+
+<target name="axis1init" depends="init">
+
+  <!-- use it to change default context name -->
+  <property name="axis1.context.name" value="${context.name}-axis"/>
+
+  <!-- use these if you have your own template -->
+  <property name="axis1.web.xml.template"   value="${src.config}/axis1/web.xml.template"/>
+
+  <!-- property propagated into web.xml -->
+  <property name="web.display.name"  value="Soaplab Web Services"/>	
+  <property name="web.display.desc"
+    value="The project home page is http://soaplab.sourceforge.net/soaplab2/"/>	
+
+  <!-- additionally for typed services: property propagated into web.xml -->
+  <property name="url.pattern.for.list"   value="/services/list"/>	
+  <property name="url.pattern.for.others" value="/services/*"/>	
+
+</target>
+
+<!-- ================================================================== -->
+<!-- Collect all files needed for Axis-1 service distribution           -->
+<!-- ================================================================== -->
+<target name="axis1dist" depends="axis1init"
+  description="Populate Axis-1 services distribution space">
+
+  <!-- add typed interface bits if includetypedinterface property set -->
+  <antcall target="jaxtyped">
+    <param name="current.protocol" value="axis1"/>
+  </antcall>
+
+  <!-- move together (almost) all needed files -->
+  <antcall target="populate-dist">
+    <param name="current.context.name" value="${axis1.context.name}"/>
+  </antcall>
+
+  <!-- remove jax-ws libraries, unless typed interface option was selected -->
+  <antcall target="delete_jax-ws_libs"/>
+
+  <!-- copy WEB configuration file -->
+  <copy
+    file="${axis1.web.xml.template}"
+    tofile="${build.web}/WEB-INF/web.xml">
+    <filterset>
+      <filter token="DISPLAY_NAME"   value="${web.display.name}"/>
+      <filter token="DISPLAY_DESC"   value="${web.display.desc}"/>
+    </filterset>
+  </copy>
+
+  <!-- create deployment descriptor -->
+  <antcall target="deployment-descriptor"/>
+
+  <!-- for typed services (some just copied files will be overwritten) -->
+  <antcall target="copy-typed-resources">
+    <param name="current.protocol" value="axis1"/>
+  </antcall>
+
+</target>
+
+<!-- remove jax-ws libraries, unless typed interface option was selected-->
+<target name="delete_jax-ws_libs" unless="includetypedinterface.true">
+  <delete>
+    <fileset dir="${build.web}/WEB-INF/lib"
+      includes="*jaxws*,*jaxb*,*jsr*"/>
+  </delete>
+</target>
+
+
+<!-- ================================================================== -->
+<!-- Creating a deployment descriptor                                   -->
+<!-- ================================================================== -->
+<target name="deployment-descriptor"
+  depends="compile, axis1init">
+
+  <!-- read the static piece of template -->
+  <loadfile
+    property="after.service.name"
+    srcFile="${src.config}/axis1/service.name.template"/>
+
+  <!-- create a file of service names that will be deployed -->
+  <!-- (the file name is in  ${services.names.file})        -->
+  <antcall target="services-list"/>
+
+  <!-- decorate service names obtained above -->
+  <loadfile
+    property="deployed.services"
+    srcFile="${services.names.file}">
+    <filterchain>
+      <tokenfilter>
+        <replaceregex
+          pattern="^(\w+\.\w+)$"
+          replace="  &lt;service name=&quot;\1&quot; ${after.service.name}"
+          flags="gi"/>
+      </tokenfilter>
+    </filterchain>
+  </loadfile>
+
+  <!-- create deployment descriptor -->
+  <copy overwrite="true"
+    file="${src.config}/axis1/server-config.wsdd.template"
+    tofile="${build.web}/WEB-INF/server-config.wsdd">
+    <filterchain>
+      <expandproperties/>
+    </filterchain>
+  </copy>
+
+</target>
+
+
+<!-- ================================================================== -->
+<!-- Creating a .war file                                               -->
+<!-- ================================================================== -->
+<target name="axis1war" depends="axis1dist"
+  description="Create a Axis-1 war file for services distribution">
+
+  <antcall target="create-war">
+    <param name="current.context.name" value="${axis1.context.name}"/>
+  </antcall>
+
+</target>
+
+
+<!-- ================================================================== -->
+<!-- Deployment to Tomcat server                                        -->
+<!-- ================================================================== -->
+<target name="axis1deploy" depends="tomcat-init,axis1war"
+  description="Deploy (copy) an Axis-1 war file to a local Tomcat server">
+
+  <antcall target="copy-war">
+    <param name="current.context.name" value="${axis1.context.name}"/>
+  </antcall>
+
+</target>
+
+<target name="axis1deployx" depends="tomcat-init,axis1war"
+  description="Deploy (use tomcat manager) an Axis-1 war file to a Tomcat server">
+
+  <antcall target="deploy">
+    <param name="current.context.name" value="${axis1.context.name}"/>
+  </antcall>
+
+</target>
+
+<!-- make a simple copy of already created .war file -->
+
+<target name="axis1copy" depends="tomcat-init,axis1init">
+
+  <antcall target="copy-war">
+    <param name="current.context.name" value="${axis1.context.name}"/>
+  </antcall>
+
+</target>

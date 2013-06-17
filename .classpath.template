@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+  <classpathentry
+    including="**/*.java|soaplab.properties|soaplab.client.properties"
+    kind="src"
+    output="build/classes"
+    path="src/main"/>
+  <classpathentry
+    including="**/*.java"
+    kind="src"
+    output="build/plugins"
+    path="src/plugins/java"/>
+  <classpathentry
+    kind="src"
+    output="build/test"
+    path="src/test/java"/>
+  <classpathentry kind="lib" path="build/lib/soaplab-spi-config.jar"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+  <classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
+  <classpathentry kind="output" path="build/classes"/>
+</classpath>

@@ -1,0 +1,7 @@
+* allow to put an empty qualifier into acd file
+  (such qualifier is turned to 'true' now)
+
+* quliafier is both in options and as a main attribute (the one from
+  options is used); should be only as the main attribute
+
+  

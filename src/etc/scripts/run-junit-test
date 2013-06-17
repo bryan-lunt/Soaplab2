@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+#  Sets CLASSPATH and runs whatever test - name its class
+#  as the first argument.
+#
+#  $Id: run-junit-test,v 1.1 2008/05/16 13:19:27 marsenger Exp $
+# ----------------------------------------------------
+
+PROJECT_HOME=@PROJECT_HOME@
+LIBS_PATH=@PROJECT_DEPS@
+
+CLASSPATH=$LIBS_PATH
+CLASSPATH=`echo ${PROJECT_HOME}/build/lib/*.jar | tr ' ' ':'`:$CLASSPATH
+CLASSPATH=${PROJECT_HOME}/build/classes:$CLASSPATH
+CLASSPATH=${PROJECT_HOME}/build/plugins:$CLASSPATH
+CLASSPATH=${PROJECT_HOME}/build/test:$CLASSPATH
+CLASSPATH=${PROJECT_HOME}/src/test/junit-resources:$CLASSPATH
+
+exec java -cp $CLASSPATH @LOG4J@ "$@"

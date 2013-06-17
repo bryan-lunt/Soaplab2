@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- place for extensions -->
+<!ENTITY % protocol_type "corba-event | corba-notification | http | rmi | smtp | ws-full | ws-simple">
+
+<!-- the real DTD starts here -->
+<!ELEMENT channel (protocol-list)>
+<!ATTLIST channel
+	id CDATA #REQUIRED
+>
+<!ELEMENT protocol-list (protocol+)>
+<!ELEMENT protocol ( (address, property*)                |
+                     (endpoint, uri?, property*)         |
+		     (ior, property*)                    |
+		     (url, cgi-element-name?, property*) |
+		     (property*)
+		     )>
+<!ATTLIST protocol
+    type  (corba-event |
+	   corba-notification |
+	   http |
+	   rmi |
+	   smtp |
+	   ws-full |
+	   ws-simple) #REQUIRED
+>
+
+<!ELEMENT property (#PCDATA)>
+<!ATTLIST property
+	name CDATA #REQUIRED
+>
+
+<!ELEMENT endpoint         (#PCDATA)>
+<!ELEMENT ior              (#PCDATA)>
+<!ELEMENT uri              (#PCDATA)>
+<!ELEMENT url              (#PCDATA)>
+<!ELEMENT address          (#PCDATA)>
+<!ELEMENT cgi-element-name (#PCDATA)>

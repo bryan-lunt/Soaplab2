@@ -1,0 +1,68 @@
+# ------------------------------------------------------------------------
+# Comments to: martin.senger@gmail.com
+# $Id: log4j.properties.template,v 1.8 2011/04/06 14:23:43 mahmutuludag Exp $
+# ------------------------------------------------------------------------
+
+# create A1 or A2 logger for Soaplab2 and its relatives
+# (make sure that it does not propagate to higher level)
+# ------------------------------------------------------
+log4j.logger.org.soaplab  = DEBUG, A1, A2
+log4j.logger.org.acdtools = DEBUG, A1, A2
+log4j.logger.org.tulsoft  = DEBUG, A1, A2
+log4j.logger.org.testing  = DEBUG, A1, A2
+log4j.additivity.org.soaplab  = false
+log4j.additivity.org.acdtools = false
+log4j.additivity.org.tulsoft  = false
+log4j.additivity.org.testing  = false
+
+# create B1 or B2 logger for the rest of the world
+# ------------------------------------------------
+log4j.rootLogger=INFO, B1, B2
+
+# set Soaplab's appenders and layouts
+# -------------------------------------
+log4j.appender.A1=org.apache.log4j.ConsoleAppender
+log4j.appender.A1.layout=org.apache.log4j.PatternLayout
+log4j.appender.A1.layout.ConversionPattern=%-4r [%t] %-5p %c{1} %x- %m%n
+log4j.appender.A1.threshold=WARN
+log4j.appender.A1.target=System.err
+
+log4j.appender.A2=org.apache.log4j.FileAppender
+log4j.appender.A2.file=@LOGDIR@/soaplab2.log
+log4j.appender.A2=org.apache.log4j.RollingFileAppender
+log4j.appender.A2.MaxFileSize=500KB
+log4j.appender.A2.MaxBackupIndex=9
+log4j.appender.A2.layout=org.apache.log4j.PatternLayout
+log4j.appender.A2.layout.ConversionPattern=%d{ISO8601} %-4r [%t] %-5p %c{1} %x- %m%n
+
+# set appenders and layouts for the rest of the world
+# ---------------------------------------------------
+log4j.appender.B1=org.apache.log4j.ConsoleAppender
+log4j.appender.B1.layout=org.apache.log4j.PatternLayout
+log4j.appender.B1.layout.ConversionPattern=%-4r [%t] %-5p %c{1} %x- %m%n
+log4j.appender.B1.threshold=WARN
+
+log4j.appender.B2=org.apache.log4j.FileAppender
+log4j.appender.B2.file=@LOGDIR@/soaplab2-others.log
+log4j.appender.B2=org.apache.log4j.RollingFileAppender
+log4j.appender.B2.MaxFileSize=500KB
+log4j.appender.B2.MaxBackupIndex=9
+log4j.appender.B2.layout=org.apache.log4j.PatternLayout
+log4j.appender.B2.layout.ConversionPattern=%d{ISO8601} %-4r [%t] %-5p %c{1} %x- %m%n
+
+
+# Logger for recording brief job information that can be used for job statistics
+log4j.logger.JobRecords = DEBUG, JR
+log4j.additivity.JobRecords=false
+log4j.appender.JR=org.apache.log4j.FileAppender
+log4j.appender.JR.layout=org.apache.log4j.PatternLayout
+log4j.appender.JR.layout.ConversionPattern=%-22d{dd/MMM/yyyy HH:mm:ss} - %m%n
+log4j.appender.JR.file=@LOGDIR@/jobrecords.log
+
+
+# the rest:
+# ---------
+# Ignore less significant messages from the third-party packages
+#log4j.logger.org.apache = WARN
+#log4j.logger.org.apache.commons.httpclient=WARN
+

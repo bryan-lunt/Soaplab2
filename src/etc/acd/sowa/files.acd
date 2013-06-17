@@ -1,0 +1,20 @@
+appl: Files [
+  documentation: "Copying and merging files to standard output"
+  groups: "Testing"
+  nonemboss: "Y"
+  executable: "copy-files.pl"
+]
+
+infile: input  [
+  additional: "Y"
+  qualifier: "i"
+]
+
+filelist: list [
+  additional: "Y"
+  qualifier: "l"
+]
+
+outfile: output  [
+  default: "stdout"
+]

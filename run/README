@@ -1,0 +1,10 @@
+This directory contains testing scripts. They may not be runnable on
+every platform (they are mostly in Perl).
+
+By default, this directory is also added to the PATH when executing
+external command-line tools from Soaplab2 services. Therefore, it is a
+good place to put your testing scripts, as well.
+
+----------------------------------------------------------------------
+$Id: README,v 1.2 2007/10/06 18:32:13 marsenger Exp $
+----------------------------------------------------------------------

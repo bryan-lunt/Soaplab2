@@ -1,0 +1,27 @@
+base.dir = @PROJECT_HOME@
+
+# ------------------------------
+# where to find service/services
+# ------------------------------
+host = @TOMCAT_HOST@
+port = @TOMCAT_PORT@
+
+# ------------------------------
+# how to access service/services
+# ------------------------------
+
+# protocol can be 'jaxws' or 'local' or 'axis1' (so far)
+protocol = jaxws
+
+# ------------------------------
+# properties for batch testing
+# ------------------------------
+test.data.dir = ${base.dir}/data
+batch.test.file = ${base.dir}/data/defaultTests.cfg
+#batch.test.file = ${base.dir}/data/embossTests.cfg
+#batch.test.file = ${base.dir}/data/embassyTests.cfg
+#batch.test.file = ${base.dir}/data/ebiServicesTests.cfg
+
+#batch.keep.results
+batch.report.table
+#batch.max.threads = 25

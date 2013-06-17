@@ -1,0 +1,34 @@
+digraph Spinet_Results {
+   rankdir=TB;
+   node [shape="box"];
+
+   {rank=same; resultlinks resultlinks2;}
+   {rank=same; directResult realResult;}
+
+   resultslist     [label="resultslist.jsp\n\n[It does not have results yet,\njust some of their attributes.\nFor example, it does not know yet\nif the result is text or binary.\nBut it knows whether\nthe result is a _url or not.]"
+                        color="#ffff99" style="filled"];
+
+   resultlinks     [label="resultlinks.jsp\n\n[It produces a result bar\nwith hyperlinks to results.\n Used for the _url type of result\nwhen it is an array.]"
+                        color="yellow" style="filled"];
+
+   resultlinks2    [label="resultlinks2.jsp\n\n[It produces a result bar\nwith hyperlinks to results.\n Used for the non-_url type of result\nwhen it is an array.]"
+                        color="yellow" style="filled"];
+
+   result          [label="result.jsp\n\n[It displays one result.\nIt takes care about proper content type\nif it is a binary result.\nIt can also display one element\nof an array result.]"
+                        color="azure2" style="filled"];
+
+   realResult      [label="Real result\n[text or binary, not an array]"
+                        color="floralwhite" style="filled"];
+
+   directResult    [label="Real result\n[a _url result, not an array]"
+                        color="floralwhite" style="filled"];
+
+   resultslist -> resultlinks   [label="for a list\nof URLs"];
+   resultslist -> result        [label="for every\nother result"];
+   resultslist -> directResult  [label="for a single\nURL"];
+
+   result -> realResult;
+   result -> resultlinks2  [label="for array result\n[if no index given]"];
+
+   resultlinks2 -> result  [label="for one result\n[given by an index]"];
+}

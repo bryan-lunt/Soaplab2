@@ -1,0 +1,14 @@
+appl: Sleep [
+  documentation: "Just sleep for a while"
+  groups: "testing"
+  nonemboss: "Y"
+  executable: "sleep"
+]
+
+integer: interval  [
+  additional: "Y"
+  parameter: "Y"
+  default: 30
+  comment: defaults
+  prompt: "Sleeping interval in seconds"
+]

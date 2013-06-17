@@ -1,0 +1,51 @@
+base.dir = @PROJECT_HOME@
+
+metadata.dir = @METADATA_DIR@
+applist = ${metadata.dir}/OtherApplications.xml
+applist = ${metadata.dir}/GowlabApplications.xml
+applist = ${metadata.dir}/EBIApplications.xml
+
+runtime.dir = @RUNTIME_DIR@
+working.dir = ${runtime.dir}/SANDBOX
+results.dir = ${runtime.dir}/RESULTS
+scripts.dir = @SCRIPTS_DIR@
+addtopath.dir = ${scripts.dir}
+
+# Cleaning intervals and timeout limits, all in milliseconds
+# ----------------------------------------------------------
+# cleaning interval for job objects
+#jobs.cleaning.interval = 60000
+# cleaning interval for service objects
+#services.cleaning.interval = 300000
+
+#maximum allowed time for jobs execution after which jobs are automatically terminated
+#jobs.timeout = 864000000
+#maximum waiting time for jobs waitfor calls
+#jobs.waitfor.timeout = 864000000
+
+
+###classic.helloworld.metadata.file = a/b/c
+
+#ignore.heartbeat.events = false
+
+#accept.any.exitcode
+
+#synonym.sowa = org.soaplab.sowa.SowaJobFactory
+
+# Accessing results by URLs:
+# --------------------------
+tomcat.host = @TOMCAT_HOST@
+tomcat.port = @TOMCAT_PORT@
+#results.url = http://${tomcat.host}:${tomcat.port}/soaplab2/results
+#results.url.target.dir = /path/to/local/directory/visible/to/your/web/server
+#results.url.ignore
+
+
+### Specifically for those who are using EMBOSS
+#
+#emboss.home = /your/EMBOSS/home/dir
+#emboss.data = /your/EMBOSS/data/dir
+#emboss.path = ${emboss.home}/bin
+#addtopath.dir = ${emboss.path}
+#
+#applist = ${metadata.dir}/EMBOSSApplications.xml

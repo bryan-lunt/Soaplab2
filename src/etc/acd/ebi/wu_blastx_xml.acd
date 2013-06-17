@@ -1,0 +1,103 @@
+appl: wu_blastx_xml [
+  documentation: "WU-BLAST with output in XML format, for DNA/RNA"
+  groups: "EBI_alignment"
+  nonemboss: "Y"
+  comment: "launcher org.soaplab.ebi.wublast.WSJob"
+  supplier: "http://www.ebi.ac.uk/Tools/webservices/wsdl/WSWUBlast.wsdl"
+  comment: "help http://www.ebi.ac.uk/Tools/webservices/services/wublast"
+  comment: "class org.soaplab.ebi.WSJobFactory"
+]
+
+# --- hidden inputs
+integer: program [
+   comment: "display false"
+   default: "blastx"
+   comment: "defaults"
+]
+string: outformat [
+   comment: "display false"
+   default: "xml"
+   comment: "defaults"
+]
+integer: searchtype  [
+   comment: "display false"
+   default: "1"
+   comment: "defaults"
+]
+
+# --- real inputs
+infile: sequence [
+   parameter: "Y"
+   information: "A DNA/RNA sequence in any format, or a sequence identifier in the form
+                 <code>db:id</code><br><i>for the list of databases supported
+                 <a href=http://www.ebi.ac.uk/Tools/webservices/help/databases>see</a></i>"
+   comment: "data direct"
+]
+list: database  [
+  information: "Search database"
+  min: 1
+  max: 10
+  default: uniprot
+  comment: "defaults"
+  values: "uniprot;uniref100;uniref90;uniref50;uniparc;swissprot;ipi;prints;sgt;pdb;imgthlap"
+]
+
+
+list: exp [
+  information: "expected threshold"
+  values: "1.0;10;100;1000"
+  min: 1
+  max: 1
+]
+list: sensitivity [
+  information: "An increase in sensitivity will increase the length of the search (longer execution times + more memory required), but increase the specificity of the results."
+  values: "vlow;low;medium;normal;high"
+  min: 1
+  max: 1
+]
+list: stats [
+  information: "type of statistics used when assessing the significance of aligned pairs"
+  values: "sump;poisson;kap"
+  min: 1
+  max: 1
+]
+list: scores [
+  information: "Maximum number of reported scores in the output"
+  values: "5;10;20;50;100;150;200;250;300;350;400;450;500"
+  min: 1
+  max: 1
+]
+list: topcombon [
+  information: "Topcombo processing causes consistent sets of HSPs to be reported, such that any given HSP is allowed to be a member of just one set"
+  values: "1;2;3;4;5;50;100;1000;1e9"
+  min: 1
+  max: 1
+]
+list: matrix  [
+  information: "Comparison matrix"
+  min: 1
+  max: 1
+  values: "blosum62;blosum30;blosum35;blosum40;blosum45;blosum50;blosum65;blosum70;blosum77;blosum80;blosum85;blosum90;blosum100;GONNET;pam10;pam20;pam30;pam40;pam50;pam60;pam70;pam80;pam90;pam100;pam110;pam120;pam130;pam140;pam150;pam160;pam170;pam180;pam190;pam200;pam210;pam220;pam230;pam240;pam250;pam260;pam270;pam280;pam290;pam300;pam310;pam320;pam330;pam340;pam350;pam360;pam370;pam380;pam390;pam400;pam410;pam420;pam430;pam440;pam450;pam460;pam470;pam480;pam490;pam500"
+]
+list: filter  [
+  information: "Filtering can eliminate statistically significant but biologically uninteresting reports from the blast output by masking out various segments of the query sequence for regions which are non-specific for sequence similarity searches"
+  min: 1
+  max: 1
+  comment: "defaults"
+  default:seg
+  values: "seg;xnu;seg+xnu;none"
+]
+list: sort  [
+  information: "Sorts the scores in the score list of the output file"
+  min: 1
+  max: 1
+  values: "pvalue;count;highscore;totalscore"
+]
+boolean: echoFilter  [
+   default: "false"
+   information: "If this option is set to yes, the filtered sequence that was obtained from the query sequence will be displayed in the results output file"
+]
+
+# --- result
+outfile: result  [
+]

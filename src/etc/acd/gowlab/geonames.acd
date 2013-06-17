@@ -1,0 +1,26 @@
+appl: Geonames [
+  documentation: "Reverse geocoding: returns a country code and name for the given latitude/longitude"
+  groups: "Geocoding"
+  nonemboss: "Y"
+  supplier: "http://ws.geonames.org/countrycode"
+  comment: defaults
+]
+
+float: latitude  [
+   qualifier: lat
+   default: 50
+]
+
+float: longitude  [
+   qualifier: lng
+   default: 15
+]
+
+list: type  [
+  min: 1
+  max: 1
+  values: "xml"
+]
+
+outfile: result  [
+]

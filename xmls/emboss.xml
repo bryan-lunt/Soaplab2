@@ -1,0 +1,86 @@
+<!-- This is an XML entity included in main build.xml file  -->
+<!-- $Id: emboss.xml,v 1.21 2012/12/13 16:34:18 mahmutuludag Exp $ -->
+<!-- ====================================================== -->
+
+<!-- ====================================================== -->
+<!--                                                        -->
+<!-- Targets dealing with EMBOSS package                    -->
+<!--                                                        -->
+<!-- These targets can be used only by those who installed  -->
+<!-- the EMBOSS package on their machines because EMBOSS is -->
+<!-- not part of the Soaplab2 package/distribution.         -->
+<!-- ====================================================== -->
+
+<!-- ====================================================== -->
+<!-- EMBOSS sets property 'emboss.home' to its location     -->
+<!-- ====================================================== -->
+<target name="emboss-init">
+
+  <condition property="real.emboss.home" value="${env.EMBOSS_HOME}">
+    <isset property="env.EMBOSS_HOME"/>
+  </condition>
+  <condition property="real.emboss.home" value="${emboss.home}">
+    <isset property="emboss.home"/>
+  </condition>
+
+  <!-- check that the EMBOSS location is set -->
+  <fail unless="real.emboss.home">
+'
+
+    ERROR: Unknown EMBOSS location.
+    -------------------------------
+    Please set environment variable EMBOSS_HOME to point to
+    the place where you have installed the EMBOSS package,
+    or create a file 'build.properties' and put there the line:
+    emboss.home = &lt;directory with your EMBOSS installation&gt;
+    (do not include '&lt;' and '&gt;' there),
+    or start your Ant with this property on the command-line:
+    ant -Demboss.home=&lt;directory with your EMBOSS&gt; 
+  </fail>
+
+  <echo
+    taskname="info"
+    message="Using EMBOSS from ${real.emboss.home}"/>
+
+</target>
+
+<!-- ====================================================== -->
+<!-- Generating XML from ACDs                               -->
+<!-- ====================================================== -->
+<target name="genemboss" depends="emboss-init"
+  description="Generate XML metadata for EMBOSS (needs EMBOSS installed)">
+
+    <property name="emboss.sl"         location="${metadata.generated}/EMBOSSApplications.xml"/>
+    <property name="emboss.acd.dir"    location="${real.emboss.home}/share/EMBOSS/acd"/>
+    <property name="gen.disabled.apps" value="aaindexextract, abiview, acd, acdc, acdlog,
+     acdpretty, acdrelations, acdtable, acdtrace, acdvalid, ajbad, ajfeatest, ajtest,
+     allversusall,
+     complex, contacts, corbatest, cutgextract, dbiblast, dbifasta, dbiflat, dbigcg,
+     dbxfasta, dbxflat, dbxgcg, dbxreport, dbxstat, demoalign, demofeatures, demolist,
+     demoreport, demosequence, demostring, demostringnew, demotable, domainalign,
+     domainer, domainnr, domainreso, domainseqs, domainsse,
+     emats, emnu, entrails, edamclean, ensembltest
+     fdnamove, fdolmove, fmove, fretree, giep, hetparse, histogramtest, intconv,
+     interface, jaspextract, libgen, matgen3d, mwwwwcontam, newcoils, origsplitter,
+     origunion, patmattest, pdbparse, pdbplus, prima, primers, printsextract,
+     prosextract, rebaseextract, rocplot, seqalign, seqfraggle, seqinfo, seqnr,
+     seqretall, seqretallfeat, seqretset, seqretsingle, seqretsplit, seqrettype,
+     seqsearch, seqsort, siggen, siggenlig, sigscanlig, sites, sqltest,
+     testplot, tfextract, treetypedisplay,
+     variationget, vrnapaln"/>
+    <property name="emboss.help.base.url"
+      value="http://emboss.sourceforge.net/apps/release/6.3/emboss/apps"/>
+    <property name="emboss.supplier" value=""/>
+    <property name="emboss.version"  value=""/>
+
+    <antcall target="_gen">
+      <param name="acd.dir"           value="${emboss.acd.dir}"/>
+      <param name="sl"                value="${emboss.sl}"/>
+      <param name="gen.job.class"     value="org.soaplab.emboss.EmbossJobFactory"/>
+      <param name="gen.help.base.url" value="${emboss.help.base.url}"/>
+      <param name="gen.supplier"      value="${emboss.supplier}"/>
+      <param name="gen.version"       value="${emboss.version}"/>
+    </antcall>
+
+</target>
+

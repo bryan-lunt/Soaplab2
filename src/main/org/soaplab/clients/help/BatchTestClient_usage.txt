@@ -1,0 +1,78 @@
+BatchTestClient
+===============
+
+Usage:
+   build/run/run-batch-client -h[elp]
+   build/run/run-batch-client <find-arguments> [options]
+
+where:
+
+  -h[elp]  ... print this help
+  -q       ... quiet mode (useful when you want to redirect
+               a result into a file)
+  -stack   ... in case of any error it print the stact trace
+               (without this option, it prints it only when a
+                serious runtime error occures)
+
+where <find-arguments> defines where to find all tested services
+and what protocol to use to access them (some of these parameters may
+also be specified in the Soaplab client configuration property file -
+by default named soaplab.client.properties and put on the CLASSPATH):
+
+   -protocol jaxws   ... service will be accessed as a Web Service,
+                         using JAX-WS toolkit (default protocol)
+   -protocol local   ... service will be accessed as local class
+                         (no remote server or any Web Service used)
+   -protocol axis1   ... service will be accessed as a Web Service,
+                         using old Axis 1 toolkit (such protocol may
+                         not be supported by the given Soaplab server)
+
+   -host <host>      ... host name (default: localhost)
+   -port <port>      ... port number (defaullt: 8080)
+   -ctx <context>    ... context part of the URL (default: soaplab2)
+
+   -e <url>          ... a full service URL (an endpoint);
+                         if given it has precedence over -host, -port,
+                         -ctx, and -name;
+                         default is created from other parameters as:
+                         http://<host>:<port>/<context>/services/<service>
+
+   -lname <service>  ... a name of a list service to be called
+                         (default   'AnalysisFactory' for axis1 protocol,
+                          otherwise 'list')
+
+   -el <url>         ... a full List service URL (an endpoint);
+                         if given it has precedence over -host, -port, -ctx,
+                         and -lname;
+                         default is created from other parameters as:
+                         http://<host>:<port>/<context>/services/<list-service>
+
+and where options are (most of these options can be specified as properties
+                       in the soaplab.client.properties file - but the
+                       command-lien options take precedence):
+
+   -batchfile <file> ... a file name with a list of services to be tested
+                         (e.g. look into data/defaultTests.txt);
+
+                         Default is taken from properties: batch.test.file
+
+   -maxthreads <int> ... how many threads to se when testing more services:
+                         0   ... as many as we have tested services,
+                         1   ... test all services sequentially,
+                         > 1 ... number of maximum tested services at once;
+
+                         Default is taken from property batch.max.threads
+                         (which is, by default, 25).
+
+   -keep             ... do not remove jobs after they finished
+                         (in this case, the job IDs are included in the
+                          reports, so one can use them to retrieve results
+                          using the regular Soaplab2 command-line client);
+
+                         Default is taken from property batch.keep.results
+                         (which is, by deafult, false).
+
+   -table            ... produce a tabular output of all tests;
+
+                         Default is taken from property batch.report.table
+                         (which is, by deafult, true).

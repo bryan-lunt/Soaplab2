@@ -1,0 +1,10 @@
+
+
+command to execute to get the ACDParser.pm file:
+
+.../perl-byacc1.8.2/byacc -P ACDParser -b acd acd.y
+
+
+example command line to generate xml for individual ACD files
+
+./old.generator/acd2xml.pl -i ./emira.acd  emira

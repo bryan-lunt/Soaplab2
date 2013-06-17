@@ -1,0 +1,21 @@
+# This is used by Ant for metadata generating targets.
+
+package Cfg;
+$PROJECT_DIR = "@PROJECT_DIR@";
+$SUB_PROJECT = "@SUB_PROJECT@";   # gowlab, sowa
+$PACKAGE_INSTALLATION = '@PACKAGE_INSTALLATION@';
+
+$ALXML = "${PROJECT_DIR}/metadata/generated";
+$ALCFG = "${PROJECT_DIR}/src/etc/acd/${SUB_PROJECT}";
+$PACKAGE_SUPPLIER = '@PACKAGE_SUPPLIER@';
+$PACKAGE_VERSION = '@PACKAGE_VERSION@';
+$HELP_ROOT = '@HELP_BASE_URL@';
+$PUBLIC_NAME = undef;
+
+$JOB = "@JOB_CLASS@";
+
+# Here specify a list (comma separated) of applications which you do
+# NOT want to have in generated lists
+$DISABLED_APPS = '@DISABLED_APPS@';
+
+1;

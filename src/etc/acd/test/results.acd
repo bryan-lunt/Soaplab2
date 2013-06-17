@@ -1,0 +1,21 @@
+appl: Results [
+  documentation: "Testing normal, adapted and URL results"
+  groups: "TUnit"
+  nonemboss: "Y"
+  executable: "echo"
+  comment: defaults
+]
+
+string: param [
+  parameter: "Y"
+  default: "this is a result"
+]
+
+outfile: output [
+  additional: "Y"
+  default: "stdout"
+#  comment: make_url
+#  comment: "make_url no"
+  comment: "output_adaptor org.soaplab.services.testing.TestingDataAdaptor"
+]
+

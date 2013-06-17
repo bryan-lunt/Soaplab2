@@ -1,0 +1,54 @@
+From jison@ebi.ac.uk Tue Mar 28 15:33:24 2006
+Date: Fri, 24 Mar 2006 13:39:10 -0000 (GMT)
+From: Jon Ison <jison@ebi.ac.uk>
+To: martin.senger@gmail.com, pmr@ebi.ac.uk, ajb@ebi.ac.uk
+Subject: ACD meeting date ...
+
+
+Dear Martin, Peter, Alan
+
+Following from our chat t'other week, can we find a couple of hours in the
+week of 3-7 April to meet and discuss future requirements for the ACD syntax.
+I can't make the 6th (dentists) and I think the 4th is out too.
+
+The basic idea is to extend ACD to be even more generic so that it's suitable
+for defining any non-interactive application, ie. the EMBOSS apps and
+everything else.  Then push for it to be taken up as a community standard.
+Should be easy ... :)
+
+Presumably ACD couldn't cope with everything that SOAPLAB needed to call;
+those cases seem a good a place to start as any.
+
+Given that we'll eventually need an XML schema to describe everything that
+might occur in an ACD file, we may as well also think about provenance info
+that could sensibly be put in an ACD file, e.g. EMBOSS version number,
+application version number, etc.  I guess most of the provenance info would
+go in the application output though.
+
+Might also be worth thinking whether there are other data, currently on the
+EMBOSS website or documentation and e.g. hardcoded into SOAPLAB, which could
+also be provided in XML - but not necessarily in the ACD-XML schema. The basic
+idea to facillitate other developers / programmatic interfaces to the EMBOSS
+apps.  I dunno, maybe a list of supported sequence database formats, tables of
+correspondence for database abbreviationss, sequence attributes etc would be
+valuable.
+
+Also, a web-based or stand-alone ACD file generator.  We could talk about
+whether the SOAPLAP dashboard (or bits of same) could be re-used, or whether
+something from scratch is needed.
+
+If other things occur, please let me know and I'll work out a proper agenda
+for the meeting.
+
+I'd sooner keep this meeting small - but can pull in other local people once
+we've got an agenda - and external groups in subsequent meetings.
+
+Occurs to me that if I could do some of this over the next year .. and your
+(Martin) 1-year revision to SOAPLAB could use some of it, then we have a nice
+basis for collaboration / little paper between the two sites.
+
+What d'ya think ?
+
+Cheers
+
+Jon

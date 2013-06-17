@@ -1,0 +1,406 @@
+<html> <head>
+<title>Soaplab2: Batch-Test Client</title>
+
+<link rel="shortcut icon" href="images/favicon.ico" >
+<link rel="icon" href="images/animated_favicon1.gif" type="image/gif" >
+<link rel="stylesheet" href="images/stylesheet.css" type="text/css">
+
+</head>
+
+<body>
+<h1>Batch-Test Client</h1>
+<img class="motto-img" src="images/motto-batch-test-client.jpg" border=0 align="left"/>
+
+<div> Soaplab2 services can be tested by calling many of them, or even
+all of them, from a single client, in a batch mode, using a
+pre-defined set of input data. They can be executed sequentially, or
+in parallel. Obviously, this client hardly provide any scientifically
+valuable results but can be used by service providers, or even by
+Soaplab2 plug-in developers, to see that things have not changed to
+the worse. <p>
+
+In some scenarios, it can be, however, also useful for running
+repeating jobs, because it can keep the results even after the batch
+test client finished. </div>
+
+<br clear="all"/>
+
+<div class="doctoc">
+<dl>
+  <dt> <a href="#structure">Structure of the testing input files</a>
+  <dt> <a href="#props">Run-time properties</a>
+  <dt> <a href="#run">How to run it</a>
+  <dt> <a href="#reports">What is reported</a>
+</dl>
+</div>
+
+<a name="structure"></a>
+<h2> Structure of the testing input files </h2>
+
+The batch test client can accept one or more <em>testing input
+files</em>. Their format is a <a
+href="ConfigurationGuide.html#pformat">properties file format</a>. The
+property names are service names (with a prefix <pn>sn.</pn>) and
+property values are the input data, specified in the same way as in
+the <a href="CmdLineClient.html">Soaplab's main command-line
+client</a>. For example (taken from the testing file for EMBOSS, the
+full file is distributed with Soaplab2 in
+<tt>data/embossTests.cfg</tt>):
+
+<pre class="smallercode">
+sn.alignment_consensus.cons=sequence_direct_data :${emboss.home}/share/EMBOSS/test/data/dna.msf
+sn.alignment_consensus.megamerger=asequence_usa embl:AC073385 bsequence_usa embl:AP006749
+sn.alignment_consensus.merger=asequence_usa embl:eclacy bsequence_usa embl:eclaca
+sn.alignment_differences.diffseq=asequence_usa embl:ap000504 bsequence_usa embl:af129756
+</pre>
+
+The same service can be called several time, each time with different
+input data (or even without any data, assuming there are some default
+values). For example:
+
+<pre class="smallercode">
+sn.classic.helloworld
+sn.classic.helloworld = greeting 'Ciao\, mundi'
+</pre>
+
+The example above also shows that commas in the input data <b>must</b>
+be escaped - otherwise the value will be interpreted as two invocations
+of the same service. <p>
+ 
+The examples also show that the property values can contain another
+properties (e.g. <pn>emboss.home</pn>) that will be substituted for
+their real value before the property is used. Of course, the
+referenced properties must be defined somewhere (either in the same
+testing file, or, usually, in the <tt>soaplab.client.properties</tt>
+file). <p>
+
+Please notice that here, as in the <a
+href="CmdLineClient.html">Soaplab's main command-line client</a>, one
+can use the ":" character to indicate that the real input will be
+actually read from the given file, and the "::" characters similarly
+to indicate a <em>file of file names</em>. <p>
+
+<a name="props"></a>
+<h2> Run-time properties </h2>
+
+The batch test client can be influenced by setting several run-time
+properties in file <tt>soaplab.client.properties</tt>. Such file must
+then appear in any directory on your CLASSPATH. Don't worry if you do
+not know what the CLASSPATH is for. Just do one of the two things (the
+second one is more recommended): <p>
+
+<ul>
+
+  <li> Put your properties in the template file
+<tt>src/etc/config/soaplab.client.properties.template</tt> and run
+
+<pre class="script">
+ant config
+</pre>
+
+  <li> Or, put your properties into any file, for example the
+<tt>testing.client.properties</tt>, and add a line to the file
+<tt>build.properties</tt> (in the Soaplab2 main directory):
+
+<pre class="code">
+my.soaplab.client.properties = <em>testing.client.properties</em>
+</pre>
+
+       and then run:
+<pre class="script">
+ant config
+</pre>
+
+</ul><p>
+
+The properties used by the batch test client:
+
+<dl>
+  <dt> <span class="hitt">batch.test.file</span>
+
+  <dd> A file name with the <a href="#structure">testing input
+data</a>. There can be more such properties, defining more testing
+input files. Usually, these properties use a reference to another
+property (e.g. <pn>base.dir</pn>):
+
+<pre class="code">
+test.data.dir = ${base.dir}/data
+batch.test.file = ${base.dir}/data/defaultTests.cfg
+batch.test.file = ${base.dir}/data/embossTests.cfg
+batch.test.file = ${base.dir}/data/embassyTests.cfg
+</pre>
+
+  <dt> <span class="hitt">test.data.dir</span>
+
+  <dd> Even though, generally, it is not a mandatory property, it is
+used in the distributed testing files (files
+<tt>data/*Tests.cfg</tt>). Therefore, if you wish to use them, you
+need to set this property. Its value is a full path to a directory
+<tt>data</tt> in the Soaplab project directory. <p>
+
+  <dt> <span class="hitt">batch.max.threads</span>
+
+  <dd> An integer defining maximum number of services invoked in
+parallel. Its default value is 25. The too high number may cause
+problem in your Tomcat server (the server has also its own maximum
+number of threads which may be too low). <p>
+
+       A value 1 causes that services will be called sequentially. A
+value 0 causes that all services will be called at once, in
+parallel. <p>
+
+       
+  <dt> <span class="hitt">batch.keep.results</span>
+
+  <dd> A boolean property. Its true value causes that the results from
+tested services will not be removed after the batch test client
+finishes. In this case, the batch test client listing will also
+include the <em>Job IDs</em> of the individual tested services that
+can be used to retrieve the results (usually by the <a
+href="CmdLineClient.html">Soaplab's main command-line client</a>). As
+shown here:
+
+<pre class="sscript">
+[COMPLETED]   7_classic.helloworld <b>[classic.helloworld]43ab9197.117d16aa957.-7ffd</b>
+[COMPLETED]  14_geocoding.geonames <b>[geocoding.geonames]43ab9197.117d16aa957.-7fff</b>
+[COMPLETED]  13_geocoding.geonames <b>[geocoding.geonames]43ab9197.117d16aa957.-8000</b>
+</pre>
+
+       Default value is false. <p>
+
+  <dt> <span class="hitt">batch.report.table</span>
+
+  <dd> A boolean property. Its true value causes to list every tested
+service with its elapsed time. See the <a href="#reports">reports</a>
+below what else can be shown. <p>
+
+       Default value is false (but the default template file
+<tt>src/etc/config/soaplab.client.properties.template</tt> sets it to
+true). <p>
+
+
+</dl><p>
+
+
+<a name="run"></a>
+<h2> How to run it </h2>
+
+<h4>Quick start...</h4>
+
+Without setting any run-time properties, without installing EMBOSS and
+EMBASSY, just with all default settings, you can run it after you
+deploy default Soaplab2 services by typing:
+
+<pre class="script">
+build/run/run-batch-client
+</pre>
+
+<h4>...and the rest</h4>
+
+The batch test client is a command-line client. Its help page can be
+displayed with the <tt>-help</tt> option:
+
+<pre class="script">
+build/run/run-batch-client -help
+</pre>
+
+<pre class="sscript">
+BatchTestClient
+===============
+
+Usage:
+   build/run/run-batch-client -h[elp]
+   build/run/run-batch-client <find-arguments> [options]
+
+where:
+
+  -h[elp]  ... print this help
+  -q       ... quiet mode (useful when you want to redirect
+               a result into a file)
+  -stack   ... in case of any error it print the stact trace
+               (without this option, it prints it only when a
+                serious runtime error occures)
+
+where <find-arguments> defines where to find all tested services
+and what protocol to use to access them (some of these parameters may
+also be specified in the Soaplab client configuration property file -
+by default named soaplab.client.properties and put on the CLASSPATH):
+
+   -protocol jaxws   ... service will be accessed as a Web Service,
+                         using JAX-WS toolkit (default protocol)
+   -protocol local   ... service will be accessed as local class
+                         (no remote server or any Web Service used)
+   -protocol axis1   ... service will be accessed as a Web Service,
+                         using old Axis 1 toolkit (such protocol may
+                         not be supported by the given Soaplab server)
+
+   -host <host>      ... host name (default: localhost)
+   -port <port>      ... port number (defaullt: 8080)
+   -ctx <context>    ... context part of the URL (default: soaplab2)
+
+   -e <url>          ... a full service URL (an endpoint);
+                         if given it has precedence over -host, -port,
+                         -ctx, and -name;
+                         default is created from other parameters as:
+                         http://<host>:<port>/<context>/services/<service>
+
+   -lname <service>  ... a name of a list service to be called
+                         (default   'AnalysisFactory' for axis1 protocol,
+                          otherwise 'list')
+
+   -el <url>         ... a full List service URL (an endpoint);
+                         if given it has precedence over -host, -port, -ctx,
+                         and -lname;
+                         default is created from other parameters as:
+                         http://<host>:<port>/<context>/services/<list-service>
+
+and where options are (most of these options can be specified as properties
+                       in the soaplab.client.properties file - but the
+                       command-lien options take precedence):
+
+   -batchfile <file> ... a file name with a list of services to be tested
+                         (e.g. look into data/defaultTests.txt);
+
+                         Default is taken from properties: batch.test.file
+
+   -maxthreads <int> ... how many threads to se when testing more services:
+                         0   ... as many as we have tested services,
+                         1   ... test all services sequentially,
+                         > 1 ... number of maximum tested services at once;
+
+                         Default is taken from property batch.max.threads
+                         (which is, by default, 25).
+
+   -keep             ... do not remove jobs after they finished
+                         (in this case, the job IDs are included in the
+                          reports, so one can use them to retrieve results
+                          using the regular Soaplab2 command-line client);
+
+                         Default is taken from property batch.keep.results
+                         (which is, by deafult, false).
+
+   -table            ... produce a tabular output of all tests;
+
+                         Default is taken from property batch.report.table
+                         (which is, by deafult, true).
+</pre>
+
+You can see that the command-line options can overwrite the run-time
+properties described <a href="#props">above</a>. <p>
+
+Soaplab2 comes with several predefined sets of testing input
+data. They can be found in the <tt>data</tt> directory:
+
+<dl>
+  <dt class="indent"><tt>defaultTests.cfg</tt> is for default, more or less testing, services,
+  <dt class="indent"><tt>embossTests.cfg</tt> is for those installing the EMBOSS package, and
+  <dt class="indent"><tt>embassyTests.cfg</tt> is for those installing the EMBASSY package.
+</dl><p>
+
+
+<a name="reports"></a>
+<h2> What is reported </h2>
+
+The batch test client produces up to four sections of reports, in this
+order:
+
+<h4>Progress</h4>
+
+<pre class="sscript">       
+[Start ]                 39_alignment_local.water
+[Start ]                 40_alignment_local.wordmatch
+[COMPLETED]               8_classic.helloworld
+[Start ]                128_alignment_multiple.emma
+[COMPLETED]              11_testing.streams
+[COMPLETED]               7_classic.helloworld
+[COMPLETED]              23_alignment_consensus.cons
+[COMPLETED]              12_testing.files
+[COMPLETED]              15_graphics.dot
+[COMPLETED]              30_alignment_dot_plots.polydot
+[TERMINATED_BY_ERROR]   128_alignment_multiple.emma
+[Start ]                142_alignment_multiple.infoalign
+[Start ]                143_alignment_multiple.plotcon
+[Start ]                144_alignment_multiple.prettyplot
+[Start ]                145_alignment_multiple.showalign
+[Start ]                146_alignment_multiple.tranalign
+[Start ]                147_display.cirdna
+[Start ]                148_display.lindna
+[COMPLETED]             142_alignment_multiple.infoalign
+</pre>
+  
+It reports when each service call starts and when it finishes. The
+starts and completions are mixed together because the services are
+called in parallel (in this example). <p>
+
+This section can be avoid by the command-line option <tt>-q</tt> (as
+"quiet"). <p>
+
+<h4>All tests</h4>
+
+<pre class="sscript">       
+All tests
+---------
+classic.helloworld      0:00:00.443 COMPLETED
+testing.sleep           0:00:02.431 COMPLETED
+testing.sleep           0:00:03.581 COMPLETED
+testing.streams         0:00:00.496 COMPLETED
+testing.files           0:00:01.027 COMPLETED
+geocoding.geonames      0:00:02.100 COMPLETED
+classic.helloworld      0:00:00.250 COMPLETED
+geocoding.geonames      0:00:02.289 COMPLETED
+graphics.dot            0:00:01.101 COMPLETED
+</pre>
+
+It reports the elapsed time and completion status of all tested
+services. It is created only if the command-line option
+<tt>-table</tt> is present or if the run-time property
+<pn>batch.report.table</pn> is set to true. <p>
+
+<h4>Errors</h4>
+
+<pre class="sscript">       
+------------------------------------------------------------------------------
+ERROR: classic.helloworld
+------------------------------------------------------------------------------
+Unrecognized inputs: greetingXX Ciao, mundi
+        Input:  greetingXX 'Ciao, mundi'
+        Status: NOT STARTED
+</pre>
+
+This section is always produced (unless there are no errors) to the
+standard error stream (so it can be redirected by using various shell
+tools). It contains errors found either by Soaplab2 (as the example
+above), or by the started underlying application itself. <p>
+
+<h4>Summary</h4>
+
+<pre class="sscript">       
+Summary
+-------
+Successfully:  8
+Erroneously:   1
+Not available: 0
+</pre>
+
+It is produced always to the standard output. The <em>Not
+available</em> contains the number of services that appeared in the
+testing input files but that are not available from the given Soaplab
+server, at least not at the moment of running the batch test
+client. <p>
+
+
+<p>
+<iframe id="maintoc" src="TOC.html" scrolling="auto"></iframe>
+
+<div align=right><font size=-2>
+<!-- hhmts start -->
+Last modified: Mon Feb  4 17:20:23 2008
+<!-- hhmts end -->
+</font></div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1011961-1";
+urchinTracker();
+</script>
+</body> </html>

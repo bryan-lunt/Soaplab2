@@ -1,0 +1,5 @@
+Put here files that you need for JUnit testing.
+This location will be part of the CLASSPATH when
+you run 'ant test-junit'. The files, therefore,
+can be accessed from/by tests as class resources.
+------------------------------------------------

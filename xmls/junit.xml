@@ -1,0 +1,129 @@
+<!-- This is an XML entity included in main build.xml file  -->
+<!-- $Id: junit.xml,v 1.8 2009/06/19 10:23:55 mahmutuludag Exp $ -->
+<!-- ====================================================== -->
+
+<!-- ================================================================== -->
+<!-- JUnit tests                                                        -->
+<!-- ================================================================== -->
+  
+<!-- ================================================================== -->
+<!-- Initialize JUnit testing                                           -->
+<!-- ================================================================== -->
+<target name="junit-init" depends="init">
+
+  <property name="test.report.dir" location="${basedir}/test-reports"/>
+  <property name="junit.resources" location="${src.root}/test/junit-resources"/>
+
+  <mkdir dir="${test.report.dir}"/>
+  
+  <path id="tests.classpath">
+    <pathelement location="${junit.resources}"/>
+    <pathelement location="${build.test}"/>
+    <path refid="build.classpath"/>
+    <path refid="dependency.classpath"/>
+  </path>
+
+</target>
+
+<!-- ================================================================== -->
+<!-- The main entry point to junit testing. If tests are successful,    -->
+<!-- it does nothing. It only reports when a failure occured.           -->
+<!-- ================================================================== -->
+<target name="test-junit" if="test.failure"
+  depends="junit-init,do-junit"
+  description="Run the junit test cases">
+  <fail message="There were test failures." />
+</target>
+
+<target name="junit-present" unless="junit.is.present"
+  depends="junit-init">
+  <echo>
+================================= WARNING ================================
+Junit library is not present in a correct directory. Tests not executed.
+The library (junit.jar) is, however, in your local Maven repository.
+Therefore:
+    Put it in your ${ANT_HOME}/lib directory.
+    Or, put in your ${HOME}/.ant/lib directory.
+    Or start ant with -lib &lt;your junit library&gt;.
+==========================================================================
+  </echo>
+</target>
+  
+<!-- ================================================================== -->
+<!-- This is the core: here are the tests done                          -->
+<!-- ================================================================== -->
+<target name="do-junit" if="junit.is.present"
+  depends="junit-present,compile-tests">
+  
+  <condition property="excludes" value="**/*$*" else="**/*$*, **/ConcurrentCallsTest*" >
+    <istrue value="${include.test.concurrentcalls}"/>
+  </condition>
+
+  <junit
+    printsummary="yes"
+    showoutput="yes"
+    fork="yes"
+    failureproperty="test.failure">
+    <classpath>
+      <path refid="dependency.classpath"/>
+      <path refid="build.classpath"/>
+      <pathelement path="${build.test}"/>
+      <fileset dir="${build.lib}">
+        <include name="${services.config.jar}"/>
+      </fileset>
+    </classpath>
+    <jvmarg value="-Dlog4j.configuration=file:${log4j.configuration}"/>
+    <formatter type="plain"/>
+    <batchtest todir="${test.report.dir}">
+      <fileset dir="${build.test}" includes="**/*Test*" excludes="${excludes}" />
+    </batchtest>
+  </junit>
+  
+</target>
+  
+<!-- ================================================================== -->
+<!-- Compile JUnit tests                                                -->
+<!-- ================================================================== -->
+<target name="compile-tests" if="junit.is.present"
+  depends="compile,junit-present">
+  
+  <!-- compilation options -->    
+  <property name="compile.test.debug"       value="${compile.debug}" />
+  <property name="compile.test.verbose"     value="${compile.verbose}" />
+  <property name="compile.test.deprecation" value="${compile.deprecation}" />
+  <property name="compile.test.optimize"    value="${compile.optimize}" />
+  <property name="compile.test.warnings"    value="${compile.warnings}" />
+  
+  <condition property="xlint.test.param" value="-Xlint:unchecked" else="-Xlint:none">
+    <istrue value="${compile.test.warnings}"/>
+  </condition>
+
+  <javac
+    srcdir="${src.test}"
+    destdir="${build.test}"
+    verbose="${compile.test.verbose}"
+    debug="${compile.test.debug}"
+    debuglevel="lines,vars,source"
+    deprecation="${compile.test.deprecation}"
+    optimize="${compile.test.optimize}"
+    excludes="${project.excludes}">
+    <classpath refid="tests.classpath"/>
+    <compilerarg value="${xlint.test.param}"/>
+  </javac>
+  
+</target>
+
+<!-- ====================================================== -->
+<!-- Generating testing XML from ACDs                       -->
+<!-- ====================================================== -->
+<target name="gentest" depends="init">
+
+    <property name="test.sl"         location="${metadata.generated}/TUnitApplications.xml"/>
+    <property name="test.acd.dir"    location="${basedir}/src/etc/acd/test"/>
+
+    <antcall target="_gen">
+      <param name="acd.dir"  value="${test.acd.dir}"/>
+      <param name="sl"       value="${test.sl}"/>
+    </antcall>
+
+</target>

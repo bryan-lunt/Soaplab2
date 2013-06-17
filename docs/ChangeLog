@@ -1,0 +1,247 @@
+2011-06-14  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Released version 2.3.2
+
+2011-05-01  Mahmut Uludag
+
+	* Missing getSomeResults method added to typed interface
+
+	* New log file that records summary information for each job started
+	  including the IP address of the client, interface used,
+	  whether the job was successfully completed, and the time elapsed
+
+2010-11-24  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Released version 2.3.1
+
+2010-11-08  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Fixed uploading file in spinet: the files are now treated as
+	with binary contents (and not blindly converted to String)
+
+	* Added (to the CmdLineClient) an ability to consider an input
+	file as binary (sending its contents as byte[] and not String)
+
+2010-10-11  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Fixed problem with result containing foreign characters. Forced
+	UTF-8 encoding. Not sure if the fix works also in Spinet for
+	Axis1-based services.
+
+2010-08-17  Martin Senger  <martin.senger&#64;gmail.com>
+
+	*  Released version 2.3.0
+
+2010-08-10  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Documentation: the Soaplab2 index page has now TOC at the top.
+
+	* Added new input/output sequence formats (including next
+	generation sequence formats ) to EMBOSS services.
+
+	* Removed not-needed repository definitions from maven.xml. Fixed
+	some dependencies.
+
+2010-08-09  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Refactoring creation and deployment of strongly typed services.
+
+2010-08-06  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Added: Documentation about 'relations' attribute in ACD files
+	(links to EDAM ontology).
+
+2010-08-05  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Fixed: the relations tags from ACD files appear now in the
+	Soaplab's XML metadata as options named 'EDAM:XXX' with value
+	consisting of namespace and term name; fixed for the EMBOSS 6.3.1
+	and also for the next EMBOSS version (where the relations tag will
+	have different syntax)
+
+2010-08-01  Mahmut Uludag
+
+    * EMBOSS-6.3 updates for ACD changes
+    * SAWSDL/EDAM support (help and suggestions from Hamish McWilliam)
+    * More output types wrapped (help from Hamish McWilliam)
+    
+2010-06-15  Dietmar Sturmayr <dsturmay@ebi.ac.uk>, Mahmut Uludag
+
+    * Fixed: too many open files problem in SowaJob class
+      process objects are now cleaned before the execute threads terminate,
+      rather than leaving the cleaning job to Java garbage collection
+
+2010-03-02  Mahmut Uludag
+
+    * temporary files are saved in the relevant job directories rather than
+      the default temporary files folder
+    * removed some synchronized blocks or reduced their scope 
+    * destroy(jobid) function returns after making a record of the request
+    * EMBOSS-6.2 updates for ACD changes
+    
+2009-08-14  Mahmut Uludag
+
+    * removed full path information from input/output file names
+    * fix: after terminate calls job status set to TERMINATE_BY_REQUEST 
+    * status of timed-out jobs changed to TERMINATED_BY_REQUEST
+      
+2009-08-14  Sebastien Moretti <Sebastien.Moretti&#64;unil.ch>
+
+    * EMBOSS tests updated for EMBOSS-6.1
+    * EMBOSS tests extended with new tests 
+
+2009-06-18  Mahmut Uludag
+
+    * new property for customised spinet title page; spinet.welcome.msg
+    * new property to set a limit for waitfor calls; jobs.waitfor.timeout
+    * support for submitting jobs to LSF queues
+    * beta version of typed interface
+    
+2009-04-22  Mahmut Uludag
+
+    * use of catalina.home replaced by catalina.base
+      suggested by José María Fernández on sourceforge tracker
+    * new ant target (deployx) to deploy soaplab web applications
+      using tomcat manager    
+
+2009-02-05  Mahmut Uludag, John S Robinson <J.S.Robinson@soton.ac.uk>
+
+    * Client side concurrency problems fixed
+      - operations on the same org.apache.axis.client.Call objects
+        are synchronized
+      - upgraded versions of the jaxws-tools and mimepull artifacts      
+
+2008-10-23  Sebastien Moretti <Sebastien.Moretti&#64;unil.ch>
+
+    * Some EMBOSS ACD files that didn't have accompanying executables
+      were disabled
+    * EMBOSS jaspextarct program was disabled
+      as it should normally be used by EMBOSS admins
+
+2008-08-21  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Added new method getJobDir() to the Job interface
+
+2008-05-05  Mahmut Uludag
+
+     * Fixed: terminate calls was hanging occasionally
+       or giving stream i/o errors
+     
+2008-05-04  Mahmut Uludag
+
+     * Fixed (EMBOSS specific): It was not possible to specify a 'false' value 
+     for Boolean parameters with a default value 'true'
+
+2008-05-16  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Released: version 2.1.1
+
+	* Changed: Replace minus characters in the job IDs to underscores.
+
+	* Updated: Ant's task 'test-junit' for testing
+
+	* Changed: the maven-ant library has the latest version, and, from
+	now, it will be fetched from bio-open server
+
+2008-04-04  Mahmut Uludag
+
+    * Added: configurable jobs.timeout property which lets
+    Soaplab terminate hanging or long running jobs automatically
+
+2008-04-03  Mahmut Uludag
+
+    * throughput of the server improved by deleting unnecessary
+    synchronized settings in three methods; two in the PersistenceManager
+    class, one in the FileStorage class  
+
+2008-03-31  Mahmut Uludag
+
+    * Fixed: FileStorage cannot store job properties problem,
+    Soaplab was attempting to store job properties files before
+    the job results directory made 
+
+2008-03-30  Mahmut Uludag
+
+    * Fixed: two javascript problems that break Spinet when using IE
+
+2008-02-05  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Released: Version 2.1.0 [the first non-beta release]
+
+2008-02-01  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Improved: Most places where the SPI mechanism is used has now a
+	default class. Therefore, the file 'soaplab-spi-config.jar' is not
+	anymore mandatory (which may help when Soaplab2 is used as a
+	third-party library from a Maven repository).
+
+2008-01-29  Mahmut Uludag  <uludag&#64;ebi.ac.uk>
+
+    * Added:
+      - directory locks when reading and loading job properties files
+      - better cleaning strategy for the directory locks used in FileManager
+      - synchronization for iterations over the configuration properties
+      - new check for testing whether a job was deleted while the JobManger
+        iterating over the jobs list
+
+2008-01-25  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Added: batch testing suites for checking services
+
+	* Upgrade: dependency on Apache Commons Configuration (needed
+	because the previous 1.3 version had bugs in properties
+	interpolation)
+
+2008-01-23  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Added: changing file permissions to become executable in the
+	WEB-INF/run directory (see more about it in property scripts.dir)
+
+2008-01-20  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Added: documentation how to create and deal with metadata
+
+	* Added: Spinet web interface (shown as the "welcome page" of the
+	Soaplab2 services)
+
+2007-12-06  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Fixed: External programs started from/by Soaplab get now updated
+	version of the environmental variable PATH (which is, for example,
+	a requirement for such programs as EMBOSS's wossname).
+
+2007-12-05  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Fixed: better support for the 'toggle' attribute in the EMBOSS
+	ACD files (until now these parameters were displayed as simple
+	text field, but they are now correctly shown as boolean radio
+	buttons).
+
+2007-12-04  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Fixed: Result 'report' was truncated when retrieved after a
+	while.
+
+2007-11-21  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Fixed: Soaplab2 running in Tomcat was not properly re-creating
+	the (empty) result directory if it was removed (manually) during
+	the Tomcat life.
+
+	* Fixed: Some jobs were removed too fast; even when it was not
+	wanted; resulting with an unexpected errors "Not Found" later
+
+2007-11-15  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Added: More service properties are coming in metadata from
+	Soaplab2 servers (version, supplier, and most importantly
+	help_URL).
+
+2007-11-01  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* EMBOSS: Some administrative services disabled by default.
+
+2007-10-28  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Released: 2.0.0-beta
+

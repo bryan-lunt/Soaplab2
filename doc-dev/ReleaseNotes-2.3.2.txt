@@ -1,0 +1,4 @@
+Release 2.3.2 is a bug-fix release. Bugs (or missing features) are
+related to the typed interfaces and to the logging.
+
+Details are in the file "docs/ChangeLog".

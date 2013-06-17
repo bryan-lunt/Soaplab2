@@ -1,0 +1,25 @@
+appl: Streams [
+  documentation: "Filtering stdin into stdout and stderr streams"
+  groups: "Testing"
+  nonemboss: "Y"
+  executable: "all-streams.pl"
+]
+
+integer: exitcode [
+  additional: "Y"
+  default: "0"
+  qualifier: "e"
+]
+
+infile: input  [
+  additional: "Y"
+  default: "stdin"
+]
+outfile: std_output  [
+  additional: "Y"
+  default: "stdout"
+]
+outfile: std_errors  [
+  additional: "Y"
+  default: "stderr"
+]

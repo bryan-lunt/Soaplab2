@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://soaplab.org/typedws"
+	xmlns:soaplab="http://soaplab.org/typedws"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:annotation>
+		<xs:documentation>Common request and response types used by
+			Soaplab typed interface
+        </xs:documentation>
+	</xs:annotation>
+
+ 
+    <xs:element name="terminate" type="soaplab:terminateRequest"/>
+    <xs:element name="waitfor" type="soaplab:waitforRequest"/>
+    <xs:element name="clear" type="soaplab:clearRequest"/>
+    <xs:element name="describe" type="soaplab:describeRequest"/>
+    <xs:element name="getLastEvent" type="soaplab:getLastEventRequest"/>
+    <xs:element name="getResultsInfo" type="soaplab:getResultsInfoRequest"/>
+
+	<xs:element name="getResults" type="soaplab:getResultsRequest" />
+	<xs:element name="getSomeResults" type="soaplab:getSomeResultsRequest" />
+	<xs:element name="getStatus" type="soaplab:getStatusRequest" />
+
+	<xs:element name="runResponse" type="soaplab:runResponse" />
+	<xs:element name="getStatusResponse" type="soaplab:jobStatus" />
+    <xs:element name="describeResponse" type="soaplab:describeResponse" />
+    <xs:element name="getLastEventResponse" type="soaplab:getLastEventResponse" />
+    <xs:element name="getResultsInfoResponse" type="soaplab:getResultsInfoResponse" />
+
+	<xs:complexType name="runResponse">
+		<xs:sequence>
+			<xs:element name="jobId" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+
+
+	<xs:complexType name="jobId">
+		<xs:sequence>
+			<xs:element name="jobId" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+
+
+	<xs:complexType name="describeResponse">
+		<xs:sequence>
+			<xs:element name="description" type="xs:string"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+
+	<xs:complexType name="getLastEventResponse">
+		<xs:sequence>
+			<xs:element name="event" type="xs:string"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+
+    <xs:complexType name="getResultsInfoResponse">
+        <xs:sequence>
+            <xs:element name="resultsInfoList" type="soaplab:resultInfo"
+            maxOccurs="unbounded" minOccurs="0">
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+
+    <xs:complexType name="resultInfo">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"></xs:element>
+            <xs:element name="type" type="xs:string"></xs:element>
+            <xs:element name="length" type="xs:long"></xs:element>
+            <xs:element name="size" type="xs:long"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+
+	<xs:complexType name="jobStatus">
+		<xs:sequence>
+			<xs:element name="jobStatus">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="UNKNOWN"></xs:enumeration>
+						<xs:enumeration value="CREATED"></xs:enumeration>
+						<xs:enumeration value="RUNNING"></xs:enumeration>
+						<xs:enumeration value="COMPLETED"></xs:enumeration>
+						<xs:enumeration value="TERMINATED_BY_REQUEST"></xs:enumeration>
+						<xs:enumeration value="TERMINATED_BY_ERROR"></xs:enumeration>
+						<xs:enumeration value="REMOVED"></xs:enumeration>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+
+    <xs:complexType name="getStatusRequest">
+        <xs:sequence>
+            <xs:element name="jobId" type="soaplab:jobId"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="getResultsRequest">
+        <xs:sequence>
+            <xs:element name="jobId" type="soaplab:jobId"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="getSomeResultsRequest">
+        <xs:sequence>
+            <xs:element name="jobId" type="soaplab:jobId"></xs:element>
+            <xs:element name="resultName" type="xs:string" maxOccurs="unbounded"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="waitforRequest">
+        <xs:sequence>
+            <xs:element name="jobId" type="soaplab:jobId"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+	<xs:complexType name="terminateRequest">
+        <xs:sequence>
+            <xs:element name="jobId" type="soaplab:jobId"></xs:element>
+        </xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="clearRequest">
+		<xs:sequence>
+			<xs:element name="jobId" type="soaplab:jobId"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+    <xs:complexType name="describeRequest">
+        <xs:sequence>
+        </xs:sequence>
+    </xs:complexType>
+	
+	<xs:complexType name="getLastEventRequest">
+        <xs:sequence>
+            <xs:element name="jobId" type="soaplab:jobId"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+	
+	<xs:complexType name="getResultsInfoRequest">
+        <xs:sequence>
+            <xs:element name="jobId" type="soaplab:jobId"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>
+
+

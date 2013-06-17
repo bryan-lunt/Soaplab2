@@ -1,0 +1,85 @@
+appl: InputTypes [
+  documentation: "Testing various types of inputs"
+  groups: "testing"
+  nonemboss: "Y"
+  executable: "echo"
+  comment: "defaults"
+  comment: "version 1.2.3"
+  comment: "help http://soaplab.sourceforge.net/soaplab2/help/InputTypes.html"
+#  comment: "help http://localhost/~senger/soaplab2/help/InputTypes.html"
+]
+
+string: text [
+  additional: "Y"
+  default: "this is a default"
+  prompt: "An optional string with a default value"
+]
+
+string: text_no_default [
+  standard: "Y"
+  prompt: "A mandatory string input"
+  help: "This is not really a useful help.
+         Its purpose is to <b>test</b> the tooltips mechanism. <p>
+         A mechanism that allows to include <font color='blue'>colors</font>,
+         <font size='+3'>sizes</font> etc."
+]
+
+integer: number_int  [
+  additional: "Y"
+  default: 42
+]
+
+float: number_float  [
+  additional: "Y"
+  precision: 2
+  default: 30.12
+]
+
+boolean: bool_false [
+  additional: "Y"
+  default: false
+]
+boolean: bool_true [
+  additional: "Y"
+  default: true
+]
+boolean: bool_no_default [
+  additional: "Y"
+]
+
+list: format  [
+  additional: "Y"
+  default: "png"
+  values: "canon; dot; fig; gd; gif; hpgl; imap; jpg; mif; mp; pcl; pic; plain; png; ps; ps2; svg; vrml; vtx; wbmp"
+  delimiter: ";"
+  prompt: "Output format"
+  min: 1
+  max: 1
+]
+
+list: format_no_default  [
+  additional: "Y"
+  values: "canon; dot; fig; gd; gif; hpgl; imap; jpg; mif; mp; pcl; pic; plain; png; ps; ps2; svg; vrml; vtx; wbmp"
+  delimiter: ";"
+  prompt: "Output format"
+  min: 1
+  max: 1
+]
+
+infile: input  [
+  additional: "Y"
+  default: "this is my default"
+  comment: default_for_direct
+]
+infile: input_only_direct  [
+  additional: "Y"
+  comment: "data direct"
+]
+infile: input_only_url  [
+  additional: "Y"
+  comment: "data filename"
+]
+
+outfile: result  [
+  default: "stdout"
+]

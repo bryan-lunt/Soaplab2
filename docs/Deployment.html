@@ -1,0 +1,481 @@
+<html> <head>
+<title>Soaplab2: Deployment</title>
+
+<link rel="shortcut icon" href="images/favicon.ico" >
+<link rel="icon" href="images/animated_favicon1.gif" type="image/gif" >
+<link rel="stylesheet" href="images/stylesheet.css" type="text/css">
+
+</head>
+
+<body>
+<h1>Deploying Soaplab2 services</h1>
+
+<img class="motto-img" src="images/motto-deploying-services.jpg" border=0 align="left"/>
+
+Deploying Web services means to move all necessary files to your
+servlet container (usually a Tomcat server), and to configure how they
+should be used when requests for services are coming. <p>
+
+It sounds easy and obvious - but it never is. Soaplab2 tries hard,
+hopefully, to make it easy at least for the default cases. <p>
+
+<br clear="all"/>
+
+<div class="doctoc">
+<dl>
+  <dt> <a href="#protocols">Supported protocols for Soaplab2 services</a>
+  <dt> <a href="#deploy">Deploying Soaplab2 services</a>
+       <dl>
+	 <dt> <a href="#tasks">Deployment Ant's tasks</a>
+	 <dt> <a href="#webxml">How to configure your own <tt>web.xml</tt></a>
+       </dl>
+  <dt> <a href="#undeploy">Un-deploying Soaplab2 services</a>
+</dl>
+</div>
+<p>
+
+
+<a name="protocols"></a>
+<h2>Supported protocols for Soaplab2 services</h2>
+
+The Web Services can be (unfortunately) accessed using several various
+protocols, or several flavours of the same SOAP protocol. The chosen
+protocol also determines what Java toolkit can be used (not every
+toolkit has support for every protocol). <p>
+
+The Soaplab2 <a
+href="DevelopersGuide.html#architecture">architecture</a> is flexible
+enough to allow several protocols. At the moment, the main protocol is
+the SOAP protocol, using the <em>document/literal</em> flavour. It is
+one of the three [<em>sic</em>] standarised flavours. This protocol is
+also well supported in Java, up to the point that the toolkit is now
+part of the Java 1.6. (Unfortunately, it is much less supported in
+other languages, yet.) <p>
+
+Reflecting the name of the Java toolkit (<em>JAX-WS</em>), we are
+referring to this protocol as a <em>jax</em> or <em>jaxws</em>
+protocol. It is a default one for deploying Soaplab2 services. <p>
+
+Mainly because of the backward compatibility with the previous
+versions of Soaplab (more about it in the <a
+href="Compatibility.html">compatibility guide</a>), Soaplab2 also
+supports the SOAP protocol, using the <em>rpc/encoded</em>
+flavour. Again reflecting the major Java toolkit for this flavour, we
+refer to is as <em>axis1</em> protocol. <p>
+
+<div class="note">
+
+It would be relatively easy to add also the REST protocol (thus
+removing the SOAP layer completely). If there is a demand for it, let
+us know please.
+
+</div>
+
+Last but not least, Soaplab2 can be used also locally, without using
+any transport protocol. If both clients and services sit on the same
+machine, they can be run within a single JVM and connect each other
+directly by loading Java classes. This tight connection also means
+that there is no need to deploy such services. It is good for testing
+your services before you deploy them and make them public. <p>
+
+It makes also possible to use Soaplab2 features (like calling external
+processes, or fetching and screen scraping remote web pages) within
+another Java project - Soaplab2 is just another library used
+there. <p>
+
+We refer to this last protocol as the <em>local</em> protocol.
+
+<a name="deploy"></a>
+<h2>Deploying Soaplab2 services</h2>
+
+The deployment of Web Services means to pack together all necessary
+files and copy them to the Tomcat directory (assuming the Tomcat is
+your servlet container of choice - but it can be any other servlet
+container). <p>
+
+<a name="tasks"></a>
+<h3>Deployment Ant's tasks</h3>
+
+Soaplab2 has Ant tasks to do that. The task names start with the
+protocol you wish your services will be accessible by.
+
+The only thing you need to do <em>before</em> calling deployment tasks
+is to generate service metadata from the ACD files. I said <em>the
+only thing</em> - which is true but it may be the hardest task you, as
+a service provider, have. There is a <a
+href="MetadataGuide.html">metadata guide</a> document about how to
+create ACD files and what Ant tasks to call to create metadata in the
+XML format from them. <p>
+
+Summarizing, what has to be done before calling any deployment task:
+<p>
+
+<ul>
+
+  <li> Create service metadata in XML format. The metadata are
+supposed to be created in the <tt>metadata/generated</tt> directory
+(that is the place where the deployment tasks will be looking for
+them). <p>
+
+  <li> A part of generated metadata is also one or more
+<em>application list</em> files. They contain a list of your services
+(with few other details). These files must be listed in the
+<tt>soaplab.properties</tt> configuration file (as a property
+<pn>applist</pn>). There may be other properties that you wish to set
+differently from the default. Check the <a
+href="ConfigurationGuide.html">configuration guide</a>. <p>
+
+  <li> Check if your <tt>build.properties</tt> file has the property
+<pn>tomcat.home</pn>, pointing to the location where your Tomcat is
+installed. Otherwise deployment task cannot copy there any files. <p>
+
+       The same file <tt>build.properties</tt> could also have the
+property <pn>tomcat.host</pn> (with a host name under which your
+Tomcat is visible to the outside world). <p>
+
+</ul>
+
+<h4>Ant tasks: jaxdeploy, axis1deploy</h4>
+
+Usually, this is the only task you need to use. Internally, under the
+hood, it calls the other tasks. <p>
+
+The main question is <em>What services are being deployed?</em>. <p>
+
+The answer is: all services whose names are listed in the application
+list files included in the <pn>applist</pn> property (or properties)
+in the <tt>soaplab.properties</tt> file. <p>
+
+The <tt>soaplab.properties</tt> is created either from the
+<tt>src/etc/config/soaplab.properties.template</tt> file or from your
+own file defined by the <pn>my.soaplab.properties</pn> property. <p>
+
+It sounds complicated and it may be so (even though I prefer to call
+it rather flexible). But the good news is that it becomes complicated
+and flexible only when you start to apply your own wishes. Using
+defaults is simple:
+
+<ul>
+
+  <li class="tiny"> You create your ACD files in the
+<tt>src/etc/acd/sowa</tt> or <tt>src/etc/acd/gowlab</tt> directories,
+and generate XML by calling
+
+<pre class="script">
+ant gen
+</pre>
+  
+  (as explained in the <a href="MetadataGuide.html">metadata
+guide</a>). <p>
+
+  <li class="tiny"> Then you call
+
+<pre class="script">
+ant jaxdeploy
+</pre>
+  
+  (or <tt>ant axis1deploy</tt>, depending of the protocol of your
+choice).
+
+</ul><p>
+And that's it. <p>
+
+Let's continue now with the optional customisation. There are few
+build-time properties that can influence what and how is deployed:
+
+<dl>
+  
+  <dt> <span class="hitt">context.name</span>
+
+  <dd> The deployment task takes your services and copy all necessary
+files to the <tt>&lt;tomcat-home&gt;/webapps</tt> directory, under the
+name either <b>soaplab2</b> (for the <em>jaxws</em> protocol) or
+<b>soaplab2-axis</b> (for the <em>axis1</em> protocol). The name
+(called a <em>context name</em>) is important because it will become
+part of the URL of your services. By default, your services will be
+accessible as:
+
+<pre class="script">
+http://url.of.your.tomcat/soaplab2/services
+</pre>
+
+or as:
+
+<pre class="script">
+http://url.of.your.tomcat/soaplab2-axis/services
+</pre>
+
+But you can customise it by using this property. The property value is
+used as a new context name for the <em>jaxws</em> protocol, and with
+appended suffix <tt>-axis</tt> for the <em>axis1</em> protocol. If you
+do not like the suffix, you can specify the whole context name for the
+<em>axis1</em> protocol by using another, more specific, property
+<pn>axis1.context.name</pn>. <p>
+
+
+  <dt> <span class="hitt">server.log4j.configuration</span>
+
+  <dd> This property points to your own configuration file that will
+be used by Soaplab services when deployed. This is a similar property
+as the <pn>log4j.configuration</pn> that is used with the
+<em>local</em> protocol. <p>
+
+
+  <dt> <span class="hitt">server.log.dir</span>
+
+  <dd> This property does not replace the whole logging configuration
+file (as the previous one) but it changes only the location of the log
+file. By default, there are two log files, <tt>soaplab2.log</tt> and
+<tt>soaplab2-others.log</tt>, both created in the
+<tt>&lt;tomcat-home&gt;/logs</tt> directory. This property can change
+it. <p>
+
+
+  <dt> <span class="hitt">server.metadata.dir</span>
+
+  <dd> Soaplab2 services read their metadata in the run-time. By
+default, all metadata are copied (as a part of deployment) to the
+directory
+<tt>&lt;tomcat-home&gt;/webapps/<em>soaplab2</em>/metadata</tt>. Which
+is usually fine and it makes the Soaplab2 <em>war file</em>
+self-contained. Everything sits nicely inside the Tomcat
+container. <p>
+
+       But there may be situations that you prefer to have easier
+access to the metadata even after services have been deployed. Typical
+case will be <a href="#undeploy">un-deploying</a> services
+<em>on-the-fly</em> (dynamically, without restarting Tomcat). <p>
+
+       Therefore, you can define that services should look for their
+metadata elsewhere. And it is done by this property. Typically, you
+point this property to the original place where the metadata have been
+generated into. This is an example from my <tt>build.properties</tt>
+file (the example includes also similar properties, described below):
+
+<pre class="code">
+# deployment - to use project root directory and not the "embedded"
+# files in the Tomcat
+server.metadata.dir = /home/senger/soaplab2/metadata/generated
+server.runtime.dir  = /home/senger/soaplab2/_R_
+server.scripts.dir  = /home/senger/soaplab2/run
+</pre>
+
+  <dt> <span class="hitt">server.runtime.dir</span>
+
+  <dd> Soaplab2 services need some space in the file system to keep
+inputs and results. By default, this space is located in the
+<tt>&lt;tomcat-home&gt;/temp</tt> directory. <p>
+
+       Again, the default place is good because everything is
+self-contained within Tomcat space. This is especially useful when you
+do not have easy or direct access to your Tomcat (for example, if you
+are using the Tomcat manager to upload a Soaplab2 <em>war file</em>
+there). <p>
+
+       But sometimes you need to use a different place (for example
+because of Tomcat's disk limitations). Use this property to point to a
+different directory. <p>
+
+
+  <dt> <span class="hitt">server.scripts.dir</span>
+
+  <dd> Soaplab2 services run (usually) external programs. This was,
+after all, the main original reason for making Soaplab. You have to
+assure that they can find them. In order to do that, you can use the
+run-time property <pn>addtopath.dir</pn> (see the <a
+href="ConfigurationGuide.html#properties">configuration
+guide</a>). <p>
+
+       Or, you can put the program executable (usually a script) in
+the directory specified by this property. By default, the deployment
+task copies the whole contents of the <tt>run</tt> directory into
+<tt>&lt;tomcat-home&gt;/webapps/<em>soaplab2</em>/WEB-INF/run</tt>
+directory. The directory name is then put in the property
+<pn>scripts.dir</pn>, which is (again by default) used in the
+<pn>addtopath.dir</pn> (so the services will look there for the
+external programs/scripts). <p>
+
+  <dt> <span class="hitt">user.lib.dir</span>
+  <dt> <span class="hitt">user.lib.include</span>
+
+  <dd> These properties are important for developers adding new
+plug-ins to the core Soaplab2. If they have a new code to be used by
+Soaplab2, they have to tell, of course, the deployment task where the
+code is. And this is the role of these properties. <p>
+
+       The property <pn>user.lib.dir</pn> does not have any default
+value. If it is defined, however, then it points to a directory where
+all files matching the pattern given by the property
+<pn>user.lib.include</pn> are copied from. The default value for the
+property <pn>user.lib.include</pn> is <tt>*.jar</tt>. <p>
+
+       The same properties, by the way, work also for the
+<em>config</em> task when the run-time scripts are being created in
+the <tt>build/run</tt> directory. <p>
+
+</dl><p>
+
+And there are couple of properties influencing the look &amp; feel of
+the <a href="SpinetClient.html">Spinet web client</a>. Look at them in
+a <a href="SpinetClient.html#deploy">separate section</a>. <p>
+
+
+<h4>Ant tasks: jaxdist, axis1dist</h4>
+
+These tasks copy all necessary files to the <tt>build/web</tt>
+directory where they will be waiting for the <em>jaxwar</em> or
+<em>axis1war</em> task to use them. <p>
+
+It is a separate task because sometimes you can use so-called <em>hot
+deployment</em> where the servlet container can be pointed to other
+place to find its classes and other files. It is handy specially in
+the development time. Useful for Eclipse Web Tool plug-in <img
+src="images/eclipse.gif" border=0/>. <p>
+
+
+<h4>Ant tasks: jaxwar, axis1war</h4>
+
+These tasks pack together everything sitting in the <tt>build/web</tt>
+directory into a <em>war file</em>. The <em>jaxdeploy</em> or
+<em>axis1deploy</em> tasks then copy this war file into Tomcat (by
+using the <em>jaxcopy</em> or <em>axis1copy</em> task). <p>
+
+It is a separate task because sometimes you do not have an access to
+the Tomcat when you are deploying your services. Perhaps Tomcat is
+running on a different machine than you are building Soaplab2
+services. Or, Tomcat is accessible only by the Tomcat manager that
+accepts <em>war file</em> by uploading them. <p>
+
+The name of the war file is created from the property
+<pn>context.name</pn> as described above. It is placed in the
+<tt>build/dist</tt> directory.<p>
+
+<h4>Ant tasks: jaxdeployx, axis1deployx</h4>
+
+These tasks prepare Soaplab web archive files, as in <em>jaxwar</em> and <em>axis1war</em> tasks,
+and then deploy prepared <em>war files</em> to local/remote tomcat servers using Tomcat manager.
+
+Details of Tomcat manager are defined using the following properties.
+
+<dl>
+  
+  <dt> <span class="hitt">tomcat.manager.username</span>
+  <dt> <span class="hitt">tomcat.manager.password</span>
+  <dt> <span class="hitt">tomcat.manager.url</span>
+</dl>
+ 
+The web application path name is set to the name of the <em>war file</em> which is in turn determined by the property
+<pn>context.name</pn> as described above.
+
+<a name="webxml"></a>
+<h3>How to configure your own <tt>web.xml</tt></h3>
+
+Each web application (and Soaplab2, once deployed, is also a web
+application) is controlled by a configuration file <tt>web.xml</tt>
+(and for the <em>jaxws</em> protocol also by the file
+<tt>sun-jaxws.xml</tt>). The deployment tasks, described above, create
+these files from their templates (available in directories
+<tt>src/etc/config/jaxws</tt> and <tt>src/etc/config/axis1</tt>) - and
+you can influence this process by setting few built-time
+properties. <p>
+
+
+<dl>
+  
+  <dt> <span class="hitt">jaxws.web.xml.template</span>
+  <dt> <span class="hitt">jaxws.xml.template</span>
+  <dt> <span class="hitt">axis1.web.xml.template</span>
+
+  <dd> First of all, you can have your own whole templates. These
+properties define their locations. Caveat lecture! <p>
+
+       The properties names reflect different protocols. <p>
+
+  <dt> <span class="hitt">web.display.name</span>
+
+  <dd> This property specifies the Web Application display name, a
+short name that can be displayed by GUI tools for servlet container
+(such as the Tomcat Manager). Default value is: <em>Soaplab Web
+Services</em>. <p>
+       
+
+  <dt> <span class="hitt">web.display.desc</span>
+
+  <dd> This property provides a descriptive text about the Web
+Application (again, used by GUI tools, such as Tomcat Manager). The
+default value is: <em>The project home page is
+http://soaplab.sourceforge.net/soaplab2/</em>. <p>
+
+       
+  <dt> <span class="hitt">url.pattern.for.list</span>
+  <dt> <span class="hitt">url.pattern.for.others</span>
+
+  <dd> These two properties are only for <em>jaxws</em> protocol. They
+define patterns that - when found in the requesting URL - redirect
+request to the Soaplab2 services. The property
+<pn>url.pattern.for.list</pn> is a URL pattern for the Soaplab2
+service providing list of all individual Soaplab2 services, and the
+<pn>url.pattern.for.others</pn> defines a pattern for individual
+services. <p>
+
+       In other words, these properties define the URLs to access
+Soaplab2 services (they are not the only ones, other parts of the URLs
+are defined by the <pn>context.name</pn> and your Tomcat host name and
+port number). <p>
+
+       It is probably easier to show where these properties are
+used. This is a part of the <tt>web.xml</tt> template file (the tokens
+in upper-cases will be replaced by values of your properties:
+
+<pre class="code">
+&lt;!-- Soaplab2 List service --&gt;
+&lt;servlet-mapping&gt;
+  &lt;servlet-name&gt;soaplab2&lt;/servlet-name&gt;
+  &lt;url-pattern&gt;@URL_FOR_LIST@&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;
+
+&lt;!-- Soaplab2 all other services --&gt;
+&lt;servlet-mapping&gt;
+  &lt;servlet-name&gt;soaplab2&lt;/servlet-name&gt;
+  &lt;url-pattern&gt;@URL_FOR_OTHERS@&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;
+</pre>
+
+       The default values are <tt>/services/list</tt> for the list
+service and <tt>/services/*</tt> for the individual services. <p>
+
+</dl> <p>
+
+
+
+
+<a name="undeploy"></a>
+<h2>Un-deploying Soaplab2 services</h2>
+
+Quick answer is: Just comment out (in the application list files) the
+service names you do not wish to be runnable anymore. <p>
+
+Such services will still finish their currently running jobs, and may
+even return their results (it depends on how long they were running
+and how are the <a href="ConfigurationGuide.html#properties">run-time
+properties</a> <pn>jobs.cleaning.interval</pn> and
+<pn>services.cleaning.interval</pn> set), but they will not be able to
+start new jobs. <p>
+
+
+<p>
+<iframe id="maintoc" src="TOC.html" scrolling="auto"></iframe>
+
+
+<div align=right><font size=-2>
+<!-- hhmts start -->
+Last modified: Tue Feb  5 17:03:32 2008
+<!-- hhmts end -->
+</font></div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1011961-1";
+urchinTracker();
+</script>
+</body> </html>

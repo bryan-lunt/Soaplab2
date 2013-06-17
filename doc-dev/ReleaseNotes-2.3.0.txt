@@ -1,0 +1,15 @@
+Release 2.3.0 is mostly a maintenance release - but it also brings
+several new features:
+
+* Strongly typed services.
+
+* Semantically annotated WSDLs.
+
+* Changes made to be compliant with the latest EMBOSS package (version
+  6.3).
+
+* More properties to customize Soaplab2 components.
+
+* Updated documentation.
+
+More details about changes are in the file "docs/ChangeLog".

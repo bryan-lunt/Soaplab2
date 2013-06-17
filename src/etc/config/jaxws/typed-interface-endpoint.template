@@ -1,0 +1,8 @@
+<endpoint
+  implementation="org.soaplab.typedws.ServiceProvider"
+  name="_GROUP_NAME_._APP_NAME_"
+  service="{http://soaplab.org/_GROUP_NAME_/_APP_NAME_}_APP_NAME_Service"
+  port="{http://soaplab.org/_GROUP_NAME_/_APP_NAME_}_APP_NAME_Port"
+  url-pattern="/typed/services/_GROUP_NAME_._APP_NAME_"
+  wsdl="WEB-INF/wsdl/_GROUP_NAME_._APP_NAME_.wsdl" />
+

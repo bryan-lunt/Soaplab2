@@ -1,0 +1,9 @@
+The packages and files in this directory are not supposed to be
+general. They are relevant only to some specific services. I keep them
+here as long as their number is small. Once it grows I may create a
+'soaplab-contrib' CVS module and to move them there.
+
+----------------------------------------------------------------------
+Martin Senger <martin.senger@gmail.com>
+$Id: README,v 1.3 2007/03/26 12:54:25 marsenger Exp $
+----------------------------------------------------------------------

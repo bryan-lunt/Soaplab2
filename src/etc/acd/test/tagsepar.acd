@@ -1,0 +1,31 @@
+appl: Tagsepar [
+  documentation: "Testing TAGSEPAR attribute"
+  groups: "TUnit"
+  nonemboss: "Y"
+  executable: "echo"
+  comment: defaults
+  comment: "tagsepar = ="
+]
+
+# --- this prameters gets TAGSEPAR from the application level
+string: param1 [
+  default: 1
+]
+
+# --- this prameters has its own TAGSEPAR
+string: param2 [
+  comment: "tagsepar = -"
+  default: 2
+]
+
+# --- this prameters wants to have an original (default) TAGSEPAR
+string: param3 [
+  default: 3
+  comment: tagsepar
+]
+
+outfile: output [
+  additional: "Y"
+  default: "stdout"
+]
+

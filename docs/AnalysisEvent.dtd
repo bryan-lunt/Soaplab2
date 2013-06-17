@@ -1,0 +1,35 @@
+<!-- ==================================================================== -->
+<!-- Serialization form of an Analysis Event                              -->
+<!-- $Id: AnalysisEvent.dtd,v 1.2 2006/11/26 20:37:26 marsenger Exp $ -->
+<!-- ==================================================================== -->
+
+<!-- place for extensions -->
+<!ENTITY % event_body_template "(state_changed | heartbeat_progress | percent_progress | time_progress | step_progress)">
+
+<!ELEMENT analysis_event (message?, (%event_body_template;)?)>
+
+<!ATTLIST analysis_event
+    timestamp  CDATA #IMPLIED>
+
+<!ELEMENT message (#PCDATA)>
+
+<!ELEMENT state_changed EMPTY>
+<!ENTITY % analysis_state "created | running | completed | terminated_by_request | terminated_by_error">
+<!ATTLIST state_changed
+    previous_state  (%analysis_state;) "created"
+    new_state       (%analysis_state;) "created">
+
+<!ELEMENT heartbeat_progress EMPTY>
+
+<!ELEMENT percent_progress EMPTY>
+<!ATTLIST percent_progress
+    percentage CDATA #REQUIRED>
+
+<!ELEMENT time_progress EMPTY>
+<!ATTLIST time_progress
+    remaining CDATA #REQUIRED>
+
+<!ELEMENT step_progress EMPTY>
+<!ATTLIST step_progress
+    total_steps      CDATA #IMPLIED
+    steps_completed CDATA #REQUIRED>

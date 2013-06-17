@@ -1,0 +1,52 @@
+What Peter did:
+===============
+
+* changed template for derived services
+  - methods (those accepting input data) have as input Java classes (such as Twater)
+  - and the first thing they do is to call a bean-introspector to
+convert this class (Twater) into a usual Map acceptible by 'normal'
+soaplab methods
+
+* a new Ant task (xslt) that converts service metadata into wsdl that
+has an XML schema for inputs/outputs (the wsdl is simply a wrapper
+around this xml schema)
+
+* use Axis tool wsdl2java to create classes representing
+inputs/outputs (such as Twater) - the input wsdl is the one from the
+step above
+
+Problem Peter encountered:
+--------------------------
+
+* some structures in metadata (and therefore in generated wsdl and its
+xml schema) are repeated (e.g. a structure for a sequence format is
+repeated for all input sequences, if a service has more than one input
+sequence parameter);
+
+* which leads to generating more classes by wsdl2java
+
+I think that a possible solution is to generate (into generated
+derived services) also a method that converts typed-inputs into a Map
+(how to do it, it in metadata that are read in the generating time).
+
+
+Alternatif approach:
+====================
+
+* Have a template WSDL file that will be used by all services
+
+* Generate XSD files for each service that will describe/define
+  the service input/output types
+
+  - One convenient way to generate the schema files would be
+    using Soaplab client API itself
+
+* Generate service WSDL files using the above template and
+  by importing the XSD files above
+
+* Implement javax.xml.ws.Provider in a generic way that should
+  be able to recognise inputs for all these services and also should
+  be able to return service specific types for each service
+
+  - Use JAXB unmarshalling and marshalling and the XML schemas above
+    for recognising inputs and for returning outputs

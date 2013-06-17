@@ -1,0 +1,94 @@
+<html> <head>
+<title>Soaplab2: Requirements</title>
+
+<link rel="shortcut icon" href="images/favicon.ico" >
+<link rel="icon" href="images/animated_favicon1.gif" type="image/gif" >
+<link rel="stylesheet" href="images/stylesheet.css" type="text/css">
+
+</head>
+
+<body>
+<h1>Requirements</h1>
+
+<p>
+
+<img class="motto-img" src="images/motto-requirements.jpg" border=0 align="left"/>
+
+<div>
+</div>
+
+<br clear="all"/>
+
+<p>
+
+Some requirements may differ depending on how and where you <a
+href="Download.html">got Soaplab from</a>. But most requirements are
+universal. <p>
+
+<ul>
+  <li> <span class="subtitle">Operating system, platform</span><p>
+       
+       Soaplab2 should work on any platform because it is written in
+Java. But keep it mind that Soaplab is just a Web Services gateway to
+the analysis tools (such as <a
+href="http://emboss.sourceforge.net/">EMBOSS</a>) that you wish to
+provide. These tools need also to be runnable on the same machine
+where you install Soaplab2. <p>
+
+  <li> <span class="subtitle">Java</span><p>
+       
+       Install <a
+href="http://java.sun.com/javase/downloads/index.jsp">JDK Java 1.5 or
+later</a>. <p>
+
+  <li> <span class="subtitle">Apache Tomcat</span> (or a similar servlet container)<p>
+       
+       Soaplab2 is about Web Services - and Web Services are web
+applications run in a servlet container. The development of Soaplab2
+was mostly done by using the <a
+href="http://tomcat.apache.org/download-55.cgi">Apache Tomcat
+5</a>. But other container should work, as well. <p>
+
+  <li> <span class="subtitle">Apache Ant</span><p>
+       
+       The Ant is a Java tool for building, executing and playing with
+Java (and perhaps other, as well) programs. Soaplab2, as most of any
+Java programs, uses it a lot. <p>
+
+  <li> <em>Optionally:</em><p>
+
+       <ul>
+	 <li class="tiny"> mySQL database for storing analysis results<p>
+
+	 In the time of writing this, however, the Soaplab2 beta
+version does not have yet support for mySQL. <p>
+
+	 <li class="tiny"> Perl<p>
+
+	 In the time of writing this, the Soaplab2 beta version still
+uses Perl for converting ACD files (those describing analyses that
+will be provided as Web Services) to XML files. The Perl is, however,
+not used when the services are run. <p>
+
+	 Also, Soaplab2 is distributed with few testing "analysis"
+(like echoing command line parameters, or copying input file to an
+output file) - and those are written in Perl. <p>
+
+       </ul>
+</ul>
+
+
+<iframe id="maintoc" src="TOC.html" scrolling="auto"></iframe>
+
+<div align=right><font size=-2>
+<!-- hhmts start -->
+Last modified: Mon Feb  4 18:26:00 2008
+<!-- hhmts end -->
+</font></div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1011961-1";
+urchinTracker();
+</script>
+</body> </html>

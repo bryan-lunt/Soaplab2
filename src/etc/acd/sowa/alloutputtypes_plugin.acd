@@ -1,0 +1,33 @@
+appl: AllOutputTypes [
+  documentation: "Showing how a plugin can create all kinds of outputs"
+  groups: "Plugins,Testing"
+  nonemboss: "Y"
+  comment: "class org.soaplab.samples.OutputTypesJobFactory"
+]
+
+infile: input  [
+  standard: "Y"
+  help: "This input will be copied to several outputs. <p>
+         For some of outputs, it will be even replicated
+         (how many times, it depends on the parameter <em>count</em>)."
+]
+
+integer: count [
+  additional: "Y"
+  default: "3"
+  prompt: "How many times to replicate input in the array outputs"
+  comment: defaults
+]
+
+outfile: simple_text_output  [
+]
+outfile: simple_binary_output  [
+  comment: bindata
+]
+outfile: array_text_output  [
+  comment: "output_type String[]"
+]
+outfile: array_binary_output  [
+  comment: bindata
+  comment: "output_type byte[][]"
+]

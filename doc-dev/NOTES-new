@@ -1,0 +1,92 @@
+* move to SVN/GIT/... ?
+* Taverna2 plugin for jaxws
+* Gowlab?
+* repeatable attributes?
+
+* Juan's StepByStep guide
+
+*
+[acd2xml] Processing dottup...
+  [acd2xml]     using /usr/local/share/EMBOSS/acd/dottup.acd
+  [acd2xml]     (generated into module alignment_dot_plots)
+  [acd2xml] Duplicated input name (graph_format) in dottup
+  [acd2xml] Duplicated input name (Graphics_in_Postscript) in dottup
+  [acd2xml] Duplicated input name (Graphics_in_PNG) in dottup
+  [acd2xml] Duplicated output name Graphics_in_Postscript in dottup
+  [acd2xml] Duplicated output name Graphics_in_Postscript_url in dottup
+  [acd2xml] Duplicated output name Graphics_in_PNG in dottup
+  [acd2xml] Duplicated output name Graphics_in_PNG_url in dottup
+
+* Spinet: why needed to click on "Update now"?
+
+---- From emails: ---
+
+* seqretsplit
+
+Type of the outseq output option in seqretsplit is defined as
+seqoutall.  In the XML metadata file generated using acd2xml parser
+the type of this output is set to "string". Since the seqretsplit
+program generates list of files for this output I expect it to be of
+type string array.
+
+However I need to investigate whether the seqoutall type is used
+consistently in all EMBOSS applications. I said this because I just
+found that the splitter application which has the same type produces
+either a single file or list of files depending on the -multifile
+option.
+
+...
+
+Thank you for pointing these errors in Soaplab and the EBI Soplab
+server. I have disabled the 'seqretall', 'seqretset', 'seqrettype' and
+'complex' programs in Soaplab CVS version and in the EBI Soaplab
+server.
+
+Current acd2xml routine gets the EMBOSS programs list from
+$emboss_home/share/EMBOSS/acd directory, an alternative is to use the
+EMBOSS wossname program. I made a note to check why EMBOSS copies
+these ACD files by default.
+
+*
+ - minlen/maxlen
+
+ these two ACD attributes are not transferred into the XML generated
+ acd2xml grammar needs updating (I cannot do)
+
+ - env.PATH is not used as thought (at least for EMBOSS jobs)
+
+ I will investigate how we can fix it
+
+ - proper use of "toggle"
+
+ Sebastien's enquiry not yet finalised
+
+*
+ Internet Explorer and Spinet
+ size of the job boxes are not as good as when using firefox
+
+*
+    Max upload size
+
+The only file uploading in Soaplab2 is in the Spinet web interface. At
+the moment, it does not provide a property that can limit the size of
+the uploaded size, but it would be very easy to add it there. It is a
+good idea, and I will do it (but not in the next two weeks - I will be
+on a conference and on a vacation in the remote parts of Asia).
+
+*
+I don't know if this is just in Firefox, but the navigation links are
+at the bottom of the pages in very small font.  On the opening page,
+they come after the "Acknowledgment" and so most visitors will assume
+that it is not useful information and, if they scroll down to see it
+(which is unlikely as it appears "below the fold") will not actually
+read it.
+
+*
+
+It could be useful for tests to activate minlength/maxlength (strings)
+and minimum/maximum (floats & integers) checks.
+
+But the most important is that these checks are activated with the
+client. I have not tested it yet.
+

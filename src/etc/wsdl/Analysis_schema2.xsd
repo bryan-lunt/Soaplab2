@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://org.soaplab.2" xmlns:tns="http://org.soaplab.2" xmlns:ns1="http://services.soaplab.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:import namespace="http://services.soaplab.org/" schemaLocation="Analysis_schema1.xsd"/>
+
+  <xs:element name="SoaplabException" nillable="true" type="ns1:SoaplabException"/>
+
+  <xs:element name="createAndRun" type="tns:createAndRun"/>
+
+  <xs:element name="createAndRunNotifiable" type="tns:createAndRunNotifiable"/>
+
+  <xs:element name="createAndRunNotifiableResponse" type="tns:createAndRunNotifiableResponse"/>
+
+  <xs:element name="createAndRunResponse" type="tns:createAndRunResponse"/>
+
+  <xs:element name="createJob" type="tns:createJob"/>
+
+  <xs:element name="createJobResponse" type="tns:createJobResponse"/>
+
+  <xs:element name="describe" type="tns:describe"/>
+
+  <xs:element name="describeResponse" type="tns:describeResponse"/>
+
+  <xs:element name="destroy" type="tns:destroy"/>
+
+  <xs:element name="destroyResponse" type="tns:destroyResponse"/>
+
+  <xs:element name="getAnalysisType" type="tns:getAnalysisType"/>
+
+  <xs:element name="getAnalysisTypeResponse" type="tns:getAnalysisTypeResponse"/>
+
+  <xs:element name="getCharacteristics" type="tns:getCharacteristics"/>
+
+  <xs:element name="getCharacteristicsResponse" type="tns:getCharacteristicsResponse"/>
+
+  <xs:element name="getInputSpec" type="tns:getInputSpec"/>
+
+  <xs:element name="getInputSpecResponse" type="tns:getInputSpecResponse"/>
+
+  <xs:element name="getLastEvent" type="tns:getLastEvent"/>
+
+  <xs:element name="getLastEventResponse" type="tns:getLastEventResponse"/>
+
+  <xs:element name="getNotificationDescriptor" type="tns:getNotificationDescriptor"/>
+
+  <xs:element name="getNotificationDescriptorResponse" type="tns:getNotificationDescriptorResponse"/>
+
+  <xs:element name="getResultSpec" type="tns:getResultSpec"/>
+
+  <xs:element name="getResultSpecResponse" type="tns:getResultSpecResponse"/>
+
+  <xs:element name="getResults" type="tns:getResults"/>
+
+  <xs:element name="getResultsInfo" type="tns:getResultsInfo"/>
+
+  <xs:element name="getResultsInfoResponse" type="tns:getResultsInfoResponse"/>
+
+  <xs:element name="getResultsResponse" type="tns:getResultsResponse"/>
+
+  <xs:element name="getSomeResults" type="tns:getSomeResults"/>
+
+  <xs:element name="getSomeResultsResponse" type="tns:getSomeResultsResponse"/>
+
+  <xs:element name="getStatus" type="tns:getStatus"/>
+
+  <xs:element name="getStatusResponse" type="tns:getStatusResponse"/>
+
+  <xs:element name="run" type="tns:run"/>
+
+  <xs:element name="runAndWaitFor" type="tns:runAndWaitFor"/>
+
+  <xs:element name="runAndWaitForResponse" type="tns:runAndWaitForResponse"/>
+
+  <xs:element name="runNotifiable" type="tns:runNotifiable"/>
+
+  <xs:element name="runNotifiableResponse" type="tns:runNotifiableResponse"/>
+
+  <xs:element name="runResponse" type="tns:runResponse"/>
+
+  <xs:element name="terminate" type="tns:terminate"/>
+
+  <xs:element name="terminateResponse" type="tns:terminateResponse"/>
+
+  <xs:element name="waitFor" type="tns:waitFor"/>
+
+  <xs:element name="waitForResponse" type="tns:waitForResponse"/>
+
+  <xs:complexType name="getAnalysisType">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getAnalysisTypeResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:SoaplabMap" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="SoaplabMap">
+    <xs:sequence>
+      <xs:element name="entries" type="tns:MapEntry" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="MapEntry">
+    <xs:sequence>
+      <xs:element name="key" type="xs:string"/>
+      <xs:element name="value" type="tns:Value"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Value">
+    <xs:sequence>
+      <xs:element name="singleString" type="xs:string" minOccurs="0"/>
+      <xs:element name="stringArray" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="singleBinary" type="xs:base64Binary" minOccurs="0"/>
+      <xs:element name="binaryArray" type="xs:base64Binary" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getResultsInfo">
+    <xs:sequence>
+      <xs:element name="arg0" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getResultsInfoResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:SoaplabMap" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getLastEvent">
+    <xs:sequence>
+      <xs:element name="arg0" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getLastEventResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="runAndWaitFor">
+    <xs:sequence>
+      <xs:element name="arg0" type="tns:SoaplabMap" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="runAndWaitForResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:SoaplabMap" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="destroy">
+    <xs:sequence>
+      <xs:element name="arg0" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="destroyResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getInputSpec">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getInputSpecResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:SoaplabMap" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createJob">
+    <xs:sequence>
+      <xs:element name="arg0" type="tns:SoaplabMap" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createJobResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="describe">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="describeResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createAndRunNotifiable">
+    <xs:sequence>
+      <xs:element name="arg0" type="tns:SoaplabMap" minOccurs="0"/>
+      <xs:element name="arg1" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createAndRunNotifiableResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getSomeResults">
+    <xs:sequence>
+      <xs:element name="arg0" type="xs:string" minOccurs="0"/>
+      <xs:element name="arg1" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getSomeResultsResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:SoaplabMap" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="run">
+    <xs:sequence>
+      <xs:element name="arg0" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="runResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getResults">
+    <xs:sequence>
+      <xs:element name="arg0" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getResultsResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:SoaplabMap" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="runNotifiable">
+    <xs:sequence>
+      <xs:element name="arg0" type="xs:string" minOccurs="0"/>
+      <xs:element name="arg1" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="runNotifiableResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="terminate">
+    <xs:sequence>
+      <xs:element name="arg0" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="terminateResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getResultSpec">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getResultSpecResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:SoaplabMap" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getNotificationDescriptor">
+    <xs:sequence>
+      <xs:element name="arg0" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getNotificationDescriptorResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getStatus">
+    <xs:sequence>
+      <xs:element name="arg0" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getStatusResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="waitFor">
+    <xs:sequence>
+      <xs:element name="arg0" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="waitForResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="createAndRun">
+    <xs:sequence>
+      <xs:element name="arg0" type="tns:SoaplabMap" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createAndRunResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getCharacteristics">
+    <xs:sequence>
+      <xs:element name="arg0" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getCharacteristicsResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:SoaplabMap" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

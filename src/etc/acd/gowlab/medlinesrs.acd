@@ -1,0 +1,16 @@
+appl: Medline [
+  documentation: "Get MEDLINE citation (in XML)"
+  groups: "Testing"
+  nonemboss: "Y"
+  comment: "launcher get"
+  supplier: "http://srs.ebi.ac.uk/srsbin/cgi-bin/wgetz"
+  comment: "method -e+[MEDLINE:'$pmid']+-ascii"
+]
+
+string: pmid  [
+#  default: 12345678
+  parameter: "Y"
+]
+
+outfile: result  [
+]

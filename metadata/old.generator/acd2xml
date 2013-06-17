@@ -1,0 +1,1841 @@
+#!/usr/bin/perl
+#
+#    Parse EMBOSS 'acd' files describing internally the applications,
+#    and convert them into an XML-based format. This XML is later used
+#    by other scripst to generate Java code, and also it is used
+#    directly in metadata loader in AppLab servers.
+#
+#    Additionally, it can create a file listing all analysis whose
+#    XML-based descriptions were generated. This file is an input
+#    for AppLabServer.
+#
+#    This is a special version of script 'al.2xml.pl' (from the
+#    core AppLab distribution). It is quite poluted with the old
+#    stuff (used for the non-acd configuration files) which is not
+#    any more used - but I am reluctant to remove it
+#    (the "just-in-case" paranoia).
+#
+#    senger@EBI.ac.uk
+#    January 2001
+#
+#--------------------------------------------------------------------------
+
+$version = '$Id: acd2xml,v 1.28 2010/08/10 10:55:42 marsenger Exp $';
+
+$usage = <<"END_OF_USAGE";
+Usage: acd2xml [-options] analysis-name [analysis-name...]
+       acd2xml [-options] -a
+
+   Options:
+      -c    ... check syntax of acd file(s), nothing generated
+      -b    ... pure BSA-compliant XML output
+      -d    ... verbose mode
+      -D    ... more verbose mode
+      -a    ... take application names from \$Cfg::APPMENU
+      -v    ... give version of the converter
+      -h    ... give this help page
+ 
+      -C cfg       ... configuration file with Perl variables
+                       (default is al.Cfg.pl - which is always
+                        taken but can be overridden)
+      -i acd       ... input acd file
+                       (default is <application-name>.acd)
+      -r dir       ... directory containing acd files
+                       (default is in al.Cfg.pl in \$Cfg::ALCFG)
+      -m module    ... module name where described analysis belong to
+                       (default is defined in al.Cfg.pl file)
+      -l filename  ... file name of a generated output containing
+                       a list of all analysis (file format follows
+                       AppLabAdmin.dtd)
+      -p path      ... a path used in a list file (as given by -l)
+                       for location of the generated XML files
+   analysis-name:
+      Application names to be processed. If there is no name on the
+      command line and an option '-a' is present, then names from
+      \$Cfg::APPMENU are used.
+
+      Note that if more application names is given, the -i option is
+      probably useless and should not be given.
+
+END_OF_USAGE
+
+#--------------------------------------------------------------------------
+
+BEGIN {
+    ($allib = $0) =~ s|/[^/]+$||;
+    unshift @INC, $allib;
+    require 'al.Cfg.pl';             # configuration file for the generator
+
+    # --- about this generator
+    $Cfg::NAME     = 'Cembalo Generator (ACD -> XML), for Soaplab2';
+    $Cfg::VERSION  = '$Id: acd2xml,v 1.28 2010/08/10 10:55:42 marsenger Exp $';
+    $Cfg::AUTHOR   = 'Martin Senger';
+    $Cfg::EMAIL    = 'martin.senger@gmail.com';
+
+    # --- perhaps to read an additional configuration file
+    use Getopt::Std;
+    getopt ('Crilmp');   # these  are switches taking an argument (a value)
+    if ($opt_C) {
+        eval { require $opt_C; };
+        die "\nERROR: Configuration file '$opt_C' not found.\n\n" if $@;
+    }
+
+    # --- we need also some files from the AppLab core generators
+#    print "Error: APPLAB_HOME environment variable is not set.\n" unless defined $ENV{'APPLAB_HOME'};
+    unshift @INC, "$Cfg::ALROOT/al";
+    require 'al.lib.pl';             # common subroutines
+    require 'al.XMLOutput.pl';       # generates XML output
+}
+
+use ACDParser;             # parser of 'acd' files
+use Fstream;               # reader used by the parser above
+
+# -----------------------------------------------------------------------------
+#
+# Globals used by more subroutines without being passed as parameters
+#
+# -----------------------------------------------------------------------------
+$app_name = '';            # currently processed application name
+$app_config;               # application specific configuration file
+%prg_list;                 # for a list output defined by '-l' option
+
+$emboss_version;           # filled just once
+if ($Cfg::PACKAGE_VERSION) {
+    $emboss_version = $Cfg::PACKAGE_VERSION;
+} elsif ($ENV{'EMBOSS_HOME'}) {
+    $emboss_version = `$ENV{'EMBOSS_HOME'}/bin/embossversion -auto`; chomp ($emboss_version);
+    $emboss_version = `embossversion -auto` unless $emboss_version; chomp ($emboss_version);
+    $emboss_version = 'unspecified' unless $emboss_version;
+}
+$RememberedLauncher;
+
+# -----------------------------------------------------------------------------
+#
+# Main program
+#
+# -----------------------------------------------------------------------------
+
+if ($opt_v or $opt_h) {
+    print "\n$Cfg::NAME\nversion: $Cfg::VERSION\n\n" .
+          "$Cfg::AUTHOR\n$Cfg::EMAIL\n\n";
+    if ($opt_h) {
+        print $usage;
+    }
+    exit (0);
+}
+
+# --- read a list of applications to be processed
+@ARGV = &l::applist() if $opt_a and @ARGV == 0;
+exit (0) unless @ARGV;
+
+#
+#     =================================================
+# --- now, each argument in @ARGV means one application
+#     =================================================
+#
+
+# --- some applications may be dissabled (we want to ignore them)
+my %disabled = ();
+foreach (split (/\s*[, ]\s*/, $Cfg::DISABLED_APPS)) {
+    $disabled{"\L$_"} = 1;
+}
+
+# --- make sure that we do not have duplicate names
+my @filtered = ();
+my @filtered = grep { exists $hash{$_} ? undef : ($hash{$_}=1) } @ARGV;
+@ARGV = grep { exists $disabled{$_} ? undef : $_ } @filtered;
+
+while ($app_name = shift) {
+    undef %app;
+
+    if ($app_name =~ s/[^-\w]/_/g) {
+        &warning ("Error in application name. Substituted by '$app_name'.");
+    }
+    $app{'name'} = $app_name;      # name of this application
+
+    #
+    # --- initialize with some pretty defaults
+    #
+
+    $app{'module'}   = $Cfg::MODULE;     # module (group) name
+    $app{'apptype'}  = 'genApp';         # application type
+    $app{'exec'}     = "\L$app_name";    # executable of this application
+
+    print "Processing $app_name...\n" if $opt_d;
+
+    #
+    # --- parse the application config (acd) file
+    #
+
+    $config_to_try = ($opt_i ? $opt_i : "\L$app_name.acd");
+    $app_config = &l::find_file ($config_to_try, $opt_r ? $opt_r : $Cfg::ALCFG);
+    die "'$config_to_try' not found\n" unless $app_config;
+    print "\tusing $app_config\n" if $opt_d;
+    
+    open (CONFIG, $app_config) or die "Can't open '$app_config' ($!).\n";
+    $input = Fstream->new (\*CONFIG, $app_config);
+    $parser = ACDParser->new (\&ACDParser::yylex, \&ACDParser::yyerror, 0 );
+    $ACDParser::Order = 0;
+    eval {
+	$parser->yyparse ($input);
+    };
+    print "ERROR: $@\n" and exit(1) if $@;
+    close CONFIG;
+
+    #
+    # an EMBOSS or a non-EMBOSS application ?
+    # (because an acd file can be used also for a non-emboss apps)
+    #
+    $app{'options'}->{'emboss'} = (defined $app{'non-emboss'} ? 'false' : 'true');
+    delete $app{'non-emboss'};
+
+    #
+    # identify the whole package - as specified in Cfg.pl variables
+    # (note that we need to have 'version' both in options and in $app:
+    # the option -l expects it in 'options', and al.XMLOutput.pl expects it
+    # both in $app{'version'} and in $app{'options'}->{'version'})
+    #
+    $app{'supplier'} = $Cfg::PACKAGE_SUPPLIER unless defined $app{'supplier'};
+    $app{'installation'} = $Cfg::PACKAGE_INSTALLATION unless defined ${$app{'options'}}{'installation'};
+
+    unless (defined $app{'version'}) {
+	if (&is ($app{'options'}->{'emboss'})) {
+	    $app{'version'} = $emboss_version;
+	}
+    }
+    my ($tmp_place) = $app{'version'};
+    &addOptions (\%app, 'options', [ qw ( supplier version installation )]);
+    $app{'version'} = $tmp_place;
+
+    if ($app{'options'}->{'help'}) {
+	$app{'help'} = $app{'options'}->{'help'};
+	delete $app{'options'}->{'help'};
+    }
+
+    # some defaults that can be done only now (when we know whether this is an emboss app)
+#    my $default_launcher = (&is ($app{'options'}->{'emboss'}) ? 'EmbossLauncher' : 'ALGenLauncher');
+    my $default_launcher = '';
+    $app{'launcher'} = ($Cfg::LAUNCHER ? $Cfg::LAUNCHER : $default_launcher);
+
+    # --- make additional qualifiers from 'input' (input sequences)
+    #     (each of them will have several input parameters, such as -sformat)
+    $app{'mainq'} = [] unless $app{'mainq'};
+    $app{'optq'} = [] unless $app{'optq'};
+
+    my ($seq_count) = 0 + @{$app{'input'}};   # how many input sequences
+    # we do not say -sformatX if there is only one sequence
+    $seq_count = '' if $seq_count < 2;
+
+    $app{'input'} = [] unless defined $app{'input'};
+    my ($input);   # a reference to a hash
+    foreach $input (reverse @{$app{'input'}}) {
+	my ($refpar) = $input;
+#	$$refpar{'qtype'} = 'text';
+	$$refpar{'qtype'} = 'text' unless $$refpar{'qtype'} =~ /^seq|seqsetall$/;
+
+        # --- all input sequences will have these additional parameters
+        $$refpar{'bsa_inputs'} = [
+			    { 'qid'     => 'sformat'.'_'.$$refpar{'name'},
+			      'qtype'   => 'dummy',
+			      'options' => { 'bsa_type' => 'string' },
+                              'hints'   => { 'readonly' => 'true' },
+                              'lists'   => [ { 'type'  => 'full',
+                                               'items' => &seq_formats (&input_seq_format_names)}],
+			      'answer'  => 'false' },
+			    { 'qid'     => 'sbegin'.'_'.$$refpar{'name'},
+			      'qtype'   => 'dummy',
+			      'options' => { 'bsa_type' => 'long' },
+			      'answer'  => 'false' },
+			    { 'qid'     => 'send'.'_'.$$refpar{'name'},
+			      'qtype'   => 'dummy',
+			      'options' => { 'bsa_type' => 'long' },
+			      'answer'  => 'false' },
+			    { 'qid'     => 'sprotein'.'_'.$$refpar{'name'},
+			      'qtype'   => 'dummy',
+			      'options' => { 'bsa_type' => 'boolean' },
+			      'answer'  => 'false' },
+			    { 'qid'     => 'snucleotide'.'_'.$$refpar{'name'},
+			      'qtype'   => 'dummy',
+			      'options' => { 'bsa_type' => 'boolean' },
+			      'answer'  => 'false' },
+			    { 'qid'     => 'sreverse'.'_'.$$refpar{'name'},
+			      'qtype'   => 'dummy',
+			      'options' => { 'bsa_type' => 'boolean' },
+			      'answer'  => 'false' },
+			    { 'qid'     => 'slower'.'_'.$$refpar{'name'},
+			      'qtype'   => 'dummy',
+			      'options' => { 'bsa_type' => 'boolean' },
+			      'answer'  => 'false' },
+			    { 'qid'     => 'supper'.'_'.$$refpar{'name'},
+			      'qtype'   => 'dummy',
+			      'options' => { 'bsa_type' => 'boolean' },
+			      'answer'  => 'false' },
+			    ];
+
+        # --- 'format' may suggest how many ways an input sequence can be entered
+        #          'direct' ... only as direct data and from a local file
+        #          'usa'    ... only as a uniform sequence address
+        #          n/a      ... both direct data and usa
+        #     'direct_for_default' is used to say that 'default' should be used
+        #          for direct data (in case we have both direct and usa data)
+        my ($format) = ${$$refpar{'options'}}{'format'};
+        $format = 'direct,usa' unless defined $format;
+	if ($format =~ /direct/i) {
+	    my (%direct) = (
+		'qid' => $$refpar{'name'} . '_direct_data',
+		'answer' => 'false',
+			    );
+	    if (&is (${$$refpar{'options'}}{'default_for_direct'}) or
+		$format !~ /usa/i) {
+		$direct{'default'} = $$refpar{'default'};
+	    }
+	    unshift (@{$$refpar{'bsa_inputs'}}, \%direct);
+	}
+	if ($format =~ /usa/i) {
+	    my (%usa) = (
+		'qid'    => $$refpar{'name'} . '_usa',
+		'answer' => 'false',
+			 );
+	    if (! &is (${$$refpar{'options'}}{'default_for_direct'})) {
+		$usa{'default'} = $$refpar{'default'};
+	    }
+	    unshift (@{$$refpar{'bsa_inputs'}}, \%usa);
+
+            # --- protect access to the USA data by a file evaluator
+# 	    $$refpar{'condition'} = [ { 'evaluator' => ($Cfg::FILE_EVALUATOR ? $Cfg::FILE_EVALUATOR : 'EmbossEvaluatorFiles'),
+# 					'options'   => { 'filename' => 'true' } }];
+# 	    &check_conditions ($refpar, undef);
+	}
+
+        # --- add/update the 'base' parameter (which represents each input sequence)
+    	if ($format =~ /usa/i and $format =~ /direct/i) {
+	    ${$$refpar{'options'}}{'format'} = 'unspecified';
+	}
+        $$refpar{'seq_type'} = ($$refpar{'type'} or 'sequence');
+#	$$refpar{'gui_class'} = 'embl.ebi.EmbossClient.ALInputSeq';      # for Java client
+	$$refpar{'server_class'} = 'org.soaplab.emboss.SeqParameter';    # for Java server
+#	$$refpar{'web_class'} = 'emboss::input_seq_parameter';           # for perl client
+        $$refpar{'seq_num'} = $seq_count if $seq_count;
+	&addOptions ($refpar, 'options', [ qw ( gui_class server_class web_class
+						seq_num seq_type features )]);
+
+        # --- list of available formats
+        $$refpar{'list'} = join (" ", &input_seq_format_names);
+        $$refpar{'listseparator'} = ' ';
+
+	if (&is ($$refpar{'required'})) {
+	    unshift (@{$app{'mainq'}}, $refpar);
+	} else {
+	    unshift (@{$app{'optq'}}, $refpar);
+	}
+
+	$seq_count--;
+    }
+
+    #
+    # --- all parameters (both mandatory and optional) must be in 'sections'
+    #
+
+    $app{'sections'} = [ { 'mainq' => $app{'mainq'},
+                           'optq'  => $app{'optq'}   } ];
+    delete $app{'mainq'};
+    delete $app{'optq'};
+    
+    #   
+    # --- process parsed data, set suitable defaults
+    #
+
+    $app{'module'} = $opt_m if $opt_m;
+    &check_module ($opt_d);
+
+    # --- each section must have...
+    $max_act = 0;    # counter of all actions
+    &do_s ( sub {
+	my ($refsec) = @_;
+
+	# ...arrays for mandatory and optional qualifiers
+	$$refsec{'mainq'} = [] unless $$refsec{'mainq'};
+	$$refsec{'optq'} = [] unless $$refsec{'optq'};
+
+	# ...at least one event
+	unless ($$refsec{'event'}) { 
+	    $$refsec{'event'} = [ { 'etype' => 'general' } ];
+	}
+
+	# and each event must have at least one action
+	# (also remember please our launcher in a global - used later here...)
+	$RememberedLauncher = ($app{'options'}->{'launcher'} or $app{'launcher'});
+	my ($refevent) = ${$$refsec{'event'}}[0];
+	$$refevent{'action'} = [ { 'atype'    => 'exe',
+				   'exec'     => ($app{'options'}->{'exe'} or $app{'exec'}),
+				   'method'   => ${$app{'options'}}{'method'},
+				   'launcher' => ($app{'options'}->{'launcher'} or $app{'launcher'}),
+			       } ];
+	my ($refact) = ${$$refevent{'action'}}[0];
+	if (${$app{'options'}}{'separator'} and !${$$refact{'options'}}{'separator'}) {
+	    ${$$refact{'options'}}{'separator'} = ${$app{'options'}}{'separator'};
+	}
+	delete ${$app{'options'}}{'separator'};
+	delete ${$app{'options'}}{'method'};
+	delete ${$app{'options'}}{'exe'};
+	delete ${$app{'options'}}{'launcher'};
+
+	# add a 'monitor' action if app's options ask for it
+	if (${$app{'options'}}{'monitor'}) {
+	    my ($mtype) = ${$app{'options'}}{'monitortype'};
+            if    ($mtype =~ /percent/i) { $mtype = 'percentprogress'; }
+            elsif ($mtype =~ /time/i)    { $mtype = 'timeprogress';    }
+            elsif ($mtype =~ /step/i)    { $mtype = 'stepprogress';    }
+            push (@{$$refevent{'action'}}, { 'atype'    => 'monitor',
+				             'exec'     => ${$app{'options'}}{'monitor'},
+	                                     'method'   => $mtype,
+	                                     'launcher' => ${$app{'options'}}{'monitorlauncher'} } );
+        }
+        delete ${$app{'options'}}{'monitor'};
+        delete ${$app{'options'}}{'monitortype'};
+        delete ${$app{'options'}}{'monitorlauncher'};
+    });
+
+    # --- add missing IDs to all sections and events, create their counters ('genid')
+    $max_sid = 0;   # section serial counter
+    $max_eid = 0;   # event serial counter
+    &do_s ( sub {
+	        my ($refsec) = @_;
+                $max_sid++;                    # increase section counter
+                $$refsec{'genid'} = $max_sid;  # store section serial number
+                unless ($$refsec{'id'}) {      # each section must have an ID
+                    $$refsec{'id'} = "_S_$max_sid";  # hopefully nobody uses _S_
+	        }
+                my ($refevent);
+                foreach $refevent (@{$$refsec{'event'}}) {
+                    $max_eid++;                      # increase event counter
+                    $$refevent{'genid'} = $max_eid;  # store event serial number
+                    unless ($$refevent{'id'}) {      # each event must have an ID
+                        $$refevent{'id'} = "_E_$max_eid";  # hopefully nobody uses _E_
+	            }
+		}
+            });
+
+    # --- remaining polishing of events
+    #     - put together style options
+    #     - propagate conditions from section to all its events if they have no conds
+    #     - some fields should be verified before using them in generator
+    &do_s ( sub {
+	        my ($refsec) = @_;
+                my ($cond) = $$refsec{'condition'};
+                my ($refevent);
+                foreach $refevent (@{$$refsec{'event'}}) {
+		    &addOptions ($refevent, 'style', ['prompt']);
+                    if ($cond and !$$refevent{'condition'}) {
+                        $$refevent{'condition'} = $cond;
+		    }
+                    &check_conditions ($refevent, $$refevent{'id'});
+
+                    $$refevent{'condoper'}  = 'eq' unless $$refevent{'condoper'};
+                    $$refevent{'condvalue'} = 0    unless $$refevent{'condvalue'};
+                    $$refevent{'nextopen'}  = []   unless $$refevent{'nextopen'};
+		}
+                delete $$refsec{'condition'};   # clean-up
+
+
+		# --- there are (pseudo-) parameters made from 'section's and 'endsection's
+		#     in acd files; remove them
+		#     (but in future we may want to take their attributes and put them
+		#      as options in all real parameters occurring between 'section' and
+		#      'endsection' pseudo-parameters; if we do this we probably need to
+		#      change first acd.y because all these pseudoparameters are put
+		#      in the 'optq' section - therefore some real parameters, originally
+		#      in the acd file belonging to a, say 'input section' may not appear
+		#      inbetween corresponding pseudo-parameters)
+
+		@{ $$refsec{'mainq'} } =
+		    grep ($$_{'qtype'} !~ /^(end)?section$/, @{ $$refsec{'mainq'} });
+		@{ $$refsec{'optq'} } =
+		    grep ($$_{'qtype'} !~ /^(end)?section$/, @{ $$refsec{'optq'} });
+            });
+
+    # --- rename result names if they clash with the standard (always present) ones
+    #     (TBD: not sure what happens if such result is also mentioned in the options
+    #           'output_name', 'output_type', 'output_adapter' - but let's cross the
+    #           bridge when we come to it)
+    &do_q (sub {
+	my ($refpar) = @_;
+	if ($refpar->{'filetype'} =~ /output/) {
+	    if ($refpar->{'qid'} eq 'report') {
+		$refpar->{'qid'} .= '_result';
+		$refpar->{'method'} =~ s/\$\$/'${report}'/eg;
+	    }
+	    if ($refpar->{'qid'} eq 'detailed_status') {
+		$refpar->{'qid'} .= '_result';
+		$refpar->{'method'} =~ s/\$\$/'${detailed_status}'/eg;
+	    }
+	}
+    });
+
+    # --- split qualifiers for output sequences into several
+    #     (one for an output sequence, one for its format)
+
+#     # first, we need to know how many output sequences we have
+#     my ($seqout_count) = 0;
+#     &do_q (sub {
+# 	my ($refpar) = @_;
+# 	$seqout_count++ if $$refpar{'qtype'} eq 'text' and $$refpar{'datatype'} =~ /^seq/;
+#     }, 'skip nested');
+#     # we do not say -osformatX if there is only one sequence
+#     $seqout_count = ($seqout_count < 2 ? '' : 1);
+
+    # now do the splitting
+    &do_q (sub {
+	my ($refpar) = @_;
+	if ($$refpar{'qtype'} eq 'text' and $$refpar{'datatype'} =~ /^seq/) {
+
+	    # --- add semantic type
+	    $$refpar{'seq_type'} = ($$refpar{'type'} or 'sequence');
+
+	    # --- change 'text' type into an output 'file'
+	    $$refpar{'qtype'} = 'file';
+	    $$refpar{'iotype'} = $$refpar{'filetype'} = 'output';
+	    $$refpar{'nodisplay'} = 'true';
+	    &addOptions ($refpar, 'options', ['datatype', 'features']);
+
+	    # --- add a 'text' parametr for output sequence format
+            my ($prompt) = ($$refpar{'prompt'} ? 'Format for: ' . $$refpar{'prompt'}
+                                               : 'Format of the output sequence (' . $$refpar{'qid'} . ')');
+	    my (%osformat) = ( 'qid'     => 'osformat'.'_'.$$refpar{'name'},
+                               'name'    => 'osformat'.'_'.$$refpar{'name'},
+			       'qtype'   => 'text',
+			       'hints'   => { 'readonly' => 'true' },
+			       'lists'   => [ { 'type'  => 'full',
+						'items' => &seq_formats (&output_seq_format_names) }],
+			       'answer'  => 'false',
+			       'prompt'  => $prompt,
+			       'default' => 'fasta',
+			     );
+#             $seqout_count++;
+	    my ($refsec) = ${$app{'sections'}}[0];
+	    push (@{$$refsec{'optq'}}, \%osformat );
+	}
+    }, 'skip nested');
+
+    # --- split qualifiers for features output
+    #     (in the same way as done above for output sequences)
+
+#     # first, we need to know how many feature output files we have
+#     my ($featout_count) = 0;
+#     &do_q (sub {
+# 	my ($refpar) = @_;
+# 	$featout_count++ if $$refpar{'qtype'} eq 'text' and $$refpar{'datatype'} =~ /^featout/;
+#     }, 'skip nested');
+#     # we do not say -offormatX if there is only one feature output
+#     $featout_count = ($featout_count < 2 ? '' : 1);
+
+    # now do the splitting
+    &do_q (sub {
+	my ($refpar) = @_;
+	if ($$refpar{'qtype'} eq 'text' and $$refpar{'datatype'} =~ /^featout/) {
+
+	    # --- change 'text' type into an output 'file'
+	    $$refpar{'qtype'} = 'file';
+	    $$refpar{'iotype'} = $$refpar{'filetype'} = 'output';
+	    $$refpar{'nodisplay'} = 'true';
+	    &addOptions ($refpar, 'options', ['datatype']);
+
+	    # --- add a 'text' parametr for feature output format
+            my ($prompt) = ($$refpar{'prompt'} ? 'Format for: ' . $$refpar{'prompt'}
+                                               : 'Format of the output features (' . $$refpar{'qid'} . ')');
+	    my (%offormat) = ( 'qid'     => 'offormat'.'_'.$$refpar{'name'},
+                               'name'    => 'offormat'.'_'.$$refpar{'name'},
+			       'qtype'   => 'text',
+			       'hints'   => { 'readonly' => 'true' },
+			       'lists'   => [ { 'type'  => 'full',
+						'items' => &featout_formats }],
+			       'answer'  => 'false',
+			       'prompt'  => $prompt,
+			       'default' => 'gff',
+			     );
+#             $featout_count++;
+	    my ($refsec) = ${$app{'sections'}}[0];
+	    push (@{$$refsec{'optq'}}, \%offormat );
+	}
+    }, 'skip nested');
+
+    # --- polish qualifiers for alignment output
+#    &do_q (sub {
+#	my ($refpar) = @_;
+#	if ($$refpar{'qtype'} eq 'text' and $$refpar{'datatype'} =~ /^alignment/) {
+
+#	    # --- change 'text' type into an output 'file'
+#	    $$refpar{'qtype'} = 'file';
+#	    $$refpar{'iotype'} = $$refpar{'filetype'} = 'output';
+#	    $$refpar{'nodisplay'} = 'true';
+#	    &addOptions ($refpar, 'options', ['datatype']);
+#	}
+#    }, 'skip nested');
+
+    # --- split qualifiers for graphical output into several:
+    #     - one will be for a dropdown list of available graphical formats,
+    #     - and several 'output' files for each supported graphical format
+    &do_q (sub {
+	my ($refpar) = @_;
+	if ($$refpar{'qtype'} eq 'text' and $$refpar{'datatype'} =~ /^graph/) {
+
+	    my ($refsec) = ${$app{'sections'}}[0];
+
+            # --- create several 'file' prameters
+            my (@sgo) = &supported_graph_outputs;   # array of hashes
+            my ($rg);   # each hash represents a supported graphical output
+            foreach $rg (@sgo) {
+                my (%gout) = %{&clone_it ($refpar)};   # copy what we got from acd.y
+
+	        $gout{'qtype'} = 'file';
+	        $gout{'name'} = $gout{'qid'} = $$rg{'output_name'};
+	        $gout{'filetype'} = 'output';
+	        $gout{'nodisplay'} = 'true';
+
+                $gout{'output_type'} = $$rg{'output_type'};
+		$gout{'datatype'} = 'bindata' if $gout{'output_type'} =~ /byte/;
+		$gout{'emboss_graph'} = 1;   # because 'datatype' does not contain anymore 'graph' and we need it for make_url
+                $gout{'output_adaptor'} = $$rg{'output_adaptor'};
+                $gout{'make_url'} = $$rg{'remote_url'};
+                $gout{'allow_non_existent'} = 'true';
+                $gout{'mimetype'} = $$rg{'mimetype'};
+	        &addOptions (\%gout, 'options', [ 'mimetype', 'output_type', 'output_adaptor', 'make_url', 'allow_non_existent' ]);
+
+                # EmbossLauncher will change this to: -goutfile XXX for
+                # the selected format (and remove the other outputs)
+ 	        $gout{'method'} = '%%%&&%%% $$';
+
+                # and finally put the new file parameter to the others
+	        push (@{$$refsec{'optq'}}, \%gout);
+            }
+
+	    # --- add things to the 'text' parametr for graphical format
+	    $$refpar{'name'} = $$refpar{'qid'} = 'graph_format';
+            $$refpar{'lists'} = [ { 'type'  => 'full',
+				    'items' => &supported_graph_formats }];
+            $$refpar{'answer'} = 'false';
+            $$refpar{'prompt'} = 'Format of the graphical output' unless defined $$refpar{'prompt'};
+            $$refpar{'default'} = &default_graph_format;
+            $$refpar{'defaults'} = 'true';
+            $$refpar{'envar'} = 'true';
+	    &addOptions ($refpar, 'options', ['defaults', 'envar']);
+            $$refpar{'readonly'} = 'true';
+	    &addOptions ($refpar, 'hints', ['readonly']);
+	}
+    }, 'skip nested');
+
+    # --- add missing IDs to qualifiers, create counters for each qualifier type
+    $max_qid = 0;   # qualifier serial counter
+    &do_q ( sub {
+	my ($refpar) = @_;
+	my ($qtype) = $$refpar{'qtype'};
+	if ($qtype) {
+	    $param_count {$qtype}++;
+	    $$refpar{'genid'} = $param_count {$qtype};
+	}
+	unless ($$refpar{'qid'}) {      # each qualifier must have an ID
+	    $max_qid++;
+	    $$refpar{'qid'} = "_Q_${qtype}_$max_qid";  # hopefully nobody uses _Q_
+	}
+	unless ($$refpar{'qid'} =~ /^[\w-]+$/) { # ID must be proper
+	    $$refpar{'qid'} =~ s/[^\w-]/_/g;
+	    &warn ('ID', 'ID can contains only [A-Za-z0-9_-] characters', $$refpar{'qid'});
+	}
+    });
+
+    # --- polish qualifier (each type can have own specifics)
+    &do_q ( sub {
+                my ($refpar) = @_;
+                my ($qtype) = $$refpar{'qtype'};
+
+		# some options are moved to the parameter main definition
+		# (they were set as options because acd files do not have
+		#  corresponding keywords for the parameter definition)
+		foreach my $key ( qw( method format ) ) {
+		    if (defined $refpar->{'options'}->{$key}) {
+			$refpar->{$key} = $refpar->{'options'}->{$key};
+			delete $refpar->{'options'}->{$key};
+		    }
+		}
+
+                # --- each parameter may have 'calculated_XXX' option,
+                #     make them digestable for our Substitutor class
+                &calculated ($refpar);
+
+                # --- to display or not to display (common to all types of parameters, except output files)
+                if (defined ${$$refpar{'options'}}{'display'} and 
+                    ! &is (${$$refpar{'options'}}{'display'})) {
+                    $$refpar{'nodisplay'} = 'true';
+                }
+                # (but do not delete yet option 'display' because if this is an output file,
+                #  we need to reverse 'nodisplay' - see below)
+
+                &check_conditions ($refpar, $$refpar{'qid'});
+
+		# --- change escaped 'n's in prompt into real newlines
+		$$refpar{'prompt'} =~ s/\\n/\n/g;
+
+                # grouptype and radiotype get long names
+                if ($qtype eq 'radio') {
+                    $$refpar{'radiotype'} =
+                        ($$refpar{'radiotype'} == 2 ? 'zero_or_one' : 'just_one');
+                    unless ($$refpar{'nested'}) {
+                        &warning ("Radio-parameter $$refpar{'qid'} without any sub-parameters.");
+                        $$refpar{'radiotype'} = 'zero_or_one';   # a bit better choice
+                    }
+		}
+                if ($qtype eq 'group') {
+                    $$refpar{'grouptype'} =
+                        ($$refpar{'grouptype'} == 1 ? 'one_or_more' : 'zero_or_more');
+                    unless ($$refpar{'nested'}) {
+                        &warning ("Group-parameter $$refpar{'qid'} without any sub-parameters.");
+                        $$refpar{'grouptype'} = 'zero_or_one';   # play it save
+                    }
+		}
+                    
+                if ($qtype eq 'range') {
+		    # copy hardXXX into scaleXXX
+		    $$refpar{'scalemin'} = $$refpar{'hardmin'} if defined $$refpar{'hardmin'};
+		    $$refpar{'scalemax'} = $$refpar{'hardmax'} if defined $$refpar{'hardmax'};
+
+		    # create 'format' (depending on 'numtype' which can be int or float)
+		    $$refpar{'format'} = ${$$refpar{'options'}}{'format'};
+                    unless (defined $$refpar{'format'}) {
+                        if ($$refpar{'numformat'} eq 'int') {
+                            $$refpar{'format'} = '%d';
+			} elsif ($$refpar{'numformat'} eq 'float') {
+			    my ($dec_digits) = $$refpar{'scaleinc'} =~ /\.(\d+)/;
+			    my ($precision) = $$refpar{'precision'};
+			    my ($format) = '%';
+                            $format .= ($precision+1) if $precision > 0;
+                            $format .= '.' . length ($dec_digits) if length ($dec_digits) > 0;
+			    $$refpar{'format'} = $format . 'f';
+			}
+		    }
+
+                    # assign a BSA type
+		    unless (defined ${$$refpar{'options'}}{'bsa_type'}) {
+                        if ($$refpar{'numformat'} eq 'int') {
+			    ${$$refpar{'options'}}{'bsa_type'} = 'long';
+		        }
+                        if ($$refpar{'numformat'} eq 'float') {
+			    ${$$refpar{'options'}}{'bsa_type'} = 'float';
+		        }
+                    }
+
+		    delete $$refpar{'numformat'};
+		    delete $$refpar{'precision'};
+		    delete ${$$refpar{'options'}}{'format'};
+		}
+
+                # --- acd parser might have put list information into a 'rawlist',
+                #     we need to make a 'lists' from it
+                if ($qtype eq 'text' and defined $$refpar{'rawlist'}) {
+                    my ($item);
+                    foreach $item (@{$$refpar{'rawlist'}}) {
+                        $$item{'level'} = '0';
+                    }
+                    $$refpar{'lists'} = [ { 'name'  => $$refpar{'header'},
+                                            'type'  => 'full',
+                                            'items' => $$refpar{'rawlist'} } ];
+                    $$refpar{'readonly'} = 'true';
+
+                    # make sure that the default value is one of the list-values,
+                    # and not the one from the list-shown_as's
+                    # (at the moment of writting this happens only for programs
+                    #  'emma' and 'dbiblast')
+                    if (defined $$refpar{'default'}) {
+                        foreach my $item (@{$$refpar{'rawlist'}}) {
+                           last if $$item{'value'} eq $$refpar{'default'};  # OK, default is equal to a list value
+                           if ($$item{'shown_as'} eq $$refpar{'default'}) { # if default is equal to 'shown_as' value
+                               $$refpar{'default'} = $$item{'value'};       # then replace the default
+                               last;
+                           }
+                        }
+                    }
+                }
+
+                if ($$refpar{'qtype'} eq 'file') {
+
+                    # create 'iotype' according to 'filetype',
+                    # also for output file with default value "STDOUT" we change the 'filetype'
+                    my ($filetype) = $$refpar{'filetype'};
+                    if ((!$filetype) || ($filetype =~ /stdin|input/i)) {
+                        if ($$refpar{'default'} =~ /^\s*stdin\s*$/i) {
+		            $$refpar{'iotype'} = $$refpar{'filetype'} = 'stdin';
+			    delete $$refpar{'default'};
+			} else {
+			    $$refpar{'iotype'} = 'input';
+			}
+		    } else {
+                        if ($$refpar{'default'} =~ /^\s*stdout\s*$/i) {
+		            $$refpar{'iotype'} = $$refpar{'filetype'} = 'stdout';
+                        } elsif ($$refpar{'default'} =~ /^\s*stderr\s*$/i) {
+		            $$refpar{'iotype'} = $$refpar{'filetype'} = 'stderr';
+                        } else {
+		            $$refpar{'iotype'} = 'output';
+                        }
+		    }
+
+#                     # access to the input files should be protected by a file evaluator
+#                     # (see details in ${APPLAB_HOME}/run/ALEvaluatorFiles)
+#                     if ($$refpar{'iotype'} eq 'input') {
+# 			if (&is ($app{'options'}->{'emboss'})) {
+# 			    push (@{$$refpar{'condition'}},
+# 				  { 'evaluator' => ($Cfg::FILE_EVALUATOR ? $Cfg::FILE_EVALUATOR : 'EmbossEvaluatorFiles'),
+# 				    'options' => { 'filename' => 'true' } });
+# 			    &check_conditions ($refpar, undef);
+
+# 			# ...and for non-emboss apps only if cfg asks for it
+# 			} elsif ($Cfg::FILE_EVALUATOR) {
+# 			    push (@{$$refpar{'condition'}},
+# 				  { 'evaluator' => $Cfg::FILE_EVALUATOR,
+# 				    'options' => { 'filename' => 'true' } });
+# 			    &check_conditions ($refpar, undef);
+# 			}
+
+#                     }
+
+                    # by default an output file is not displayed unless asked for it in
+                    # option 'display' (this is the opposite to all other parameters)
+                    if ($$refpar{'iotype'} =~ /output|stdout|stderr/) {
+                        $$refpar{'nodisplay'} = (&is (${$$refpar{'options'}}{'display'}) ? 'false' : 'true');
+
+                        # an output file, which is not displayed, should not be mandatory
+                        $$refpar{'answer'} = (&is ($$refpar{'nodisplay'}) ? 'false' : 'true');
+		    }
+
+                    # ignore empty result files
+#                     $$refpar{'ignore_empty'} = 'true';
+# 	            &addOptions ($refpar, 'options', [ 'ignore_empty' ]);
+
+                    # make default 'extension' from 'filter'
+                    if (!$$refpar{'extension'} and $$refpar{'filter'}) {
+	                ($$refpar{'extension'}) = $$refpar{'filter'} =~ /\*\.(\w+)/;
+                    }
+
+		    # for input data representig a filelist we need to add
+		    # few new options:
+		    #    - to read it only as a direct data or as filename, and
+		    #    - to add a specific input adapter
+		    # the default combinations (used when there is no input
+		    # adapter already defined in the options) are:
+		    #    * for EMBOSS applications use InputManyFilesCS adapter
+		    #      which creates a comma-separated list of files, and this
+		    #      list is then used directly on the command-line - which
+		    #      means we need to 'pretend' that the list is a filename
+		    #      (eventhough it is not) otherwise Applab would put the
+		    #      list into its own file as it treats all direct data
+		    #    * for non-EMBOSS applications use InputManyFiles, and
+		    #      treat it as a direct data (so the list will be stored
+		    #      by Applab into a file and this new file name will be
+		    #      put on the command-line
+		    #    * for non-EMBOSS applications using LSF launcher
+		    #      we need slightly different input adapter (it varies in
+		    #      the place where temporary files will be created)
+                    if ($$refpar{'iotype'} eq 'input') {
+			if ($refpar->{'datatype'} eq 'filelist') {
+			    unless ($refpar->{'options'}->{'input_adaptor'}) {
+				if (&is ($app{'options'}->{'emboss'})) {
+				    $refpar->{'options'}->{'data'} = 'filename';
+				    $refpar->{'options'}->{'input_adaptor'} = 'org.soaplab.services.adaptor.InputManyFiles';
+				} elsif ($RememberedLauncher =~ /LSF/) {
+				    $refpar->{'options'}->{'data'} = 'direct';
+				    $refpar->{'options'}->{'input_adaptor'} = 'embl.ebi.EmbossServer.InputManyFilesHome';
+				} else {
+				    $refpar->{'options'}->{'data'} = 'direct';
+				    $refpar->{'options'}->{'input_adaptor'} = 'org.soaplab.services.adaptor.InputManyFiles';
+				}
+			    }
+			}
+		    }
+
+                    # default for 'datatype' and move 'datatype' into 'options'
+		    $$refpar{'datatype'} = 'bindata' if &is ($refpar->{'options'}->{'bindata'});
+                    $$refpar{'datatype'} = 'gendata' unless $$refpar{'datatype'};
+		    &addOptions ($refpar, 'options', ['datatype']);
+		    delete $refpar->{'options'}->{'bindata'};   # clean-up
+
+                    # 'format' tells us how this param can be shown on the screen
+                    # (let's make an 'ioformat' from it)
+                    if ($$refpar{'iotype'} eq 'input') {
+                        my ($fformat) = $$refpar{'format'};
+                        $fformat = $refpar->{'options'}->{'data'} unless $fformat;
+                        if ($fformat =~ /direct/i and $fformat =~ /filename/i) {
+                            $$refpar{'ioformat'} = 'unspecified';
+		        } elsif ($fformat =~ /direct/i) {
+                            $$refpar{'ioformat'} = 'direct';
+                            ${$$refpar{'options'}}{'default_for_direct'} = 1;
+		        } elsif ($fformat =~ /filename/i) {
+                            $$refpar{'ioformat'} = 'url';
+                            delete ${$$refpar{'options'}}{'default_for_direct'};
+		        }
+                        $$refpar{'ioformat'} = 'unspecified' unless $$refpar{'ioformat'};
+                    }
+                    delete $$refpar{'format'};   # clean-up
+		    delete ${$$refpar{'options'}}{'data'};
+
+                    # make a list of expected results (for each output file)
+                    if ($$refpar{'iotype'} =~ /output|stdout|stderr/) {
+
+			# add the missing 'type' in graphical output
+			if (defined $refpar->{'options'}->{'output_type'}) {
+			    $refpar->{'options'}->{'bsa_type'} = $refpar->{'options'}->{'output_type'}
+			}
+
+			my (@results, $i);
+                        my ($make_result) = ${$$refpar{'options'}}{'make_result'};
+                        if (not $make_result or &is ($make_result)) {
+
+			    my ($r_names)    = &cut_list_to_pieces (${$$refpar{'options'}}{'output_name'},    ",");
+                            my ($r_types)    = &cut_list_to_pieces (${$$refpar{'options'}}{'output_type'},    ",");
+                            my ($r_adaptors) = &cut_list_to_pieces (${$$refpar{'options'}}{'output_adaptor'}, ",");
+
+                            $$r_names[0] = $$refpar{'qid'} if $#$r_names < 0;
+                            foreach $i (0..$#$r_names) {
+			        my (%result);
+			        $result{'name'} = ($$r_names[$i] ? $$r_names[$i] : $$refpar{'qid'}."_".($i+1));
+			        $result{'type'} = ($$r_types[$i] ? $$r_types[$i] :
+                                                   (${$$refpar{'options'}}{'datatype'} =~ /bindata/ ? 'byte[]' :'string'));
+			        $result{'adaptor'} = $$r_adaptors[$i] if $$r_adaptors[$i];
+                                $result{'options'} = &result_options ($refpar, $result{'name'});
+                                push (@results, \%result);
+			    }
+                        }
+                         if (&is ( ${$$refpar{'options'}}{'make_info'} )) {
+			        my (%result);
+			        $result{'name'} = $$refpar{'qid'} . '_info';
+			        $result{'type'} = 'IDL:omg.org/DsLSRAnalysis/StringList:1.0';
+                                if ( ${$$refpar{'options'}}{'info_adaptor'} ) {
+                                    $result{'adaptor'} = ${$$refpar{'options'}}{'info_adaptor'};
+                                }
+                                $result{'special_type'} = 'info';
+                                $result{'options'} = &result_options ($refpar, $result{'name'});
+                                push (@results, \%result);
+			}
+			# make_url always present unless it is specifically disabled
+                        if ( (not defined ${$$refpar{'options'}}{'make_url'}) or
+			     (&is ( ${$$refpar{'options'}}{'make_url'} )) ) {
+			        my (%result);
+			        $result{'name'} = $$refpar{'qid'} . '_url';
+			        if ( ${$$refpar{'options'}}{'output_type'} eq 'byte[][]') {
+                      $result{'type'} = 'String[]';
+                    } else {
+			          $result{'type'} = 'string';
+                    }
+                                if ( ${$$refpar{'options'}}{'url_adaptor'} ) {
+                                    $result{'adaptor'} = ${$$refpar{'options'}}{'url_adaptor'};
+                                }
+                                $result{'special_type'} = 'url';
+                                $result{'options'} = &result_options ($refpar, $result{'name'});
+
+#                                 # -- for graphical outputs to be prepared as a remote URL
+#                                 #    we want to have our own data viewer script to do it
+# 				if (&is ($refpar->{'emboss_graph'})) {
+# 				    $result{'options'} = {} unless defined $result{'options'};
+# 				    ${$result{'options'}}{'DATAVIEWER'} = 'EmbossDataViewer';
+# 				} else {
+# 				    # at least fix the bug in AppLab where DATAVIEWER option
+# 				    # is expected in upper-case
+# 				    if ($result{'options'}->{'dataviewer'}) {
+# 					$result{'options'}->{'DATAVIEWER'} = $result{'options'}->{'dataviewer'};
+# 					delete $result{'options'}->{'dataviewer'};
+# 				    }
+# 				}
+
+                                push (@results, \%result);
+			}
+                        if (&is ( ${$$refpar{'options'}}{'make_raw'} )) {
+			        my (%result);
+			        $result{'name'} = $$refpar{'qid'} . '_raw';
+			        $result{'type'} = 'string';
+                                push (@results, \%result);
+			}
+                        $$refpar{'results'} = \@results;
+
+                        delete ${$$refpar{'options'}}{'make_result'};
+                        delete ${$$refpar{'options'}}{'output_type'};
+                        delete ${$$refpar{'options'}}{'output_name'};
+                        delete ${$$refpar{'options'}}{'output_adaptor'};
+                        delete ${$$refpar{'options'}}{'make_info'};
+                        delete ${$$refpar{'options'}}{'info_adaptor'};
+                        delete ${$$refpar{'options'}}{'make_url'};
+                        delete ${$$refpar{'options'}}{'url_adaptor'};
+                        delete ${$$refpar{'options'}}{'make_raw'};
+		    }
+		}
+
+                # copy static lists into 'lists' structure
+                my (@lists);   # here we build an array of available lists
+
+                my ($list, $listV, $sn, $listX, $listsepX, $listXV, @sn);
+                my ($r_array_list, $r_array_value, $hierarchy, $listtitle);
+
+                # --- first do it for the main 'list'
+		$list = $$refpar{'list'};
+                if ($list) {    # for list names (they will be shown in a list)
+                    $r_array_list = &cut_list_to_pieces ($list, $$refpar{'listseparator'});
+
+		    $listV = $$refpar{'listvalue'};
+                    if ($listV) {    # for list values (they will be used when corresponding name selected)
+                        $r_array_value = &cut_list_to_pieces ($listV, $$refpar{'listseparator'});
+		    }
+                    if (defined $$refpar{'options'}) {
+                        $hierarchy = ${$$refpar{'options'}}{'hierarchy'};
+                        $listtitle = ${$$refpar{'options'}}{'listtitle'};
+                        delete ${$$refpar{'options'}}{'hierarchy'};   # clean-up
+                        delete ${$$refpar{'options'}}{'listtitle'};
+                    }
+                    push (@lists, &create_one_list (0,
+                                                    $r_array_list,
+                                                    $r_array_value,
+                                                    $hierarchy,
+                                                    $listtitle));
+		}
+                delete $$refpar{'listseparator'};   # clean-up
+                delete $$refpar{'list'};
+                delete $$refpar{'listvalue'};
+
+                # --- then do similarly for numbered lists (used for printf slices)
+                if (defined $$refpar{'options'}) {
+                    @sn = map (/^list(\d+)/i, grep (/^list\d+$/i, keys %{$$refpar{'options'}}));
+                    foreach $sn (@sn) {
+			undef $r_array_list, $r_array_value, $hierarchy, $listtitle;
+		        $listX = ${$$refpar{'options'}}{'list'.$sn};
+                        $listsepX = ${$$refpar{'options'}}{'listseparator'.$sn};
+                        if ($listX) {
+                            $r_array_list = &cut_list_to_pieces ($listX, $listsepX);
+                            $listXV = ${$$refpar{'options'}}{'listvalue'.$sn};
+                            if ($listXV) {
+                                $r_array_value = &cut_list_to_pieces ($listXV, $listsepX);
+			    }
+                            push (@lists, &create_one_list ($sn,
+                                                            $r_array_list,
+                                                            $r_array_value,
+                                                            ${$$refpar{'options'}}{'hierarchy'.$sn},
+                                                            ${$$refpar{'options'}}{'listtitle'.$sn}));
+		        }
+                        delete ${$$refpar{'options'}}{'list'.$sn};       # clean-up
+                        delete ${$$refpar{'options'}}{'listvalue'.$sn};
+                        delete ${$$refpar{'options'}}{'listseparator'.$sn};
+                        delete ${$$refpar{'options'}}{'hierarchy'.$sn};
+                        delete ${$$refpar{'options'}}{'listtitle'.$sn};
+                    }
+                }
+
+                # --- finally put the created array of lists into $$refpar
+		$$refpar{'lists'} = \@lists if @lists > 0;
+
+                # put together options etc. for repeatables
+                if ($qtype =~ /text|range|file|obj/) {
+		    my ($value) = $$refpar{'repeat'};
+                    my ($min, $max);
+                    if ($value) {
+                        ($min, $max) = split (/\s*,\s*/, $value, 2);
+                        $min =  0 unless defined $min;   $min += 0;
+                        $max = -1 unless defined $max;   $max += 0;
+                        $max = $min = 0 if ($max == 1 and $min == 1);
+                        $max = -1 if $max < -1;
+                        $min = 0 if $min < 0;
+		    } else {
+                        $min = 0;
+                        $max = 0;
+		    }
+                    $$refpar{'repeatmin'} = $min;
+                    $$refpar{'repeatmax'} = $max;
+                    delete $$refpar{'repeat'};   # clean-up
+
+                    # move options and styles related to repeating under a separate name ('repeatopt')
+                    &addOptions ($$refpar{'options'}, 'repeatopt', [ 'repeatprompt', 'repeaterror' ]);
+                    $$refpar{'repeatopt'} = ${$$refpar{'options'}}{'repeatopt'};
+                    delete ${$$refpar{'options'}}{'repeatopt'};
+
+                    &addOptions ($$refpar{'hints'}, 'repeatopt', [ 'repeatprompt', 'repeaterror' ]);
+                    my (%rephints) = %{${$$refpar{'hints'}}{'repeatopt'}};
+                    foreach $rep_hint (keys %rephints) {
+                        ${$$refpar{'repeatopt'}}{$rep_hint} = $rephints{$rep_hint};
+		    }
+                    delete ${$$refpar{'hints'}}{'repeatopt'};
+	        }
+
+                # substitute some shortcuts in a 'method' template
+                my ($method) = $$refpar{'method'};
+                if ($method) {
+                    $method =~ s/\$\$/'${' . $$refpar{'qid'} .'}'/eg;         # $$ => ${qid}
+                    $method =~ s/\$"\$"/'$"' . $$refpar{'qid'} .'"'/eg;       # $"$" => $"qid"
+                    $method =~ s/\$value/'${' . $$refpar{'qid'} .'}'/egi;     # $value => ${qid}
+                    $method =~ s/\$\{value\}/'${' . $$refpar{'qid'} .'}'/egi; # ${value} => ${qid}
+                    $method =~ s/(&&)|(\$name)|(\$\{name\})/$$refpar{'name'}/eg; # qualifier name
+		    $$refpar{'method'} = $method;
+		}
+
+#                # what is toggleable, could not be mandatory (I guess)
+#                $$refpar{'answer'} = 'false' if $$refpar{'toggle'};
+
+                # --- put together all options
+                &addOptions ($refpar, 'options', [ qw( checkneeded order envar
+                                                       specifyby   notag
+                                                      )]);
+                # --- put together layout/graphical hints
+                &addOptions ($refpar, 'hints', [ qw( toggle   toggledef nodisplay
+                                                     scalemin scalemax  scaleinc
+                                                     filter   noshow    readonly
+                                                     columns  dropdown
+                                                     title
+						    )]);
+
+                delete ${$$refpar{'options'}}{'display'};   # clean-up
+            });
+
+    # what is mandatory and what not
+    &do_q ( sub {
+                my ($refpar) = @_;
+
+#                # --- if there is an empty default value, it should be treated as optional
+#                if (exists $$refpar{'default'} and
+#                    ($$refpar{'default'} eq '' or $$refpar{'default'} == 0)) {
+#                   $$refpar{'answer'} = 'false';
+#                }
+                # --- if there is a default value, or of there is a 'nullok' option,
+		#     it should be treated as optional
+                if (exists $$refpar{'default'} or exists $$refpar{'nullok'}) {
+                   $$refpar{'answer'} = 'false';
+                }
+
+                # --- set 'answer' according to the section type
+                #     (the section type was set from 'required')
+                $$refpar{'answer'} = $in_req unless $$refpar{'answer'};
+
+                # --- and what should be in main and what in optional section
+                if (&is ($$refpar{'answer'}) != $in_req) {
+                    $$refpar{'inmain'} = ($in_req ? 'true' : 'false');
+#                     &addOptions ($refpar, 'hints', [ 'inmain' ]);
+		}
+            }, 'skip nested');
+
+    # --- set some remaining options
+    $app{'tagsepar'} = ' ' unless defined $app{'tagsepar'};
+
+    &do_q ( sub {
+                my ($refpar) = @_;
+                if ($$refpar{'qtype'} ne 'bool') {
+
+                    # --- propagate some app attributes to individual parameters
+		    unless ($$refpar{'defaults'}) {
+                        if (defined $app{'defaults'}) {
+                            $$refpar{'defaults'} = $app{'defaults'};
+			}
+#                         } else {
+#                             $$refpar{'defaults'} = $$refpar{'answer'};
+#                         }
+		    }
+		    unless ($$refpar{'tagsepar'} or $app{'tagsepar'} eq ' ') {
+                        $$refpar{'tagsepar'} = $app{'tagsepar'};
+		    }
+		  &addOptionsMaybe ($refpar, 'options', [ 'defaults', 'tagsepar' ]);
+	        }
+            }, 'skip nested');
+    delete $app{'tagsepar'};  # clean-up
+    delete $app{'defaults'};
+
+    print "\t(" . ($opt_c ? 'would be ' : '') . "generated into module $app{'module'})\n" if $opt_d;
+
+    # --- verbose (debugging) print
+    if ($opt_D) {
+        print "\tInternal structure: $app_name\n";
+        print "\tFrom: $app_config\n";
+        &print_it (0, 'app', \%app);
+        print "\n";
+    }
+
+    # --- finally generate the code
+    my ($created_file) = &gendoc unless $opt_c;
+
+    # --- collect some data from each analysis to be able
+    #     to create a list output with all of them
+    if (defined $created_file) {
+	my ($only_part) = $app{'description'};
+#	$only_part =~ s/[.\n].*//;   # take only until first period or newline
+	$only_part =~ s/\n/ /g;  # change newlines to spaces
+	$only_part =~ s/\s+/ /g;   # change consecutive whitespaces to one only
+
+	if ($opt_p) {
+	    my ($prefix) = $Cfg::ALXML;
+	    $created_file =~ s|\Q$prefix\E/?||;
+	    $created_file = "$opt_p/$created_file";
+	}
+
+	foreach $one_module (@$more_modules) {
+	    $prg_list{$one_module} = []
+		unless (defined $prg_list{$one_module});
+	    push (@{$prg_list{$one_module}},
+		  { name     => $app_name,
+		    class    => ${$app{'options'}}{'class'} || $Cfg::JOB || "sowa",
+		    xml      => $created_file,
+		    desc     => $only_part,
+		});
+	}
+    }
+}
+
+# --- and the very end...
+&genlist if $opt_l and not $opt_c;
+
+# --- verbose (debugging) print
+if ($opt_D and $opt_l) {
+    print "\tInternal structure: %prg_list\n";
+    &print_it (0, 'prg_list', \%prg_list);
+    print "\n";
+}
+
+# -----------------------------------------------------------------------------
+#
+# Subroutines for generating outputs.
+#
+# -----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
+# Generate an XML output (one output for every analysis). Return name of the
+# created file (we need it for option '-l').
+# -----------------------------------------------------------------------------
+sub gendoc {
+
+    # --- create some subdirectories (if necessary):
+    #     $Cfg::ALXML                <-- this directory MUST already exist
+    #         $app{'module'}         <-- this directory COULD already exist
+    my ($path) = "$Cfg::ALXML/$app{'module'}";
+    unless (-d $path) {
+        mkdir ($path, 0777) || die "Can't make a directory '$path' ($!).\n";
+    }
+
+    # --- create an XML output document
+    my ($file) = "${app_name}_al.xml";
+    $file = "${app_name}_bsa.xml" if $opt_b;
+    my ($doc) = &XMLOutput::create ($file);
+    return unless $doc;   # do not create empty files
+    $file = "$path/$file" unless &l::is_path_attached ($file);
+
+    # --- save the document into a file
+    open (OUTPUT, ">$file") || die "Can't create '$file' ($!)\n";
+    print OUTPUT $doc;
+    close OUTPUT;
+
+    print "\tCreated: $file\n" if $opt_d;
+    return $file;
+}
+
+# -----------------------------------------------------------------------------
+# Generate a list of analysis for whose XML outputs were generated.
+# The generated data are taken from global '%prg_list' - its contents can be
+# seen/printed by using '-D' option.
+#
+# The output file name is given by $opt_l (prefixed possibly with a path
+# $Cfg::ALXML if it has no attached path yet).
+# -----------------------------------------------------------------------------
+sub genlist {
+
+    # --- create an XML output document
+    my ($doc) = &XMLOutput::create_list;
+    return unless $doc;   # do not create empty files
+
+    # --- save the document into a file
+    my ($file) = $opt_l;
+    $file = "$Cfg::ALXML/$file" unless &l::is_path_attached ($file);
+    open (OUTPUT, ">$file") || die "Can't create '$file' ($!)\n";
+    print OUTPUT $doc;
+    close OUTPUT;
+
+    print "Created: $file\n" if $opt_d;
+}
+
+# -----------------------------------------------------------------------------
+#
+# Each parameter may have a 'calculated_XXX' option. Keep only those
+# who would be understandable to the Substitutor (a class in AppLab server).
+# Still more TBD here...
+#
+# -----------------------------------------------------------------------------
+sub calculated {
+    my ($refpar) = @_;
+    local ($_);
+    my ($key);
+    my (@calculated_keys) = grep (/^calculated_/, keys %{$$refpar{'options'}});
+    foreach $key (@calculated_keys) {
+	$_ = ${$$refpar{'options'}}{$key};
+        s/^\@\s*\(\s*(.*)\s*\)\s*$/$1/;    # remove '@(' ... ')'
+        s/\$\(([^)]+)\)/\${$1}/g;          # replace $(nnn) by ${nnn}
+        ${$$refpar{'options'}}{$key} = $_;
+    }
+}
+
+
+# -----------------------------------------------------------------------------
+#
+# Subroutines for messages
+#
+# -----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
+# General warning message
+# -----------------------------------------------------------------------------
+sub warning {
+    my ($msg) = @_;
+    print "[$app_name] " unless $opt_d or not $app_name;
+    print "Warning: $msg\n";
+}
+
+# -----------------------------------------------------------------------------
+# Warning about a substitution (active only in verbose mode)
+# -----------------------------------------------------------------------------
+sub warn {
+    my ($where, $msg, $subs_by) = @_;
+    &warning ("Error in a $where directive: $msg. Substituted by '$subs_by'.") if $opt_d;
+}
+
+# -----------------------------------------------------------------------------
+# Recursively print a hierarchical data structure.
+# -----------------------------------------------------------------------------
+sub print_it {
+    my ($level) = shift;
+    my ($sugar) = shift;
+    local ($_);
+    my ($i, $ref, $val);
+    $_ = ref (@_[0]);
+
+  SWITCH: {
+      if (!$_) {
+          print "   " x $level . "$sugar: @_[0]\n"; 
+          last SWITCH;
+      }
+      $ref = $_[0];
+      my ($xxx) = sprintf '%s', $ref;
+      $xxx =~ s/\(.*\)$//;    # remove: (hex-dig)
+      print "   " x $level . "$sugar: $xxx\n";
+      $level++;
+      if (/SCALAR/) {
+          &print_it ($level, $sugar, $$ref); 
+          last SWITCH;
+      }
+      if (/HASH/) {
+          foreach $i (sort keys %$ref) {
+              $val = $$ref{$i};
+              &print_it ($level, $i, $val);
+	  }
+	  last SWITCH;
+      }
+      if (/ARRAY/) {
+          for $i (0..@$ref-1) {
+              $val = $$ref[$i]; 
+              &print_it ($level, $i, $val);
+	  }
+	  last SWITCH;
+      }
+
+  }
+}
+# -----------------------------------------------------------------------------
+# Recursively clone a hierarchical data structure.
+# -----------------------------------------------------------------------------
+sub clone_it {
+    local ($_);
+    $_ = ref (@_[0]);      # $_ is an element to be cloned and returned
+
+    if (!$_) {
+	return @_[0];   # it is not a reference: returned it without cloning it
+    }
+    my ($ref) = $_[0];
+    if (/SCALAR/) {
+	my ($new_scalar) = $$ref;
+	return \$new_scalar;
+    }
+    if (/HASH/) {
+	my (%new_hash, $i);
+	foreach $i (keys %$ref) {
+	    $new_hash{$i} = &clone_it ($$ref{$i});
+	}
+	return \%new_hash;
+    }
+    if (/ARRAY/) {
+	my (@new_array, $i);
+	for $i (@$ref) {
+	    push (@new_array, &clone_it ($i));
+	}
+	return \@new_array;
+    }
+    return $ref;   # for REF, for example
+}
+
+# -----------------------------------------------------------------------------
+#
+# Other subroutines
+#
+# -----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
+# Go through all sections and for each section call a subroutine whose
+# reference is given in $do_s_subref, passing it a reference to the current
+# section as a parameter.
+# -----------------------------------------------------------------------------
+sub do_s {
+    my ($do_s_subref) = @_;
+    my ($sect);
+    foreach $sect (@{$app{'sections'}}) {
+	&$do_s_subref ($sect);
+    }
+}
+
+# -----------------------------------------------------------------------------
+# Go through all sections and for each qualifier execute a subroutine whose
+# reference is given in $do_q_subref, passing it a reference to the current
+# qualifier as a parameter.
+# -----------------------------------------------------------------------------
+sub do_q {
+    local ($do_q_subref, $skip_nested) = @_;
+    &do_s ( sub {
+	        my ($refsec) = @_;
+                $in_req = 1;
+                &_do_q (@{$$refsec{'mainq'}});
+                $in_req = 0;
+                &_do_q (@{$$refsec{'optq'}});
+	    });
+}
+
+sub _do_q {
+    my (@qref) = @_;
+    local ($_);
+    foreach (@qref) {
+        next unless $$_{'qtype'};
+        &$do_q_subref ($_);
+        if (${$_}{'nested'} && !$skip_nested) {
+            &_do_q (@{${$_}{'nested'}});
+        }
+    }
+}
+
+# --- and similar for layout hints (they do not have nested elements)
+
+sub do_h {
+    local ($do_h_subref) = @_;
+    &do_s ( sub {
+	        my ($refsec) = @_;
+                $in_req = 1;
+                &_do_h (@{$$refsec{'mainq'}});
+                $in_req = 0;
+                &_do_h (@{$$refsec{'optq'}});
+	    });
+}
+
+sub _do_h {
+    my (@href) = @_;
+    local ($_);
+    foreach (@href) {
+        next unless $$_{'htype'};
+        &$do_h_subref ($_);
+    }
+}
+
+# -----------------------------------------------------------------------------
+# returns 1 or 0, depending on the given parameter
+# -----------------------------------------------------------------------------
+sub is {
+    local ($_) = @_;
+    return (/\+|1|yes|true/i ? 1 : 0);
+}
+
+# -----------------------------------------------------------------------------
+# locate various items
+# -----------------------------------------------------------------------------
+sub find_sect {     # return a reference to the found section
+    my ($id) = @_;
+    my ($sect);
+    foreach $sect (@{$app{'sections'}}) {
+        return $sect if "\L$$sect{'id'}" eq "\L$id";
+    }
+    return undef;
+}
+
+sub find_event {    # find an event in a given section (given by reference)
+    my ($refsect, $id) = @_;
+    return undef unless defined $refsect;
+    my ($event);
+    foreach $event (@{$$refsect{'event'}}) {
+        return $event if "\L$$event{'id'}" eq "\L$id";
+    }
+    return undef;
+}
+
+sub find_qual_by_id {   # $id
+    local ($id) = @_;
+    local ($resultref);
+    &do_q ( sub {
+	        my ($refpar) = @_;
+                my ($qid) = $$refpar{'qid'};
+                $resultref = $refpar if "\L$qid" eq "\L$id";
+            });
+    return %$resultref;
+}
+
+# -----------------------------------------------------------------------------
+# Break $list into pieces. The pieces are separated by $listsep (or a default
+# is used when $listsep is not given). Return a reference to an array of the
+# found pieces. (Because leading and trailing whitespaces are always trimmed,
+# use \s instead to keep them.)
+# -----------------------------------------------------------------------------
+sub cut_list_to_pieces {
+    my ($list, $listsep) = @_;
+    $list =~ s/\\n/\n/g;
+    $list =~ s/\\t/\t/g;
+    if ($listsep) {
+	$listsep =~ s/\\n/\n/g;
+	$listsep =~ s/\\s/ /g;
+	$listsep =~ s/\\t/\t/g;
+    } else {  # default separator is \n or space
+	$listsep = ($list =~ /\n/ ? "\n" : ' ');
+    }
+    $listsep =~ s/[.*?+\[\]|]/\\$&/g;   # because of usage in regexp later
+    my ($rlist) = [ split (/$listsep/, $list) ];
+    map { s/^\s*//; s/\s*$//; s/\\s/ /g; } @{$rlist};
+    return $rlist;
+}
+
+# -----------------------------------------------------------------------------
+# Create a hash defining a 'list' of possible values for a parameter, and return
+# a reference to this hash. The input data are:
+#    $slice_num ... if zero this is a main list, otherwise a 'slice' list,
+#    $r_list    ... an array of the list values, unless there is non-empty
+#                   $r_value
+#    $r_value   ... if present then it represents a real value of the created
+#                   list and $r)list are just "shown_as" values
+#    $hierarchy ... a character which may appear at the beginning of some
+#                   elements in $r_list to indicate nesting of values
+#    $listtitle ... guess what it is
+# -----------------------------------------------------------------------------
+sub create_one_list {
+    my ($slice_num, $r_list, $r_value, $hierarchy, $listtitle) = @_;
+    my (%list);
+    $list{'name'} = $listtitle if $listtitle;
+    $list{'type'} = ($slice_num > 0 ? 'slice' : 'full');
+    $list{'slice'} = $slice_num if $slice_num > 0;
+    my ($i, @items);
+    if ($r_value) {
+	foreach $i (0..$#{$r_list}) {
+            push (@items, &create_one_item ($$r_list[$i], $$r_value[$i], $hierarchy));
+	}
+    } else {
+	foreach $i (0..$#{$r_list}) {
+#            push (@items, &create_one_item ($$r_list[$i], 0, $hierarchy));
+            push (@items, &create_one_item ($$r_list[$i], undef, $hierarchy));
+	}
+    }
+
+    # --- we need to assign 'node' type for inner list items
+    my ($r_item, $r_next_item);
+    foreach $i (0..$#items - 1) {
+        $r_item = $items[$i];
+        $r_next_item = $items[$i+1];
+        if ($$r_item{'level'} < $$r_next_item{'level'}) {
+            $$r_item{'type'} = 'node';
+	}
+    }
+
+    $list{'items'} = \@items;
+    return \%list;
+}
+
+sub create_one_item {
+    my ($list, $listvalue, $hierarchy) = @_;
+
+    # --- to be able to use it in regexp without worries
+    $hierarchy =~ s/(.)/\\$1/g;
+
+    # --- find how deeply this item should be nested
+    my ($level) = 0;
+    if ($hierarchy) {
+        $level++ while ($list =~ s/^$hierarchy//);
+    }
+
+    # --- this may be only a separator (but still properly nested)
+    return { 'level' => $level,
+             'type'  => 'separator' } if $list eq '-';
+
+    # --- ...or a regular list item
+    return { 'level'    => $level,
+	     'value'    => $listvalue,
+             'shown_as' => $list }   if defined $listvalue;
+    return { 'level'    => $level,
+	     'value'    => $list };
+}
+
+# -----------------------------------------------------------------------------
+# Add to (or create if does not exist yet) a list of options. '$rhash' is a 
+# reference to a hash table where contents of key defined in '$name' is
+# updated by keys defined in an array referenced by '$rlist'. Values for these
+# keys are taken from the same $rhash where they are eventually removed from.
+# -----------------------------------------------------------------------------
+sub addOptions {
+    my ($rhash, $name, $rlist) = @_;
+    $$rhash{$name} = {} unless defined $$rhash{$name};  # create if not existent
+    my ($rhopts) = $$rhash{$name};  # into this hash we want to add new options
+
+    my ($key, $value);
+    foreach $key (@$rlist) {
+        $value = $$rhash{$key};
+	$$rhopts{$key} = $value if $value;
+        delete $$rhash{$key};
+    }
+}
+
+# --- add only not-yet-existing options
+sub addOptionsMaybe {
+    my ($rhash, $name, $rlist) = @_;
+    $$rhash{$name} = {} unless defined $$rhash{$name};  # create if not existent
+    my ($rhopts) = $$rhash{$name};  # into this hash we want to add new options
+
+    my ($key, $value);
+    foreach $key (@$rlist) {
+        unless ($$rhopts{$key}) {
+            $value = $$rhash{$key};
+	    $$rhopts{$key} = $value if $value;
+	}
+        delete $$rhash{$key};
+    }
+}
+
+# --- from parameter's options extract options related to the result 'name'
+#     and return them as a hash
+#     (The current implementation is not too clever - it does not use 'name'
+#     - it simply takes all options starting with 'result_' always, and it
+#     does not delete copied options from parameter's options either.)
+sub result_options {
+    my ($refpar, $name) = @_;
+    my (%ret);
+    my (%options) = %{$$refpar{'options'}};
+    foreach (keys %options) {
+        if (/^result_/i) {
+            $ret{$'} = $options{$_};   # remove prefix 'result_' from option name
+        }
+    }
+    return \%ret;
+}
+#'
+
+# -----------------------------------------------------------------------------
+# Available sequence formats
+# -----------------------------------------------------------------------------
+sub input_seq_format_names {
+    # return qw( gcg gcg8 embl swiss fasta ncbi genbank nbrf pir
+    # 	       codata strider clustal phylip acedb msf jackknifer
+    # 	       jackknifernon nexus nexusnon treecon mega meganon
+    # 	       ig staden text raw
+    # 	       );
+    return qw( abi ace acedb bam biomart clustal codata dbid embl ensembl experiment fasta fastq fastq-illumina fastq-sanger fastq-solexa fitch gcg genbank genpept gff2 gff3 gifasta hennig86 ig igstrict jackknifer mase mega msf nbrf nexus pdb pdbnuc pdbnucseq pdbseq pearson phylip phylipnon raw refseqp sam selex staden stockholm strider swiss text treecon );
+}
+
+sub output_seq_format_names {
+    # return qw( gcg gcg8 embl swiss fasta ncbi genbank nbrf pir
+    # 	       codata strider clustal phylip acedb msf jackknifer
+    # 	       jackknifernon nexus nexusnon treecon mega meganon
+    # 	       ig staden text raw
+    # 	       );
+
+    return qw( acedb asn1 bam clustal codata das dasdna embl experiment fasta fastq-illumina fastq-sanger fastq-solexa fitch gcg genbank genpept gff2 gff3 gifasta hennig86 ig jackknifer jackknifernon mase mega meganon msf nbrf ncbi nexus nexusnon phylip phylipnon pir raw refseq refseqp sam selex staden strider swiss text treecon );
+}
+
+sub seq_formats {
+    my (@formats) = @_;
+    local ($_);
+#    my (@formats) = &input_seq_format_names;
+    my (@list);
+    foreach (@formats) {
+	push (@list, { 'level' => 0, 'value' => $_  });
+    }
+    return \@list;
+}
+
+# -----------------------------------------------------------------------------
+# Available output formats for features
+# -----------------------------------------------------------------------------
+sub featout_format_names {
+    return qw( gff gff2 embl genbank ddbj pir swiss dasgff );
+}
+
+sub featout_formats {
+    local ($_);
+    my (@formats) = &featout_format_names;
+    my (@list);
+    foreach (@formats) {
+	push (@list, { 'level' => 0, 'value' => $_  });
+    }
+    return \@list;
+}
+
+# -----------------------------------------------------------------------------
+# Available graphical formats
+#    'supported_graph_outputs' returns an array of hashes, each of them defines
+#       attributes for one graphical result. Each such result will be represented
+#       as a separate output file. 'markup' is a word which will appear on the
+#       analysis command line and will be replaced by EmbossLauncher by a real
+#       qualifier (or removed completely if user does not ask for this particular
+#       graphical output).
+#    'supported_graph_formats' returns a list suitable for building a dropdown
+#       menu with all possible graphical formats.
+#    Note that there may be more 'formats' than 'outputs' (eg. both 'postscript'
+#    and 'colourps' will be treated as the same output).
+# -----------------------------------------------------------------------------
+sub supported_graph_outputs {
+    return (
+	    { 'output_name' => 'Graphics_in_Postscript',     # name of the result
+	      'output_type' => 'string',                     # BSA-compatible type
+              'markup'      => 'POSTSCRIPT',                 # for EmboosLauncher
+	      'remote_url'  => 'true',                       # generate 'make_url' option
+	      'mimetype'    => 'application/postscript',     # mime type
+	  },
+#	    { 'output_name' => 'Graphics',
+#	      'output_type' => 'byte[]',
+#              'markup'      => 'HPGL',
+#	      'remote_url'  => 'true',
+#	  },
+	    { 'output_name' => 'Graphics_in_PNG',
+	      'output_type' => 'byte[][]',
+              'markup'      => 'PNG',
+	      'remote_url'  => 'true',
+	      'mimetype'    => 'image/png',
+	  }
+	    );
+}
+
+sub supported_graph_formats {
+    my (@formats) = ( # value        # shown_as
+		     'png'        => 'Portable Network Graphics (png)',
+		     'colourps'   => 'Postscript',
+#		     'postscript' => 'Postscript',
+#		     'colourps'   => 'Color Postscript',
+#		     'hpgl'       => 'HP Graphics Language (hpgl)',
+		     );
+    my (@list, $i);
+    $i = 0;
+    while ($i <= $#formats) {
+	push (@list, { 'level'    => 0,
+		       'value'    => $formats[$i],
+		       'shown_as' => $formats[$i+1],
+                     });
+	$i = $i + 2;
+    }
+    return \@list;
+}
+
+sub default_graph_format { return 'png'; }
+
+# -----------------------------------------------------------------------------
+# Conditions
+# -----------------------------------------------------------------------------
+sub check_verlevel {
+    my ($ref) = @_;  # hash whose 'verlevel' has to be checked and/or corrected
+    $$ref{'verlevel'} = "\L$$ref{'verlevel'}";
+    my ($value) = $$ref{'verlevel'};
+
+    # --- allowed values
+    my (%verlevels) = ( 'na'     => 1, 'none'    => 1,
+                        'silent' => 1, 'warning' => 1, 'abort' => 1 );
+
+    # --- set to default if empty
+    unless ($value) {
+        $$ref{'verlevel'} = 'abort';
+	return;
+    }
+
+    # --- check value
+    unless ($verlevels{"\L$value"}) {
+        &warn ('VERLEVEL', "unknown value '$value'", 'abort');
+        $$ref{'verlevel'} = 'abort';
+    }
+}
+
+sub check_owner {
+    my ($ref) = @_;  # hash whose 'owner' has to be checked and/or corrected
+    $$ref{'owner'} = "\L$$ref{'owner'}";
+    my ($value) = $$ref{'owner'};
+
+    # --- allowed values
+    my (%owners) = ( 'n_a' => 1, 'client' => 1, 'server' => 1 );
+
+    # --- set to default if empty
+    unless ($value) {
+        $$ref{'owner'} = 'n_a';
+	return;
+    }
+
+    # --- check value
+    unless ($owners{$value}) {
+        &warn ('OWNER', "unknown value '$value'", 'not-assigned');
+        $$ref{'owner'} = 'n_a';
+    }
+}
+
+sub check_conditions {
+    my ($rhash, $id) = @_;  # hash whose 'condition' has to be set and/or checked
+                            # $id is used for substituting $$'s in cond expressions
+    my ($ref) = $$rhash{'condition'};  # reference to an array of conditions
+
+    # --- set to empty array if no conditions specified
+    unless ($ref) {
+        $$rhash{'condition'} = [];
+	return;
+    }
+
+    # --- check all conditions one by one
+    my ($cond, $expr);
+    foreach $cond (@$ref) {
+        &check_owner ($cond);
+        &check_verlevel ($cond);
+        if (!$$cond{'evaluator'} and $app{'evaluator'}) {
+            $$cond{'evaluator'} = $app{'evaluator'};
+	}
+
+        # --- $$ => $qid, $value => $qid, ${value} => $qid
+        $expr = $$cond{'boolexp'};
+        if ($expr) {
+            $expr =~ s/(\$\$)|(\$value)|(\$\{value\})/'$' . $id/eg;
+	    $$cond{'boolexp'} = $expr;
+	}
+        $expr = $$cond{'regexp'};
+        if ($expr) {
+            $expr =~ s/(\$\$)|(\$value)|(\$\{value\})/'$' . $id/eg;
+	    $$cond{'regexp'} = $expr;
+	}
+    }
+}
+
+#------------------------------------------------------------------------------
+# Check/correct a module name (as it is in $::app{'module'}:
+#    - it takes only the first module name (separated by comma or semicolon)
+#    - it substitutes 'strange' characters (as spaces) by underscores
+#    - it replaces clusters of '\s*:\s*' with one undesrcore
+#      (this cluster may happen - see wosname -explode for explanation)
+#
+# Before overwritting 'module' store it in 'apptype' as a string, and also
+# in global 'more_modules' as an array (which makes sense if the module consists
+# of several module names separated by comma, or similar).
+#------------------------------------------------------------------------------
+sub check_module {
+    my ($opt_d) = @_;   # to print or not to print a warning message
+
+    $::app{'apptype'} = $::app{'module'};
+    $::app{'apptype'} =~ s/\s*:\s*/ /g;
+
+    # --- if more names (separated by commas, etc.) take just the first one
+    my (@modules) = split (/\s*[,;]\s*/, $::app{'module'});
+    local ($_);
+    foreach (@modules) {
+	s/\s*:\s*/_/g;
+	s/\W/_/g;
+	tr/A-Z/a-z/;
+	$_ = '_' . $_      # make sure that it starts with a letter  
+	    unless /^[a-zA-Z_]/;
+    }
+    $::app{'module'} = $modules[0];
+    $::more_modules = \@modules;
+}
+
+__END__
+

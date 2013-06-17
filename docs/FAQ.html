@@ -1,0 +1,329 @@
+<html> <head>
+<title>Soaplab2: FAQ</title>
+
+<link rel="shortcut icon" href="images/favicon.ico" >
+<link rel="icon" href="images/animated_favicon1.gif" type="image/gif" >
+<link rel="stylesheet" href="images/stylesheet.css" type="text/css">
+
+</head>
+
+<body>
+<h1>Frequently Asked Questions</h1>
+
+<img class="motto-img" src="images/motto-faqs.jpg" border=0 align="left"/>
+
+<div>
+<div class="motto">
+
+There are no stupid questions,<br>
+there may be only stupid answers...
+
+</div>
+<div class="motto-signature">[Tulak]</div>
+</div>
+
+<br clear="all"/>
+
+<h3>Questions</h3>
+
+<ul>
+  <li> <a href="#000">What license does the project use?</a>
+  <li> <a href="#001">What is <em>USA</em> in the EMBOSS services?</a>
+  <li> <a href="#002">I'm getting an error message that starts with
+          "<em>JAXB 2.0 API is being loaded from the bootstrap classloader</em>"</a>
+  <li> <a href="#003">I wish to deploy two or more versions of Soaplab services</a>
+  <li> <a href="#004">I'm getting "Unable to delete file" error message(s)
+          for files under my Soaplab web application directory when deploying Soaplab</a>
+  <li> <a href="#005">I try to find the right way to create boolean
+parameters (I mean parameter name without parameter value) in ACD
+format, but they don't appear in the report file when I run the
+service</a>
+  <li> <a href="#006">I'm getting "Report:No such file or directory" errors</a>
+  <li> <a href="#007">I'm getting "grammar is not specified" errors</a>
+  <li> <a href="#008">My application creates files with fixed names. How to deal with it in Soaplab?</a>
+</ul>
+<p>
+
+<h3>Answers</h3>
+
+<dl>
+
+  <!-- -------------------------------------------------- -->
+  <!--             Here starts a new answer               -->
+  <!-- -------------------------------------------------- -->
+  <dt> <a name="000"></a>
+       <img src="images/hpoint_right.gif" border=0/>
+       <span class="subtitle">What license does the project use?</span><p>
+
+  <dd><p>An <a href="LICENSE">Apache License, Version 2.0</a> <p>
+
+       
+  <!-- -------------------------------------------------- -->
+  <!--             Here starts a new answer               -->
+  <!-- -------------------------------------------------- -->
+  <dt> <a name="001"></a>
+       <img src="images/hpoint_right.gif" border=0/>
+       <span class="subtitle">What is <em>USA</em> in the EMBOSS services?</span><p>
+       
+  <dd><p><span class="small">[taken from the EMBOSS documentation]</span> The <a
+href="http://emboss.sourceforge.net/docs/themes/UniformSequenceAddress.html">Uniform
+Sequence Address</a>, or USA, is a standard sequence naming scheme
+used by all EMBOSS applications. The USA syntax has the following types:
+<pre>
+    * "file"
+    * "format::file"
+    * "format::file:entry"
+    * "dbname:entry"
+    * "@listfile"
+</pre>
+       
+Where "format" is the database format of a file ("file") you have
+provided and "entry" is the database entry code. Alternatively an
+entry can be retrieved from an installed database of format
+"dnmame". "listfile" is the name a file which itself contains a list
+of file names. <p>
+
+The "::" and ":" syntax is to allow, for example, "embl" and "pir" to
+be both database names and sequence formats.
+
+
+  <!-- -------------------------------------------------- -->
+  <!--             Here starts a new answer               -->
+  <!-- -------------------------------------------------- -->
+  <dt> <a name="002"></a>
+       <img src="images/hpoint_right.gif" border=0/>
+       <span class="subtitle">I'm getting an error message that starts with <em>"JAXB 2.0 API is being loaded from the bootstrap classloader</em>"</span>
+       
+  <dd>
+	<p>You are probably using an early version of Java6 (prior to
+	Java6-update4) that includes JAXB 2.0 API. If you upgrade your Java
+	installation to Java6-update5 (or to the latest version of Java-6)
+	this problem should be resolved since Java6-update4 and later releases
+	include the same version of JAXB API used by Soaplab, version 2.1. <em>This
+	problem should not happen when using Java5</em> since it doesn't include any
+	JAXB API by default.</p>
+	<p>If you do not want to upgrade to the latest Java6 you can use
+	the <a href="http://java.sun.com/j2se/1.5.0/docs/guide/standards/">
+	java endorsed mechanism</a>. You should simply copy <tt>jaxb-api-2.1.jar</tt>
+	and <tt>jaxws-api-2.1.jar</tt> files to your <tt>&lt;java-home&gt;/lib/endorsed</tt>
+	directory. Here <tt>&lt;java-home&gt;</tt> refers to the directory
+	where your Java runtime software is installed (which is the top-level
+	directory of your Java Runtime Environment installation or the <tt>jre</tt>
+	directory in your JDK installation). After you have installed Soaplab2
+	you can find <tt>jaxb-api-2.1.jar</tt> and <tt>jaxws-api-2.1.jar</tt>
+	files in your local maven repository, or in <tt>WEB-INF/lib</tt>
+	directory of your soaplab2 web application after you have called the <tt
+		class="script">ant jaxdeploy</tt> target. Since Tomcat by default sets
+	the <tt>java.endorsed.dirs</tt> property to <tt>${CATALINA_HOME}/common/endorsed</tt>
+	you need to copy these two jar files to this directory as well, for the
+	use of your Tomcat(Soaplab) server. Please note that <em>Soaplab2
+	was not tested on updates of Java6 earlier than update 4</em>.</p>
+	<!-- -------------------------------------------------- -->
+  <!--             Here starts a new answer               -->
+  <!-- -------------------------------------------------- -->
+  <dt> <a name="003"></a>
+       <img src="images/hpoint_right.gif" border=0/>
+       <span class="subtitle">I wish to deploy two or more versions of Soaplab services</span>
+       <p>
+       
+  <dd> Use the property <pn>context.name</pn>. Details in the <a
+href="Deployment.html">deployment guide</a>, here a brief example:
+
+<pre class="script">
+ant "-Dcontext.name=soaplab2-testing" jaxdeploy
+ant "-Dcontext.name=soaplab2-production" jaxdeploy
+</pre>
+
+       The above creates two web applications, accessible (assuming a
+Tomcat running on a localhost using a default port number) as
+<tt>http://localhost:8080/soaplab2-testing</tt> and
+<tt>http://localhost:8080/soaplab2-production</tt>. <p>
+
+       If you are deploying using the <em>axis1</em> protocol:
+
+       <pre class="script">
+ant "-Dcontext.name=soaplab2-testing" axis1deploy
+ant "-Dcontext.name=soaplab2-production" axis1deploy
+</pre>
+
+       then the URLs will be
+<tt>http://localhost:8080/soaplab2-testing-axis</tt> and
+<tt>http://localhost:8080/soaplab2-production-axis</tt>. <p>
+
+
+  <!-- -------------------------------------------------- -->
+  <!--             Here starts a new answer               -->
+  <!-- -------------------------------------------------- -->
+  <dt> <a name="004"></a>
+       <img src="images/hpoint_right.gif" border=0/>
+       <span class="subtitle">I'm getting "Unable to delete file" error message(s)
+        for files under my Soaplab web application directory when deploying Soaplab</span>
+       </dt>
+       
+  <dd>
+	<p>When deploying Soaplab web applications using Soaplab's ant
+	tasks the deploy tasks attempt to delete the existing web application
+	directory under your Tomcat's "webapps" directory in order to make
+	sure that Tomcat will use the files in the new war file but not the
+	files from the old web application directory. It is possible that while
+	the ant task is cleaning the existing web application directory some
+	files would be in use, causing the above errors. However in most cases
+	Tomcat are able to use the war file copied to its web application
+	directory successfully, even after the above file delete error messages.</p>
+  </dd>
+
+       
+  <!-- -------------------------------------------------- -->
+  <!--             Here starts a new answer               -->
+  <!-- -------------------------------------------------- -->
+  <dt> <a name="005"></a>
+       <img src="images/hpoint_right.gif" border=0/>
+       <span class="subtitle">I try to find the right way to create
+boolean parameters (I mean parameter name without parameter value) in
+ACD format.  But they don't appear in the report file when I run the
+service.</span><p>
+
+  <dd><p>
+       The boolean parameters are treated very similarly to other
+parameters, except that one can never send a boolean parameter with
+the false value (e.g. a construct known from some programs, such as
+"-I-"). Well, never say never: one actually <em>can</em> do it by
+using instead a string parameter and the <a
+href="MetadataGuide.html#general">template/method</a> parameter
+attribute - but that is not anymore a boolean parameter. <p>
+
+       Default values for boolean parameters are sent only when an ACD
+file explicitly asks for it by using parameter <tt>comment:
+default</tt> (more about it in <a
+href="MetadataGuide.html#default">How to use default values</a>). <p>
+
+       In which case (assuming that a user have not specified any
+value for a boolean parameter): the boolean parameter with the default
+value <tt>true</tt> is sent always, and the boolean parameter with the
+default value false, or without any default value, is not sent.
+
+       <p>
+
+  <!-- -------------------------------------------------- -->
+  <!--             Here starts a new answer               -->
+  <!-- -------------------------------------------------- -->
+  <dt> <a name="006"></a>
+      <img src="images/hpoint_right.gif" border=0/>
+      <span class="subtitle">I'm getting "Report:No such file or directory" errors</span>
+	<dd>
+     <p>
+       This error suggests that Soaplab server is not able to create temporary
+        files under your Tomcat's default temporary files folder. Check your
+        Tomcat's default temporary directory setting. You can change it using
+        the <tt>CATALINA_TMPDIR</tt> environment variable. The default value is
+        "<tt>$CATALINA_BASE/temp</tt>".
+        </p>
+	</dd>
+
+  <!-- -------------------------------------------------- -->
+  <!--             Here starts a new answer               -->
+  <!-- -------------------------------------------------- -->
+  <dt> <a name="007"></a>
+      <img src="images/hpoint_right.gif" border=0/>
+      <span class="subtitle">I'm getting "grammar is not specified" errors</span>
+    <dd>
+     <p>
+       This error happens when using ant tasks after enabling typed interface
+       on a wrongly configured Soaplab installation. Usually getWSDLfiles ant task is not able 
+       to load the analysis list file specified in your <tt>soaplab.properties file</tt>,
+       or any analysis list file were not defined at all.
+       This results in no XSD files generated that ant 'xjc' task can
+       process, so the above error is generated.
+       Solution: make sure you have at list one analysis list file defined
+       which includes at least one entry. If you still get the same error check that you have called
+       'ant gen' target, or 'ant genemboss' target if you are deploying EMBOSS services, and it has
+       generated XML service description files (also called metadata files) successfully.
+        </p>
+    </dd>
+
+
+  <!-- -------------------------------------------------- -->
+  <!--             Here starts a new answer               -->
+  <!-- -------------------------------------------------- -->
+  <dt> <a name="008"></a>
+      <img src="images/hpoint_right.gif" border=0/>
+      <span class="subtitle">My application creates files with fixed names. How to deal with it in Soaplab?</span>
+    <dd>
+
+     <p>Soaplab does not allow users to specify names of the output
+     files (the reasons are mostly because of the distributed
+     character of web services where the concept of "files" is
+     blurred; but also for some legacy reasons). Therefore, if an
+     application has to have fixed names (either hard-coded names or
+     names based on the value of other parameters) one must wrap the
+     application into a wrapper script. The acd file specifies this
+     wrapper as an executable. The wrapper maps the fixed names into
+     the names generated by Soaplab. The wrapper knows what names were
+     generated because it gets the full command line from the
+     Soaplab. </p>
+
+     <p>Here is an example - for the <a
+     href="http://pbil.univ-lyon1.fr/cap3.php"
+     target="_blank">cap3</a> program. The "cap3" program uses the
+     name of its input file as a prefix for several output file
+     names. The wrapper for cap3 program could use this command-line:</p>
+
+<pre class="code">
+cap3_wrapper
+     -I seq
+     -q seq.qual
+     -C seq.con
+
+     -A seq.cap.ace
+     -G seq.cap.contigs
+     -Q seq.cap.contigs.qual
+     -L seq.cap.contigs.links
+     -F seq.cap.info
+     -S seq.cap.singlets
+     -R seq.con.cap.results
+</pre>
+
+Where <tt>-I</tt> indicates the input file, and <tt>-A</tt>,
+<tt>-G</tt>, <tt>-Q</tt>, <tt>-L</tt>, <tt>-F</tt>, <tt>-S</tt>, and
+<tt>-R</tt> are all possible output files. The ACD file will reflect
+this command-line. For example, the first two outputs will be
+specified as:
+
+<pre class="code">
+...
+outfile: ace [
+  additional: "Y"
+  qualifier: "A"
+]
+
+outfile: contigs [
+  additional: "Y"
+  qualifier: "G"
+]
+...
+</pre>
+
+The full cap3 wrapper is available <a href="cap3.wrapper.pl.txt"
+target="_blank">here</a> (most of the code is a help message that is
+not really crucial).
+
+
+    </dd>
+
+</dl>
+
+<p>
+<iframe id="maintoc" src="TOC.html" scrolling="auto"></iframe>
+
+<div align=right><font size=-2>
+<!-- hhmts start -->
+Last modified: Wed Aug  4 12:51:53 2010
+<!-- hhmts end -->
+</font></div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1011961-1";
+urchinTracker();
+</script>
+</body> </html>

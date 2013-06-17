@@ -1,0 +1,5 @@
+provider="java:RPC">
+    <parameter name="allowedMethods" value="*"/>
+    <parameter name="className" value="org.soaplab.services.protocol.axis1.AnalysisService"/>
+    <parameter name="scope" value="application"/>
+  </service>

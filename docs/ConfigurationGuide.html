@@ -1,0 +1,654 @@
+<html> <head>
+<title>Soaplab2: Configuration</title>
+
+<link rel="shortcut icon" href="images/favicon.ico" >
+<link rel="icon" href="images/animated_favicon1.gif" type="image/gif" >
+<link rel="stylesheet" href="images/stylesheet.css" type="text/css">
+
+</head>
+
+<body>
+<h1>Soaplab2: Configuration Guide</h1>
+
+<img class="motto-img" src="images/motto-configuration-guide.jpg" border=0 align="left"/>
+
+Soaplab2 is configurable to the extent that it is sometimes annoying
+<img src="images/smile.gif" border=0></img>. <p>
+
+<br clear="all"/>
+
+<div class="doctoc">
+<dl>
+  <dt> <a href="#config_sources">Configuration sources</a>
+       <dl>
+	 <dt> <a href="#cfiles">How does Soaplab find its configuration file, or files?</a>
+	 <dt> <a href="#pformat">What is the format of property files?</a>
+       </dl>
+  <dt> <a href="#properties">Configuration properties</a>
+  <dt> <a href="#logging">Logging</a>
+</dl> <p>
+</div>
+
+
+There are several moments and places when and how to configure
+Soaplab2:
+
+<ul>
+  <li> <span class="highlight">Building Soaplab2</span><p>
+
+       How to set various properties used when you build Soaplab2 (the
+first time after download), and when you deploy new services. These
+activities are usually done using Java tool <em>Ant</em> which uses
+property file <tt>build.properties</tt>. There is a template for this
+file <tt>build.properties.template</tt>. What Ant tasks are available
+and what properties can be used to customize the tasks is a topic of
+a <a href="BuildGuide.html">How to build</a> document. <p>
+
+  <li> <span class="highlight">Service metadata</span><p>
+
+       There are lists of available services (analyses) and each
+service has its own metadata. They both can be considered as
+configuration options. But they are topic of other documents (partly
+the <a href="DevelopersGuide.html">Developers Guide</a>, and mainly
+the <a href="MetadataGuide.html">Metadata Guide</a>). <p>
+
+  <li> <span class="highlight">Run-time configuration</span><p>
+
+       How to configure Soaplab2 services for running and serving
+clients. This document is exactly about this type of configuration.
+       
+</ul> <p>
+
+<a name="config_sources"></a>
+<h2>Configuration sources</h2>
+
+The main format of Soaplab2 configuration are <em>properties</em>
+which are nothing else than the name/value pairs. They can be defined
+in several ways, and depending on it they have different precedence. <p>
+
+Java System properties have the highest precedence. They can be
+specified on the command-line with the <tt>-D</tt> option(s). They are
+good for testing but less suitable when services are run from a
+servlet engine, like Apache Tomcat. If you still wish to use them,
+see the Tomcat documentation about how to set <tt>CATALINA_OPTS</tt>
+environment variable. <p>
+
+Normally, Soaplab2 configuration properties are taken from a
+configuration file. There can be more configuration files - and if
+they are, the later ones have higher precedence (but still lower than
+the Java System properties). <p>
+
+<a name="cfiles"></a>
+<h3>How does Soaplab find its configuration file, or files?</h3>
+
+
+Soaplab2 tries first to find the property
+<pn>soaplab.configuration</pn>. Its value should contain the name, or
+names, of the property files containing the rest of Soaplab2
+configuration. <p>
+
+However, this is obviously a Catch-22 situation: how can you find a
+property pointing to a file if such property may be in that file?
+Well, you can't. Unless this one property is defined by a Java System
+property. Therefore, this property may be the only good candidate to
+define by the System property - even within Tomcat. <p>
+
+But there is still another way: If Soaplab cannot find the property
+<tt>soaplab.configuration</tt>, it tries to find a property file with
+a default name <pn>soaplab.properties</pn>. The file will be searched
+for automatically in the following locations:
+
+<ul>
+  <li class="tiny"> in the current directory,
+  <li class="tiny"> in the user home,
+  <li class="tiny"> in directories defined in the CLASSPATH
+</ul><p>
+
+If the property <tt>soaplab.configuration</tt> was found and its value
+is a file name with an absolute path, it is taken as defined and it
+does not look further. <p>
+
+In the Soaplab2 distribution (what you have when you CVS check-out
+Soaplab2), there is a template for the default property file
+<tt>src/etc/config/soaplab.properties.template</tt>. During building
+(compiling sources), Soaplab2 copies this file into
+<tt>build/classes/soaplab.properties</tt> - which is a directory on
+the CLASSPATH, and which is a default name, therefore, the property
+file is found. <p>
+
+You can change this behaviour, and let Ant copy your own property
+file, by specifying a <em>build-time</em> property
+<pn>my.soaplab.properties</pn> (the build-time properties are used by
+Ant and were mentioned briefly at the beginning of this document) when
+running the Ant's <em>config</em> task (the file name
+'testing.soplab.properties' in the example is a fictive file name, you
+will use your own name):
+
+<pre class="script">
+ant -Dmy.soaplab.properties=testing.soaplab.properties config
+</pre>
+
+The property <tt>soaplab.configuration</tt> can contain more property
+file name, separated by commas. For example, a plug-in project
+BioinfoGRID starts its command-line Java programs with this line:
+
+<pre class="script">
+exec java -cp $CLASSPATH -Dsoaplab.configuration=bioinfogrid.properties,soaplab.properties "$@"
+</pre>
+
+It lists two property files, <tt>bioinfogrid.properties</tt> and
+<tt>soaplab.properties</tt>, both of them without an absolute path, so
+Soaplab2 will search for them in the places mentioned above (current,
+home, CLASSPATH). <p>
+
+<a name="pformat"></a>
+<h3>What is the format of property files?</h3>
+
+Simply speaking, it follows the same syntax as required by
+<tt>java.util.Property.load()</tt> method. The gory details can be
+found (for example) <a
+href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/Properties.html#load(java.io.InputStream)">here</a>. For example, here are few, randomly picked-up, properties: <p>
+
+<pre class="sscript">
+base.dir = /home/senger/soaplab2
+jobs.cleaning.interval = 1000
+results.dir = RESULTS
+</pre>
+
+However, Soaplab2 goes further. It allows: <p>
+
+<ul>
+  <li class="tiny"> To have properties with <hi>multiple values</hi>, either as a
+comma-separated list in one property, or by using the same property
+name twice. For example:
+
+<pre class="sscript">
+applist = /mydir/metadata/DefaultApplications.xml
+applist = /mydir/metadata/generated/OtherApplications.xml
+</pre>
+
+  Of course, this feature is useful only when the Soaplab2 code
+<em>expects</em> to get more than one value. It is usually mentioned
+in the description of the individual properties whether it does or
+does not. <p>
+
+  <li class="tiny"> If a property is named <pn>include</pn> and the
+value of that property is the name of a file on the disk, that file
+will be included into the configuration. For example:
+
+<pre class="sscript">
+# properties of the third-party plug-ins
+include = bioinfogrid.properties
+</pre>
+
+  <li class="tiny"> <hi>Variable interpolation</hi>: the expressions
+like ${token} are automatically expanded when the configuration file
+is loaded. The expressions can contains names of other properties from
+the same configuration file, or of Java System properties. For example
+(taken from the BioinfoGRID plug-in):
+
+<pre class="sscript">
+grid.vo = biomed
+grid.proxy.dir = ${java.io.tmpdir}/proxies
+grid.proxy.file = x509${grid.vo}_${user.name}
+</pre>
+
+  The property <tt>java.io.tmpdir</tt> and <tt>user.name</tt> are Java
+System properties. <p>
+  
+  <li class="tiny"> Boolean property with an <hi>empty value</hi>
+means <tt>true</tt>. For example these two properties are both
+considered set to true:
+
+<pre class="sscript">
+ignore.heartbeat.events = true
+ignore.timeprogress.events
+</pre>
+  
+  <li class="tiny"> <hi>Prefixed properties</hi>: Almost any property
+  can be prefixed by a service name or a class name. Soaplab2 tries to
+  find and use first a property prefixed with a service name (using the
+  current service the Soaplab2 code is just dealing with), then - if not
+  found - to find and use a property prefixed with the full class name
+  of the class where is the property being read, and finally - if it
+  is still not found - to use a simple property name. For example:
+
+<pre class="sscript">
+results.dir = RESULTS
+classic.helloworld.result.dir = HELLOWORLDS
+</pre>
+
+
+It means that all services will store there results in the
+<tt>RESULTS</tt> directory except for service
+<em>classic.helloworld</em> whose results will go to the
+<tt>HELLOWORLDS</tt> directory. <p>
+
+   <li class="tiny"> <hi>Special characters</hi>: If you need a
+special character in a property like a line feed, a tabulation or an
+unicode character, you can specify it with the same escaped notation
+used for Java Strings. The list separator (comma by default), can also
+be escaped. For example:
+
+<pre class="sscript">
+key = This \n string \t contains \, escaped \\ characters \u0020
+</pre>
+
+   <li class="tiny"> And finally, <hi>automatic reloading</hi>:
+properties file will be reloaded when its contents has been
+changed. Again, this feature can be useful only if the Soaplab2 code
+also re-reads the properties - but it often does so. <p>
+
+</ul> <p>
+
+<a name="properties"></a>
+<h2>Configuration properties </h2>
+
+<div class="note"> All properties used by Soaplab2, together with
+short descriptions are listed in the class <a
+href="API/org/soaplab/services/Config.html">Config</a> - looked there
+for fields started with <tt>PROP_</tt> if this chapter has a missing
+property. Which may happen with brand new properties. </div>
+
+Small note about the <em>default values</em>: After installation or
+deployment, the Soaplab2 uses a configuration file that was created
+from a template
+<tt>src/etc/config/soaplab.properties.template</tt>. The values there
+are considered the <em>default values</em> in the descriptions
+below. If you, however, change this configuration file and remove some
+properties completely, Soaplab2 may still have internally coded and
+used some default values. Those values are listed in the class <a
+href="API/org/soaplab/services/Config.html">Config</a>. Usually, just
+to avoid uncertainty, it is better to put always some values (at least
+for the properties defining path and file names) in your configuration
+file. <p>
+
+
+<dl>
+
+  <dt> <span class="hitt">working.dir</span>
+       
+  <dd> Its value contains a directory name where the inputs and
+outputs of the running external process will be stored in. <p>
+       
+       By default, there will be created a <tt>_R_</tt> sub-directory
+in the <em>base</em> directory, and within this there will be another
+sub-directory <tt>SANDBOX</tt> as the working directory. The
+<em>base</em> directory depends on how the Soaplab2 service is
+invoked: it can be either Soaplab2 main project directory, or (after
+services being deployed) a <tt>&lt;tomcat-home&gt;/temp</tt>
+directory. <p>
+
+       For example, this is a part of a Soaplab2 configuration file
+used by deployed services in Tomcat, showing basic directories used by
+Soaplab2:
+
+<pre class="code">
+base.dir = \${catalina.home}/webapps/soaplab2
+
+metadata.dir = \${catalina.home}/webapps/soaplab2/metadata
+applist = ${metadata.dir}/OtherApplications.xml
+applist = ${metadata.dir}/GowlabApplications.xml
+applist = ${metadata.dir}/EBIApplications.xml
+
+runtime.dir = \${catalina.home}/temp/_R_
+working.dir = ${runtime.dir}/SANDBOX
+results.dir = ${runtime.dir}/RESULTS
+</pre>
+
+
+  <dt> <span class="hitt">results.dir</span>
+       
+  <dd> Its value is an absolute path to a directory where Soaplab2
+keeps results in the local file system. <p>
+       
+       Default value is <tt>RESULTS</tt>, created in the same place as
+the <tt>SANDBOX</tt> shown in <pn>working.dir</pn> property above. <p>
+
+
+  <dt> <span class="hitt">metadata.dir</span>
+       
+  <dd> Its value is a name of a directory containing service
+metadata. <p>
+
+       The importance of this property depends also on the contents of
+the service lists (given by the <pn>applist</pn> property). There are
+links to the individual service metadata files. If these links are
+absolute paths the <pn>metadata.dir</pn> property is not
+used. Otherwise (which is the usual and default way), its value is put
+as a prefix to those links. <p>
+
+
+  <dt> <span class="hitt">.metadata.file</span>
+       
+  <dd> This is only a part of a property name. Its value is a name of
+a file containing metadata for a particular service. <p>
+       
+       The property name must be prefixed by the service name whose
+metadata this file contains. For example, for service
+<tt>edit.seqret</tt>, the full property name should be
+<pn>edit.seqret.metadata.file</pn>. <p>
+
+       There is no default value.<p>
+
+
+  <dt> <span class="hitt">applist</span>
+       
+  <dd> A filename containing a list of services. There is no default
+value. For example:
+
+<pre class="code">
+base.dir = /home/senger/soaplab2
+metadata.dir = ${base.dir}/metadata/generated
+<b>applist</b> = ${metadata.dir}/OtherApplications.xml
+<b>applist</b> = ${metadata.dir}/GowlabApplications.xml
+<b>applist</b> = ${metadata.dir}/EBIApplications.xml
+<b>applist</b> = ${metadata.dir}/EMBOSSApplications.xml
+</pre>
+
+
+  <dt> <span class="hitt">jobs.cleaning.interval</span>
+       
+  <dd> Its value (an integer, number of milliseconds) indicates how
+often to scan a list of completed jobs in order to remove them from
+the memory (not to destroy them; their results will still be
+available). This property can help keeping the Soaplab2 memory
+footprint lower. Default value is 60000 (1 minute). <p>
+
+  <dt> <span class="hitt">jobs.timeout</span>
+
+  <dd>Its value (an integer, number of milliseconds) indicates how
+  long after a job is started it should be terminated if it is still running.
+  This property lets Soaplab terminate hanging or long running jobs automatically.
+  You can prefix this property with service name to have different timeout values
+  for different services, such as <tt>classic.helloworld.jobs.timeout=5</tt>.
+  Checks for timeout are performed every <tt>jobs.cleaning.interval</tt>.
+  <p>
+  Default value is 864000000 (10 days).
+ <p>
+
+  <dt> <span class="hitt">jobs.waitfor.timeout</span>
+
+  <dd>Its value (an integer, number of milliseconds) indicates how
+  long after a <tt>waitfor</tt> call made should the call be returned
+  if the job is still running after that period.
+  <p>
+  Default value is 864000000 (10 days).
+ <p>
+
+  <dt> <span class="hitt">services.cleaning.interval</span>
+       
+  <dd> Its value (an integer, number of milliseconds) indicates how
+often to scan a list of instantiated services in order to remove them
+from the memory (they can be still later re-instantiated if a request
+comes). Again, it helps to low the memory footprint. Default value is
+300000 (5 minutes). <p>
+
+       
+  <dt> <span class="hitt">ignore.heartbeat.events</span>
+       
+  <dd> Its boolean true value indicates that event listeners should
+ignore Heartbeat Progress events (because there may be too many of
+them). A bit more about Soaplab2 events can be found in the <a
+href="DevelopersGuide.html#spi_eventlistener">developers
+guide</a>. <p>
+       
+       Default value is false.<p>
+
+
+  <dt> <span class="hitt">event.log.level</span>
+       
+  <dd> The Soaplab2 default event listener records the events into a
+log (usually) file. This property indicates a logging level under
+which the events are logged. The accepted values are (in
+case-insensitive way): <tt>trace</tt>, <tt>debug</tt>, <tt>info</tt>,
+<tt>warn</tt>, <tt>error</tt>, <tt>fatal</tt>, and <tt>off</tt>
+(<tt>off</tt> means no logging at all). <p>
+       
+       Default value is debug. <p>
+
+
+       <!-- PUT this into Gowlab.html
+  <dt> <span class="hitt">supplier.url</span>
+       
+  <dd> <p>
+
+
+    /**
+     * A property name. Its value contains a URL for Gowlab-based
+     * services. <p>
+     */
+    public static final String PROP_SUPPLIER = "supplier.url";
+
+-->
+
+  <dt> <span class="hitt">env</span>
+       
+  <dd> This is not a full property name, just a prefix. It should be
+followed by a dot and a name of an environment variable that will be
+set before invoking a command-line program. The property value becomes
+the value of this environment variable. <p>
+
+       Be aware that playing with environment variable may be
+system-dependent and therefore not too portable. But in many occasions
+it may be very helpful (and can replace a need to write various script
+wrappers around the command-line programs that would set
+environment). <p>
+
+       Also, be aware, that this does not work for the environment
+variable <tt>PATH</tt>. In order to let Soaplab2 to find the
+command-line program, use rather property <pn>addtopath.dir</pn>. <p>
+
+       An example:
+
+<pre class="code">
+env.EMBOSS_HOME = /usr/local/emboss
+env.EMBOSS_DATA = /usr/local/emboss/share/EMBOSS/data
+</pre>
+
+
+  <dt> <span class="hitt">addtopath.dir</span>
+       
+  <dd> Its value contains one or more directory names (separated by
+commas) that are searched for an external (command-line) program that
+has to be invoked.  It is a replacement of setting the usual
+environment variable PATH (which would not work from Java). <p>
+
+       The default value is the directory defined in another property
+<pn>scripts.dir</pn>. Therefore, that is a good place to put your
+scripts. <p>
+
+
+  <dt> <span class="hitt">scripts.dir</span>
+       
+  <dd> This property contains a directory name with scripts that are
+supposed to be called by Soaplab services. So why not to add this
+directory name directly into <pn>addtopath.dir</pn> property? The
+reasons is that Soaplab2 treats directory defined here slightly more:
+Unless the Soaplab2 server is running on the Windows operating system
+(where this treatment is not needed), Soaplab2 tries to change file
+permissions of all files in this directory to become executable (by
+calling an external program <tt>chmod</tt>). This is needed because
+the original file permissions are gone when deployed from a
+<em>war</em> file (which is a usual way how the Soaplab2 services are
+deployed). <p>
+       
+       The default value depends on the protocol used. When deploying
+to Tomcat, it is directory <tt>webapps/soaplab2/WEB-INF/run</tt>. When
+running using the <em>local</em> protocol, it is the <tt>run</tt>
+directory in the Soaplab2 project directory (from where the scripts
+are copied to <tt>webapps/soaplab2/WEB-INF/run</tt> during deployment
+anyway). <p>
+
+
+  <dt> <span class="hitt">accept.any.exitcode</span>
+       
+  <dd> Its boolean true value indicates that any exit code returned by
+the invoked external program is treated as a good one. Otherwise only
+zero exit code is acceptable as a good one. <p>
+       
+       Default value is false.<p>
+
+
+  <dt> <span class="hitt">results.url.ignore</span>
+       
+  <dd> This (and the following three other properties) deal with the
+results shown by reference - by sending a URL instead the result
+itselves. <p>
+
+       The true value of this property disables creation of such
+reference results. Default value is false, i.e. reference results
+<em>are enabled</em>. Unless, of course, they are permanently disabled
+already in their metadata (look for the <tt>make_url</tt> attribute in
+the <a href="MetadataGuide.html">metadata guide</a>). <p>
+
+       
+  <dt> <span class="hitt">results.url.target.dir</span>
+       
+  <dd> Its value is a directory (usually with the full path) where
+Soaplab2 will be copying results that should be viewed (accessed) via
+protocols such as HTTP or FTP. This property is a full path to the
+same directory where the property <pn>results.url</pn> points to as a
+URL. <p>
+       
+       Default value depends on the context: if a Soaplab2 service is
+running in a servlet container (such as Tomcat - which is a usual
+case), a directory <tt>results</tt> is created inside Soaplab2 web
+application. Otherwise, the directory given by property
+<pn>base.dir</pn> and <tt>results</tt> is used. <p>
+
+If you change this directory and have then problems with results
+containing foreign characters, in other words if you need to be sure
+that the results are correctly sent with the UTF-8 character encoding,
+you need to specify the new directory name also in
+<tt>src/etc/config/*/web.xml.template</tt>. <p>
+
+  <dt> <span class="hitt">results.url</span>
+       
+  <dd> Its value is a URL (without the last file name) where the
+Soaplab's results are accessible from. This URL points to the same
+place as specified in the property
+<pn>results.url.target.dir</pn>. <p>
+
+       Default value is <tt>http://&lt;<pn>tomcat.host</pn>&gt;:&lt;<pn>tomcat.port</pn>&gt;/soaplab2/results</tt>. <p>
+       
+  <dt> <span class="hitt">tomcat.host</span>
+       
+  <dd> Its value is a host name where your Tomcat is waiting for
+Soaplab2 services requests. It is used to create default
+<pn>results.dir</pn> (in case that the <pn>results.dir</pn> is not
+given). <p>
+
+       Default value is <tt>localhost</tt>. <p>
+
+  <dt> <span class="hitt">tomcat.port</span>
+       
+  <dd> Its integer value is a port number where your Tomcat is
+listening for Soaplab2 services requests. It is used to create default
+<pn>results.dir</pn> (in case that the <pn>results.dir</pn> is not
+given). <p>
+
+       Default value is <tt>8080</tt>. <p>
+
+
+  <dt> <span class="hitt">lsf.enabled</span>       
+  <dd> Use this property if you have <a href="http://en.wikipedia.org/wiki/Platform_LSF">LSF</a>
+  installed on your server machine and you prefer your Soaplab jobs submitted to LSF queues
+  rather than executed on your Soaplab server machine.<p>
+       Default value is <tt>false</tt>.<p>
+  You can enable, or disable, LSF for different services as in the second example below.
+  <pre class="sscript">
+                   lsf.enabled = true
+classic.helloworld.lsf.enabled = false
+</pre>
+
+
+  <dt> <span class="hitt">lsf.queuename</span>       
+  <dd> Use this property to specify queue name for LSF jobs<p>
+  You can specify different queues for different services as in the second example below.
+  <pre class="sscript">
+                   lsf.queuename = queueforsoaplab
+classic.helloworld.lsf.queuename = queueforfastreturningjobs
+</pre>
+
+  <dt> <span class="hitt">lsf.arch</span>
+  <dd> Use this property to specify architecture to submit LSF jobs on.<p>
+
+  <dt> <span class="hitt">lsf.project</span>
+  <dd> Use this property to specify project name for LSF jobs.<p>
+
+</dl> <p>
+
+
+
+
+<a name="logging"></a>
+<h2>Logging</h2>
+
+Soaplab2 uses <em>log4j</em> logging, together with Apache Commons
+logging wrapper. This logging system is reasonably <a
+href="http://logging.apache.org/log4j/docs/index.html">well
+documented</a>. The only topic we should cover here is how Soaplab2
+finds the <em>log4j</em> configuration. <p>
+
+There is a template containing a good starting point for your logging
+configuration in
+<tt>src/etc/config/log4j.properties.template</tt>. <p>
+
+When building Soaplab2, Ant copies this file (after making some
+substitutions inside, regarding the current directory) into
+<tt>build/classes</tt> directory - which is on the CLASSPATH so it
+could be discovered in the run-time. If you wish another file to be
+used, create a property <pn>my.log4j.properties</pn> pointing to your
+file of choice. Ant recognizes this property and copies your file. <p>
+
+More to it, Ant also puts a well-known property
+<pn>log4j.configuration</pn> into the run scripts (the <em>run
+scripts</em> are command-line clients created in the
+<tt>build/run</tt> directory). This property points to the same
+<tt>build/classes/log4j.properties</tt> file . For example:
+
+<pre class="sscript">
+exec java -cp $CLASSPATH "-Dlog4j.configuration=file:/home/senger/soaplab2/build/classes/log4j.properties" "$@"
+</pre>
+
+Unless you change it in the <tt>log4j.properties</tt>, Soaplab2 will
+be using two log files, the <tt>soaplab2.log</tt> and
+<tt>soaplab2-others.log</tt>. The logged records will have the
+following format (the characters with the percent sign are used in the
+logging <em>ConversionPattern</em> property):
+
+<pre class="script">
+%d{ISO8601}             %-4r [%t]   %-5p  %c{1}      %x- %m%n
+2006-11-24 14:38:49,447 296  [main] INFO  testing_echo - Service instance created.
+(1)                     (2)  (3)    (4)   (5)        (6) (7)(8)
+</pre>
+
+Where:
+<ol>
+  <li class="dcount"> (%d) - Current date in ISO8601 format
+  <li class="dcount"> (%r) - Number of milliseconds elapsed from program start to logging event
+  <li class="dcount"> (%t) - Name of the thread that generated the logging event
+  <li class="dcount"> (%p) - Level (priority) of the logging event
+  <li class="dcount"> (%c) - Place (usually a class name) where the logging event happened
+  <li class="dcount"> (%x) - <em>not used yet</em> - (kind of a <em>user session</em>)
+  <li class="dcount"> (%m) - The message to be logged
+  <li class="dcount"> (%n) - Newline
+</ol>
+<p>
+
+
+<iframe id="maintoc" src="TOC.html" scrolling="auto"></iframe>
+
+<div align=right><font size=-2>
+<!-- hhmts start -->
+Last modified: Mon Oct 11 16:14:02 2010
+<!-- hhmts end -->
+</font></div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1011961-1";
+urchinTracker();
+</script>
+</body> </html>

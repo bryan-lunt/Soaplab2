@@ -1,0 +1,1327 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<TITLE>MEME</TITLE>
+<STYLE type="text/css">
+  TD.invisible { color: '#D5F0FF'; }
+  TD.c0 { background: aqua; color: black; }
+  TD.cw0 { background: aqua; color: black; font: 50% sans-serif; }
+  TD.c1 { background: blue; color: white; }
+  TD.cw1 { background: blue; color: white; font: 50% sans-serif; }
+  TD.c2 { background: red; color: white; }
+  TD.cw2 { background: red; color: white; font: 50% sans-serif; }
+  TD.c3 { background: fuchsia; color: black; }
+  TD.cw3 { background: fuchsia; color: black; font: 50% sans-serif; }
+  TD.c4 { background: yellow; color: black; }
+  TD.cw4 { background: yellow; color: black; font: 50% sans-serif; }
+  TD.c5 { background: lime; color: black; }
+  TD.cw5 { background: lime; color: black; font: 50% sans-serif; }
+  TD.c6 { background: teal; color: white; }
+  TD.cw6 { background: teal; color: white; font: 50% sans-serif; }
+  TD.c7 { background: #444444; color: white; }
+  TD.cw7 { background: #444444; color: white; font: 50% sans-serif; }
+  TD.c8 { background: green; color: white; }
+  TD.cw8 { background: green; color: white; font: 50% sans-serif; }
+  TD.c9 { background: silver; color: black; }
+  TD.cw9 { background: silver; color: black; font: 50% sans-serif; }
+  TD.c10 { background: purple; color: white; }
+  TD.cw10 { background: purple; color: white; font: 50% sans-serif; }
+  TD.c11 { background: olive; color: black; }
+  TD.cw11 { background: olive; color: black; font: 50% sans-serif; }
+  TD.c12 { background: navy; color: white; }
+  TD.cw12 { background: navy; color: white; font: 50% sans-serif; }
+  TD.c13 { background: maroon; color: white; }
+  TD.cw13 { background: maroon; color: white; font: 50% sans-serif; }
+  TD.c14 { background: black; color: white; }
+  TD.cw14 { background: black; color: white; font: 50% sans-serif; }
+  TD.c15 { background: white; color: black; }
+  TD.cw15 { background: white; color: black; font: 50% sans-serif; }
+  B.red { color: red; }
+  TD.red { color: red; }
+  TH.red { color: red; }
+  B.blue { color: blue; }
+  TD.blue { color: blue; }
+  TH.blue { color: blue; }
+  B.orange { color: orange; }
+  TD.orange { color: orange; }
+  TH.orange { color: orange; }
+  B.green { color: green; }
+  TD.green { color: green; }
+  TH.green { color: green; }
+  B.black { color: black; }
+  TD.black { color: black; }
+  TH.black { color: black; }
+  B.magenta { color: magenta; }
+  TD.magenta { color: magenta; }
+  TH.magenta { color: magenta; }
+  B.pink { color: pink; }
+  TD.pink { color: pink; }
+  TH.pink { color: pink; }
+  B.yellow { color: yellow; }
+  TD.yellow { color: yellow; }
+  TH.yellow { color: yellow; }
+  B.turquoise { color: turquoise; }
+  TD.turquoise { color: turquoise; }
+  TH.turquoise { color: turquoise; }
+</STYLE>
+</HEAD>
+<BODY BGCOLOR='#D5F0FF'>
+<A NAME='top_buttons'></A><HR>
+<TABLE SUMMARY='buttons' ALIGN=LEFT CELLSPACING=0><TR>
+  <TD BGCOLOR='#DDDDFF'><A HREF="#command"><B>Command line</B></A>
+  <TD BGCOLOR='#00FFFF'><A HREF="#sequences"><B>Training Set</B></A>
+  <TD BGCOLOR='#DDFFDD'><A HREF="#summary1"><B>First Motif</B></A>
+  <TD BGCOLOR='#FFDDFF'><A HREF="#motif-summary"><B>Summary of Motifs</B></A>
+  <TD BGCOLOR='#00FF00'><A HREF="#stopped"><B>Termination</B></A>
+  <TD BGCOLOR='#FFFF00'><A HREF="#explanation"><B>Explanation</B></A></TABLE>
+<BR CLEAR=LEFT>
+
+<FORM ENCTYPE = "application/x-www-form-urlencoded" METHOD = POST
+TARGET = "_new"
+ACTION = "http://frt.prdclst.vital-it.ch/meme/cgi-bin/process_request.cgi">
+<B>
+<BR><INPUT TYPE = 'SUBMIT' NAME = 'action' VALUE = 'MAST'> Search sequence databases with these motifs using <A HREF='http://frt.prdclst.vital-it.ch/meme/mast-intro.html'>MAST.</A>
+<BR><INPUT TYPE = 'SUBMIT' NAME = 'action' VALUE = 'BLOCKS'> Submit these motifs to <A HREF='http://blocks.fhcrc.org/blocks/process_blocks.html'>BLOCKS multiple alignment processor.</A>
+<BR><INPUT TYPE = 'SUBMIT' NAME = 'action' VALUE = 'MetaMEME'> Build and use a motif-based hidden Markov model (HMM) using <A HREF='http://metameme.sdsc.edu'>Meta-MEME.</A>
+</B><BR CLEAR=LEFT>
+<HR><CENTER><A NAME=version></A>
+  <BIG><B> <A HREF="#version_doc">MEME - Motif discovery tool</A> 
+</B></BIG></CENTER><HR>
+<P>
+MEME version 3.5.0 (Release date: 2005/07/29 20:02:31)
+<P>
+For further information on how to interpret these results or to get
+a copy of the MEME software please access <A HREF="http://meme.nbcr.net.">http://meme.nbcr.net.</A>
+<P>
+This file may be used as input to the MAST algorithm for searching
+sequence databases for matches to groups of motifs.  MAST is available
+for interactive use and downloading at <A HREF="http://meme.nbcr.net.">http://meme.nbcr.net.</A>
+
+<HR><CENTER><A NAME=reference></A>
+  <BIG><B> <A HREF="#reference_doc">REFERENCE</A> 
+</B></BIG></CENTER><HR>
+<P>
+If you use this program in your research, please cite:
+<P>
+Timothy L. Bailey and Charles Elkan,
+"Fitting a mixture model by expectation maximization to discover
+motifs in biopolymers", Proceedings of the Second International
+Conference on Intelligent Systems for Molecular Biology, pp. 28-36,
+AAAI Press, Menlo Park, California, 1994.
+
+<HR><CENTER><A NAME=sequences></A>
+  <BIG><B> <A HREF="#sequences_doc">TRAINING SET</A> 
+</B></BIG></CENTER><HR>
+<PRE>
+DATAFILE= ./ememe-1231508353.15541
+ALPHABET= ACGT
+Sequence name            Weight Length  Sequence name            Weight Length  
+-------------            ------ ------  -------------            ------ ------  
+ce1cg                    1.0000    105  ara                      1.0000    105  
+bglr1                    1.0000    105  crp                      1.0000    105  
+cya                      1.0000    105  deop2                    1.0000    105  
+gale                     1.0000    105  ilv                      1.0000    105  
+lac                      1.0000    105  male                     1.0000    105  
+malk                     1.0000    105  malt                     1.0000    105  
+ompa                     1.0000    105  tnaa                     1.0000    105  
+uxu1                     1.0000    105  pbr322                   1.0000    105  
+trn9cat                  1.0000    105  tdc                      1.0000    105  
+</PRE>
+<INPUT TYPE = HIDDEN NAME = name VALUE = "./ememe-1231508353.15541" >
+<INPUT TYPE = HIDDEN NAME = alphabet VALUE = "ACGT" >
+<INPUT TYPE = HIDDEN NAME = url VALUE = "http://frt.prdclst.vital-it.ch/meme" >
+
+<HR><CENTER><A NAME=command></A>
+  <BIG><B> <A HREF="#command_doc">COMMAND LINE SUMMARY</A> 
+</B></BIG></CENTER><HR>
+<PRE>
+This information can also be useful in the event you wish to report a
+problem with the MEME software.
+
+command: meme ./ememe-1231508353.15541 -mod oops -nmotifs 1 -prior dirichlet -wnsites 0.800000 -minw 8 -maxw 50 -wg 11 -ws 1 -revcomp -nostatus -maxiter 50 -distance 0.001000 -spmap uni -dna 
+
+model:  mod=          oops    nmotifs=         1    evt=           inf
+object function=  E-value of product of p-values
+width:  minw=            8    maxw=           50    minic=        0.00
+width:  wg=             11    ws=              1    endgaps=       yes
+nsites: minsites=       18    maxsites=       18    wnsites=       0.8
+theta:  prob=            1    spmap=         uni    spfuzz=        0.5
+em:     prior=   dirichlet    b=            0.01    maxiter=        50
+        distance=    0.001
+data:   n=            1890    N=              18
+strands: + -
+sample: seed=            0    seqfrac=         1
+Letter frequencies in dataset:
+A 0.304 C 0.196 G 0.196 T 0.304 
+Background letter frequencies (from dataset with add-one prior applied):
+A 0.304 C 0.196 G 0.196 T 0.304 
+</PRE>
+<INPUT TYPE = HIDDEN NAME = bgfreq VALUE = "
+A 0.304 C 0.196 G 0.196 T 0.304 
+" >
+
+<HR><CENTER><A NAME=summary1></A>
+ <TABLE SUMMARY='buttons' ALIGN=LEFT CELLSPACING=0><TR>
+  <TD BGCOLOR='#OOFFFF'><A HREF="#motif-summary"><B>P</B></A>
+  <TD BGCOLOR='#FFFFOO'><A HREF="#summary2"><B>N</B></A></TABLE> <BIG><B> <A HREF="#summary_doc">MOTIF  1</A>  &nbsp;&nbsp;&nbsp; width = 15     &nbsp;&nbsp;&nbsp; sites =  18    &nbsp;&nbsp;&nbsp; llr = 169    &nbsp;&nbsp;&nbsp; E-value = 3.4e-006<BR CLEAR=LEFT>
+</B></BIG></CENTER><HR>
+<TABLE SUMMARY='motif description' CELLPADDING=0 CELLSPACING=1>
+<TR><TD COLSPAN=8><TH><A NAME='simplified1' HREF="#simplified_doc">Simplified</A><TH ALIGN=RIGHT>A<TH><TD 
+  >1<TD>:<TD>:<TD>9<TD>:<TD>1<TD 
+  >2<TD>3<TD>1<TD>:<TD>:<TD>1<TD 
+  >8<TD>2<TD>9
+<TR><TD COLSPAN=8><TH><A HREF="#simplified_doc">pos.-specific</A><TH ALIGN=RIGHT>C<TH><TD 
+  >1<TD>1<TD>1<TD>1<TD>4<TD>4<TD 
+  >3<TD>2<TD>1<TD>3<TD>1<TD>7<TD 
+  >:<TD>8<TD>1
+<TR><TD COLSPAN=8><TH><A HREF="#simplified_doc">probability</A><TH ALIGN=RIGHT>G<TH><TD 
+  >8<TD>:<TD>9<TD>:<TD>2<TD>3<TD 
+  >2<TD>2<TD>4<TD>1<TD>2<TD>1<TD 
+  >2<TD>:<TD>:
+<TR><TD COLSPAN=8><TH><A HREF="#simplified_doc">matrix</A><TH ALIGN=RIGHT>T<TH><TD 
+  >1<TD>9<TD>:<TD>1<TD>4<TD>1<TD 
+  >4<TD>3<TD>3<TD>7<TD>8<TD>2<TD 
+  >1<TD>1<TD>:
+<TR><TD CLASS='invisible'>.</TD>
+<TR><TD COLSPAN=8><TH> <A NAME='IC1'>          bits    </A><TH ALIGN=RIGHT>2.4<TH><TD
+  ><TD><TD><TD
+  ><TD><TD><TD
+  ><TD><TD><TD
+  ><TD><TD><TD
+  ><TD><TD>
+<TR><TD COLSPAN=8><TH>                  <TH ALIGN=RIGHT>2.1<TH><TD
+  ><TD><TD BGCOLOR="orange">&nbsp;<TD
+  ><TD><TD><TD
+  ><TD><TD><TD
+  ><TD><TD><TD
+  ><TD><TD>
+<TR><TD COLSPAN=8><TH>                  <TH ALIGN=RIGHT>1.9<TH><TD
+  ><TD><TD BGCOLOR="orange">&nbsp;<TD
+  ><TD><TD><TD
+  ><TD><TD><TD
+  ><TD><TD><TD
+  ><TD><TD>
+<TR><TD COLSPAN=8><TH>                  <TH ALIGN=RIGHT>1.6<TH><TD
+  ><TD><TD BGCOLOR="orange">&nbsp;<TD
+  ><TD><TD><TD
+  ><TD><TD><TD
+  ><TD><TD><TD
+  ><TD><TD>
+<TR><TD COLSPAN=8><TH> <A HREF="#IC_doc"> Information </A><TH ALIGN=RIGHT>1.4<TH><TD
+   BGCOLOR="orange">&nbsp;<TD BGCOLOR="green">&nbsp;<TD BGCOLOR="orange">&nbsp;<TD
+  ><TD><TD><TD
+  ><TD><TD><TD
+  ><TD><TD><TD
+  ><TD><TD BGCOLOR="red">&nbsp;
+<TR><TD COLSPAN=8><TH> <A HREF="#IC_doc"> content </A><TH ALIGN=RIGHT>1.2<TH><TD
+   BGCOLOR="orange">&nbsp;<TD BGCOLOR="green">&nbsp;<TD BGCOLOR="orange">&nbsp;<TD
+   BGCOLOR="red">&nbsp;<TD><TD><TD
+  ><TD><TD><TD
+  ><TD><TD><TD
+  ><TD BGCOLOR="blue">&nbsp;<TD BGCOLOR="red">&nbsp;
+<TR><TD COLSPAN=8><TH> (13.5 bits)<TH ALIGN=RIGHT>0.9<TH><TD
+   BGCOLOR="orange">&nbsp;<TD BGCOLOR="green">&nbsp;<TD BGCOLOR="orange">&nbsp;<TD
+   BGCOLOR="red">&nbsp;<TD><TD><TD
+  ><TD><TD><TD
+  ><TD BGCOLOR="green">&nbsp;<TD><TD
+   BGCOLOR="red">&nbsp;<TD BGCOLOR="blue">&nbsp;<TD BGCOLOR="red">&nbsp;
+<TR><TD COLSPAN=8><TH>                  <TH ALIGN=RIGHT>0.7<TH><TD
+   BGCOLOR="orange">&nbsp;<TD BGCOLOR="green">&nbsp;<TD BGCOLOR="orange">&nbsp;<TD
+   BGCOLOR="red">&nbsp;<TD BGCOLOR="black">&nbsp;<TD><TD
+  ><TD><TD><TD
+   BGCOLOR="green">&nbsp;<TD BGCOLOR="green">&nbsp;<TD BGCOLOR="blue">&nbsp;<TD
+   BGCOLOR="red">&nbsp;<TD BGCOLOR="blue">&nbsp;<TD BGCOLOR="red">&nbsp;
+<TR><TD COLSPAN=8><TH>                  <TH ALIGN=RIGHT>0.5<TH><TD
+   BGCOLOR="orange">&nbsp;<TD BGCOLOR="green">&nbsp;<TD BGCOLOR="orange">&nbsp;<TD
+   BGCOLOR="red">&nbsp;<TD BGCOLOR="black">&nbsp;<TD BGCOLOR="black">&nbsp;<TD
+  ><TD><TD><TD
+   BGCOLOR="green">&nbsp;<TD BGCOLOR="green">&nbsp;<TD BGCOLOR="blue">&nbsp;<TD
+   BGCOLOR="red">&nbsp;<TD BGCOLOR="blue">&nbsp;<TD BGCOLOR="red">&nbsp;
+<TR><TD COLSPAN=8><TH>                  <TH ALIGN=RIGHT>0.2<TH><TD
+   BGCOLOR="orange">&nbsp;<TD BGCOLOR="green">&nbsp;<TD BGCOLOR="orange">&nbsp;<TD
+   BGCOLOR="red">&nbsp;<TD BGCOLOR="black">&nbsp;<TD BGCOLOR="black">&nbsp;<TD
+  ><TD><TD BGCOLOR="black">&nbsp;<TD
+   BGCOLOR="green">&nbsp;<TD BGCOLOR="green">&nbsp;<TD BGCOLOR="blue">&nbsp;<TD
+   BGCOLOR="red">&nbsp;<TD BGCOLOR="blue">&nbsp;<TD BGCOLOR="red">&nbsp;
+<TR><TD COLSPAN=8><TH>                  <TH ALIGN=RIGHT>0.0<TH><TD COLSPAN=15> <HR>
+<TR><TD CLASS='invisible'>.</TD>
+<TR><TD COLSPAN=8><TH><A NAME='consensus1' HREF="#consensus_doc">Multilevel           </A><TD><TH><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD>
+<TR><TD COLSPAN=8><TH><A HREF="#consensus_doc">consensus            </A><TD><TH><TD CLASS=black
+  ></TD><TD CLASS=black></TD><TD CLASS=black
+  ></TD><TD CLASS=black></TD><TD CLASS=blue
+  ><TT>C</TT></TD><TD CLASS=orange><TT>G</TT></TD><TD CLASS=blue
+  ><TT>C</TT></TD><TD CLASS=green><TT>T</TT></TD><TD CLASS=green
+  ><TT>T</TT></TD><TD CLASS=blue><TT>C</TT></TD><TD CLASS=black
+  ></TD><TD CLASS=black></TD><TD CLASS=black
+  ></TD><TD CLASS=black></TD><TD CLASS=black
+  ></TD>
+<TR><TD COLSPAN=8><TH><A HREF="#consensus_doc">sequence             </A><TD><TH><TD CLASS=black
+  ></TD><TD CLASS=black></TD><TD CLASS=black
+  ></TD><TD CLASS=black></TD><TD CLASS=black
+  ></TD><TD CLASS=black></TD><TD CLASS=black
+  ></TD><TD CLASS=orange><TT>G</TT></TD><TD CLASS=black
+  ></TD><TD CLASS=black></TD><TD CLASS=black
+  ></TD><TD CLASS=black></TD><TD CLASS=black
+  ></TD><TD CLASS=black></TD><TD CLASS=black
+  ></TD>
+<TR><TD COLSPAN=8><TH>                     <TD><TH><TD CLASS=black
+  ></TD><TD CLASS=black></TD><TD CLASS=black
+  ></TD><TD CLASS=black></TD><TD CLASS=black
+  ></TD><TD CLASS=black></TD><TD CLASS=black
+  ></TD><TD CLASS=black></TD><TD CLASS=black
+  ></TD><TD CLASS=black></TD><TD CLASS=black
+  ></TD><TD CLASS=black></TD><TD CLASS=black
+  ></TD><TD CLASS=black></TD><TD CLASS=black
+  ></TD>
+
+<TR><TD CLASS='invisible'>.</TD>
+<TR><TH ALIGN=LEFT>NAME<TH>&nbsp;<TH>STRAND<TH>&nbsp;<TH>START<TH>&nbsp;<TH>P-VALUE<TH>&nbsp;<TH>&nbsp;<TH>&nbsp;<TH>&nbsp;<TH><TH COLSPAN=15 ALIGN=CENTER><A NAME='sites1' HREF="#sites_doc">SITES</A><TH>&nbsp;
+<TR><TD>lac<TD><TD ALIGN=CENTER>-<TD><TD ALIGN=RIGHT>12<TD><TD ALIGN=RIGHT>1.53e-06<TD>
+  <TD COLSPAN=2 ALIGN=RIGHT><TT>TGCCTAATGA</TT><TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD><TD><TD ALIGN=LEFT><TT>TTAATTGCGT</TT>
+<TR><TD>ompa<TD><TD ALIGN=CENTER>+<TD><TD ALIGN=RIGHT>52<TD><TD ALIGN=RIGHT>2.44e-06<TD>
+  <TD COLSPAN=2 ALIGN=RIGHT><TT>TTTCATATGC</TT><TD><TD CLASS=blue
+  ><TT><B>C</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=blue
+  ><TT><B>C</B></TT></TD><TD CLASS=orange><TT><B>G</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD><TD><TD ALIGN=LEFT><TT>CTTGTAAGTT</TT>
+<TR><TD>ara<TD><TD ALIGN=CENTER>-<TD><TD ALIGN=RIGHT>58<TD><TD ALIGN=RIGHT>2.72e-06<TD>
+  <TD COLSPAN=2 ALIGN=RIGHT><TT>ATAGCAAAGT</TT><TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=blue
+  ><TT><B>C</B></TT></TD><TD CLASS=orange><TT><B>G</B></TT></TD><TD CLASS=blue
+  ><TT><B>C</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD><TD><TD ALIGN=LEFT><TT>TAATCAATGT</TT>
+<TR><TD>tnaa<TD><TD ALIGN=CENTER>+<TD><TD ALIGN=RIGHT>75<TD><TD ALIGN=RIGHT>3.77e-06<TD>
+  <TD COLSPAN=2 ALIGN=RIGHT><TT>CCGAACGATT</TT><TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=blue
+  ><TT><B>C</B></TT></TD><TD CLASS=orange><TT><B>G</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD><TD><TD ALIGN=LEFT><TT>TTTAAACAAT</TT>
+<TR><TD>malk<TD><TD ALIGN=CENTER>+<TD><TD ALIGN=RIGHT>65<TD><TD ALIGN=RIGHT>5.16e-06<TD>
+  <TD COLSPAN=2 ALIGN=RIGHT><TT>AAGGAATTTC</TT><TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=orange><TT><B>G</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD><TD><TD ALIGN=LEFT><TT>AAAATCGTGG</TT>
+<TR><TD>cya<TD><TD ALIGN=CENTER>-<TD><TD ALIGN=RIGHT>53<TD><TD ALIGN=RIGHT>5.16e-06<TD>
+  <TD COLSPAN=2 ALIGN=RIGHT><TT>GGTCTAAAAC</TT><TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD><TD><TD ALIGN=LEFT><TT>CCTTGCTGAT</TT>
+<TR><TD>pbr322<TD><TD ALIGN=CENTER>-<TD><TD ALIGN=RIGHT>56<TD><TD ALIGN=RIGHT>5.73e-06<TD>
+  <TD COLSPAN=2 ALIGN=RIGHT><TT>TTACGCATCT</TT><TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=orange><TT><B>G</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD><TD><TD ALIGN=LEFT><TT>CCGCATATGG</TT>
+<TR><TD>bglr1<TD><TD ALIGN=CENTER>-<TD><TD ALIGN=RIGHT>79<TD><TD ALIGN=RIGHT>9.29e-06<TD>
+  <TD COLSPAN=2 ALIGN=RIGHT><TT>TGATAAAAAT</TT><TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=blue
+  ><TT><B>C</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD><TD><TD ALIGN=LEFT><TT>GTTATTAACT</TT>
+<TR><TD>deop2<TD><TD ALIGN=CENTER>-<TD><TD ALIGN=RIGHT>10<TD><TD ALIGN=RIGHT>1.02e-05<TD>
+  <TD COLSPAN=2 ALIGN=RIGHT><TT>TCACTGTAAT</TT><TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=orange><TT><B>G</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD><TD><TD ALIGN=LEFT><TT>TAATTCACT</TT>
+<TR><TD>malt<TD><TD ALIGN=CENTER>+<TD><TD ALIGN=RIGHT>45<TD><TD ALIGN=RIGHT>1.12e-05<TD>
+  <TD COLSPAN=2 ALIGN=RIGHT><TT>ATTTGGAATT</TT><TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=blue
+  ><TT><B>C</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=blue
+  ><TT><B>C</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD><TD><TD ALIGN=LEFT><TT>TTCAGACACA</TT>
+<TR><TD>ce1cg<TD><TD ALIGN=CENTER>+<TD><TD ALIGN=RIGHT>65<TD><TD ALIGN=RIGHT>1.12e-05<TD>
+  <TD COLSPAN=2 ALIGN=RIGHT><TT>GACTGTTTTT</TT><TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD><TD><TD ALIGN=LEFT><TT>AAAATGGAAG</TT>
+<TR><TD>crp<TD><TD ALIGN=CENTER>-<TD><TD ALIGN=RIGHT>66<TD><TD ALIGN=RIGHT>1.35e-05<TD>
+  <TD COLSPAN=2 ALIGN=RIGHT><TT>GCACGGTAAT</TT><TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=blue
+  ><TT><B>C</B></TT></TD><TD CLASS=orange><TT><B>G</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=blue
+  ><TT><B>C</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD><TD><TD ALIGN=LEFT><TT>TACATGCAGT</TT>
+<TR><TD>uxu1<TD><TD ALIGN=CENTER>+<TD><TD ALIGN=RIGHT>21<TD><TD ALIGN=RIGHT>1.62e-05<TD>
+  <TD COLSPAN=2 ALIGN=RIGHT><TT>TGAAATTGTT</TT><TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=orange><TT><B>G</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=orange><TT><B>G</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=blue
+  ><TT><B>C</B></TT></TD><TD><TD><TD ALIGN=LEFT><TT>CAATTAGAAT</TT>
+<TR><TD>male<TD><TD ALIGN=CENTER>-<TD><TD ALIGN=RIGHT>17<TD><TD ALIGN=RIGHT>1.62e-05<TD>
+  <TD COLSPAN=2 ALIGN=RIGHT><TT>GTCGCTTTGT</TT><TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=orange><TT><B>G</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD><TD><TD ALIGN=LEFT><TT>GAATTGGCGG</TT>
+<TR><TD>tdc<TD><TD ALIGN=CENTER>+<TD><TD ALIGN=RIGHT>82<TD><TD ALIGN=RIGHT>1.77e-05<TD>
+  <TD COLSPAN=2 ALIGN=RIGHT><TT>AAGTTAATTT</TT><TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=orange><TT><B>G</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD><TD><TD ALIGN=LEFT><TT>TATCCTGTT</TT>
+<TR><TD>gale<TD><TD ALIGN=CENTER>+<TD><TD ALIGN=RIGHT>55<TD><TD ALIGN=RIGHT>5.66e-05<TD>
+  <TD COLSPAN=2 ALIGN=RIGHT><TT>TTTATTCCAT</TT><TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=blue
+  ><TT><B>C</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=blue
+  ><TT><B>C</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=blue
+  ><TT><B>C</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD><TD><TD ALIGN=LEFT><TT>TCTTTGTTAT</TT>
+<TR><TD>ilv<TD><TD ALIGN=CENTER>+<TD><TD ALIGN=RIGHT>43<TD><TD ALIGN=RIGHT>1.54e-04<TD>
+  <TD COLSPAN=2 ALIGN=RIGHT><TT>AGTACAAAAC</TT><TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD CLASS=red><TT><B>A</B></TT></TD><TD CLASS=blue
+  ><TT><B>C</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=blue
+  ><TT><B>C</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD><TD><TD ALIGN=LEFT><TT>ATTTTCCCTT</TT>
+<TR><TD>trn9cat<TD><TD ALIGN=CENTER>+<TD><TD ALIGN=RIGHT>40<TD><TD ALIGN=RIGHT>2.28e-04<TD>
+  <TD COLSPAN=2 ALIGN=RIGHT><TT>ATAAATCCTG</TT><TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=blue
+  ><TT><B>C</B></TT></TD><TD CLASS=blue><TT><B>C</B></TT></TD><TD CLASS=blue
+  ><TT><B>C</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=orange
+  ><TT><B>G</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=green
+  ><TT><B>T</B></TT></TD><TD CLASS=orange><TT><B>G</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD CLASS=green><TT><B>T</B></TT></TD><TD CLASS=red
+  ><TT><B>A</B></TT></TD><TD><TD><TD ALIGN=LEFT><TT>CCGGGAAGCC</TT>
+</TABLE>
+<HR><CENTER><A NAME=diagrams1></A>
+  <BIG><B> <A HREF="#diagrams_doc">	Motif 1 block diagrams</A> 
+</B></BIG></CENTER><HR>
+<TABLE SUMMARY='motif diagrams' BORDER=1>
+<TR><TH>Name<TH>Lowest<BR>p-value<TH ALIGN=LEFT>&nbsp;&nbsp; Motifs
+<TR>
+  <TD><A NAME=d8></A>lac
+ <TD ALIGN=RIGHT NOWRAP>1.5e-06
+ <TD><TABLE SUMMARY='diagram 8' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=22><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>-1
+  <TD WIDTH=158><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d12></A>ompa
+ <TD ALIGN=RIGHT NOWRAP>2.4e-06
+ <TD><TABLE SUMMARY='diagram 12' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=102><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>+1
+  <TD WIDTH=78><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d1></A>ara
+ <TD ALIGN=RIGHT NOWRAP>2.7e-06
+ <TD><TABLE SUMMARY='diagram 1' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=114><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>-1
+  <TD WIDTH=66><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d13></A>tnaa
+ <TD ALIGN=RIGHT NOWRAP>3.8e-06
+ <TD><TABLE SUMMARY='diagram 13' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=148><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>+1
+  <TD WIDTH=32><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d10></A>malk
+ <TD ALIGN=RIGHT NOWRAP>5.2e-06
+ <TD><TABLE SUMMARY='diagram 10' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=128><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>+1
+  <TD WIDTH=52><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d4></A>cya
+ <TD ALIGN=RIGHT NOWRAP>5.2e-06
+ <TD><TABLE SUMMARY='diagram 4' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=104><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>-1
+  <TD WIDTH=76><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d15></A>pbr322
+ <TD ALIGN=RIGHT NOWRAP>5.7e-06
+ <TD><TABLE SUMMARY='diagram 15' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=110><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>-1
+  <TD WIDTH=70><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d2></A>bglr1
+ <TD ALIGN=RIGHT NOWRAP>9.3e-06
+ <TD><TABLE SUMMARY='diagram 2' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=156><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>-1
+  <TD WIDTH=24><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d5></A>deop2
+ <TD ALIGN=RIGHT NOWRAP>1e-05
+ <TD><TABLE SUMMARY='diagram 5' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=18><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>-1
+  <TD WIDTH=162><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d11></A>malt
+ <TD ALIGN=RIGHT NOWRAP>1.1e-05
+ <TD><TABLE SUMMARY='diagram 11' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=88><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>+1
+  <TD WIDTH=92><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d0></A>ce1cg
+ <TD ALIGN=RIGHT NOWRAP>1.1e-05
+ <TD><TABLE SUMMARY='diagram 0' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=128><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>+1
+  <TD WIDTH=52><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d3></A>crp
+ <TD ALIGN=RIGHT NOWRAP>1.3e-05
+ <TD><TABLE SUMMARY='diagram 3' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=130><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>-1
+  <TD WIDTH=50><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d14></A>uxu1
+ <TD ALIGN=RIGHT NOWRAP>1.6e-05
+ <TD><TABLE SUMMARY='diagram 14' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=40><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>+1
+  <TD WIDTH=140><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d9></A>male
+ <TD ALIGN=RIGHT NOWRAP>1.6e-05
+ <TD><TABLE SUMMARY='diagram 9' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=32><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>-1
+  <TD WIDTH=148><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d17></A>tdc
+ <TD ALIGN=RIGHT NOWRAP>1.8e-05
+ <TD><TABLE SUMMARY='diagram 17' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=162><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>+1
+  <TD WIDTH=18><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d6></A>gale
+ <TD ALIGN=RIGHT NOWRAP>5.7e-05
+ <TD><TABLE SUMMARY='diagram 6' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=108><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>+1
+  <TD WIDTH=72><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d7></A>ilv
+ <TD ALIGN=RIGHT NOWRAP>0.00015
+ <TD><TABLE SUMMARY='diagram 7' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=84><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>+1
+  <TD WIDTH=96><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d16></A>trn9cat
+ <TD ALIGN=RIGHT NOWRAP>0.00023
+ <TD><TABLE SUMMARY='diagram 16' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=78><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>+1
+  <TD WIDTH=102><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR><TH CLASS='blue' COLSPAN=2 ROWSPAN=2 ALIGN=LEFT>SCALE
+  <TD><TABLE SUMMARY='scale' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+    <TD CLASS='blue' WIDTH=48 ALIGN=LEFT>|</TD>
+    <TD CLASS='blue' WIDTH=50 ALIGN=LEFT>|</TD>
+    <TD CLASS='blue' WIDTH=50 ALIGN=LEFT>|</TD>
+    <TD CLASS='blue' WIDTH=50 ALIGN=LEFT>|</TD>
+  <TR><TD CLASS='blue' WIDTH=48 ALIGN=LEFT>1</TD>
+    <TD CLASS='blue' WIDTH=50 ALIGN=LEFT>25</TD>
+    <TD CLASS='blue' WIDTH=50 ALIGN=LEFT>50</TD>
+    <TD CLASS='blue' WIDTH=50 ALIGN=LEFT>75</TD>
+  </TABLE>
+</TABLE>
+
+<HR><CENTER><A NAME=BLOCKS1></A>
+  <BIG><B> <A HREF="#BLOCKS_doc">	Motif 1 in BLOCKS format</A> 
+</B></BIG></CENTER><HR>
+<INPUT TYPE = "HIDDEN" NAME = "BLOCKS1" VALUE = "
+BL   MOTIF 1 width=15 seqs=18
+lac                      (   12) GTGAGCTAACTCACA  1 
+ompa                     (   52) CTGACGGAGTTCACA  1 
+ara                      (   58) GTGACGCCGTGCAAA  1 
+tnaa                     (   75) GTGATTCGATTCACA  1 
+malk                     (   65) GTGATGTTGCTTGCA  1 
+cya                      (   53) GTGATCAATTTAACA  1 
+pbr322                   (   56) GTGCGGTATTTCACA  1 
+bglr1                    (   79) ATGACCATGCTCACA  1 
+deop2                    (   10) GCGATCTGGTTCAAA  1 
+malt                     (   45) GTGACACAGTGCAAA  1 
+ce1cg                    (   65) TTGATCGTTTTCACA  1 
+crp                      (   66) GTGACGTCCTTTGCA  1 
+uxu1                     (   21) GTGATGTGGTTAACC  1 
+male                     (   17) GTGATCTCTGTTACA  1 
+tdc                      (   82) GTGAGTGGTCGCACA  1 
+gale                     (   55) GTCACACTTTTCGCA  1 
+ilv                      (   43) GTGATCAACCCCTCA  1 
+trn9cat                  (   40) GTGTCCCTGTTGATA  1 
+//
+
+ ">
+<INPUT TYPE = 'SUBMIT' NAME = 'action' VALUE = 'View BLOCK 1'>
+<INPUT TYPE = 'SUBMIT' NAME = 'action' VALUE = 'View FASTA 1'>
+<INPUT TYPE = 'SUBMIT' NAME = 'action' VALUE = 'View RAW 1'>
+<BR><INPUT TYPE = 'SUBMIT' NAME = 'action' VALUE = 'Submit BLOCK 1'>
+<B>to <A HREF='http://www.blocks.fhcrc.org/blocks/process_blocks.html'>BLOCKS multiple alignment processor.</A></B>
+<HR><CENTER><A NAME=pssm1></A>
+  <BIG><B> <A HREF="#pssm_doc">	Motif 1 position-specific scoring matrix</A> 
+</B></BIG></CENTER><HR>
+<INPUT TYPE = "HIDDEN" NAME = "pssm1" VALUE = "
+log-odds matrix: alength= 4 w= 15 n= 1638 bayes= 6.49185 E= 3.4e-006 
+  -245   -182    209   -245 
+ -1081   -182  -1081    163 
+ -1081   -182    227  -1081 
+   155   -182  -1081   -245 
+ -1081     99    -23     55 
+  -145    118     77   -145 
+   -87     50    -23     35 
+    13    -23     18    -13 
+  -145    -82    118     13 
+ -1081     50   -182    113 
+ -1081   -182    -23    135 
+  -145    177   -182    -87 
+   135  -1081    -23   -245 
+   -87    199  -1081   -245 
+   163   -182  -1081  -1081 
+ ">
+<INPUT TYPE = 'SUBMIT' NAME = 'action' VALUE = 'View PSSM 1'>
+
+<HR><CENTER><A NAME=pspm1></A>
+  <BIG><B> <A HREF="#pspm_doc">	Motif 1 position-specific probability matrix</A> 
+</B></BIG></CENTER><HR>
+<INPUT TYPE = "HIDDEN" NAME = "pspm1" VALUE = "
+letter-probability matrix: alength= 4 w= 15 nsites= 18 E= 3.4e-006 
+ 0.055556  0.055556  0.833333  0.055556 
+ 0.000000  0.055556  0.000000  0.944444 
+ 0.000000  0.055556  0.944444  0.000000 
+ 0.888889  0.055556  0.000000  0.055556 
+ 0.000000  0.388889  0.166667  0.444444 
+ 0.111111  0.444444  0.333333  0.111111 
+ 0.166667  0.277778  0.166667  0.388889 
+ 0.333333  0.166667  0.222222  0.277778 
+ 0.111111  0.111111  0.444444  0.333333 
+ 0.000000  0.277778  0.055556  0.666667 
+ 0.000000  0.055556  0.166667  0.777778 
+ 0.111111  0.666667  0.055556  0.166667 
+ 0.777778  0.000000  0.166667  0.055556 
+ 0.166667  0.777778  0.000000  0.055556 
+ 0.944444  0.055556  0.000000  0.000000 
+ ">
+<INPUT TYPE = 'SUBMIT' NAME = 'action' VALUE = 'View PSPM 1'>
+
+<PRE>
+
+
+
+
+
+Time  0.70 secs.
+
+</PRE>
+
+<A NAME='summary2'></A><HR><CENTER><A NAME=motif-summary></A>
+ <TABLE SUMMARY='buttons' ALIGN=LEFT CELLSPACING=0><TR>
+  <TD BGCOLOR='#OOFFFF'><A HREF="#summary1"><B>P</B></A>
+  <TD BGCOLOR='#FFFFOO'><A HREF="#summary1"><B>N</B></A></TABLE> <BIG><B> <A HREF="#motif-summary_doc">SUMMARY OF MOTIFS</A> <BR CLEAR=LEFT>
+</B></BIG></CENTER><HR>
+<HR><CENTER>  <BIG><B>
+ 	Combined block diagrams: non-overlapping sites with p-value < 0.0001 
+</B></BIG></CENTER><HR><TABLE SUMMARY='motif diagrams' BORDER=1>
+<TR><TH>Name<TH>Combined<BR>p-value<TH ALIGN=LEFT>&nbsp;&nbsp; Motifs
+<TR>
+  <TD><A NAME=d0></A>ce1cg
+ <TD ALIGN=RIGHT NOWRAP>2.03e-03
+ <TD><TABLE SUMMARY='diagram 0' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=128><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>+1
+  <TD WIDTH=52><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d1></A>ara
+ <TD ALIGN=RIGHT NOWRAP>4.96e-04
+ <TD><TABLE SUMMARY='diagram 1' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=114><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>-1
+  <TD WIDTH=66><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d2></A>bglr1
+ <TD ALIGN=RIGHT NOWRAP>1.69e-03
+ <TD><TABLE SUMMARY='diagram 2' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=156><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>-1
+  <TD WIDTH=24><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d3></A>crp
+ <TD ALIGN=RIGHT NOWRAP>2.45e-03
+ <TD><TABLE SUMMARY='diagram 3' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=130><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>-1
+  <TD WIDTH=50><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d4></A>cya
+ <TD ALIGN=RIGHT NOWRAP>9.39e-04
+ <TD><TABLE SUMMARY='diagram 4' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=104><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>-1
+  <TD WIDTH=76><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d5></A>deop2
+ <TD ALIGN=RIGHT NOWRAP>1.86e-03
+ <TD><TABLE SUMMARY='diagram 5' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=18><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>-1
+  <TD WIDTH=162><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d6></A>gale
+ <TD ALIGN=RIGHT NOWRAP>1.02e-02
+ <TD><TABLE SUMMARY='diagram 6' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=108><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>+1
+  <TD WIDTH=72><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d7></A>ilv
+ <TD ALIGN=RIGHT NOWRAP>2.77e-02
+ <TD><TABLE SUMMARY='diagram 7' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=210><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d8></A>lac
+ <TD ALIGN=RIGHT NOWRAP>2.78e-04
+ <TD><TABLE SUMMARY='diagram 8' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=22><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>-1
+  <TD WIDTH=158><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d9></A>male
+ <TD ALIGN=RIGHT NOWRAP>2.94e-03
+ <TD><TABLE SUMMARY='diagram 9' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=32><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>-1
+  <TD WIDTH=148><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d10></A>malk
+ <TD ALIGN=RIGHT NOWRAP>9.39e-04
+ <TD><TABLE SUMMARY='diagram 10' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=128><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>+1
+  <TD WIDTH=52><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d11></A>malt
+ <TD ALIGN=RIGHT NOWRAP>2.03e-03
+ <TD><TABLE SUMMARY='diagram 11' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=88><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>+1
+  <TD WIDTH=92><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d12></A>ompa
+ <TD ALIGN=RIGHT NOWRAP>4.43e-04
+ <TD><TABLE SUMMARY='diagram 12' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=102><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>+1
+  <TD WIDTH=78><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d13></A>tnaa
+ <TD ALIGN=RIGHT NOWRAP>6.86e-04
+ <TD><TABLE SUMMARY='diagram 13' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=148><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>+1
+  <TD WIDTH=32><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d14></A>uxu1
+ <TD ALIGN=RIGHT NOWRAP>2.94e-03
+ <TD><TABLE SUMMARY='diagram 14' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=40><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>+1
+  <TD WIDTH=140><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d15></A>pbr322
+ <TD ALIGN=RIGHT NOWRAP>1.04e-03
+ <TD><TABLE SUMMARY='diagram 15' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=110><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>-1
+  <TD WIDTH=70><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d16></A>trn9cat
+ <TD ALIGN=RIGHT NOWRAP>4.06e-02
+ <TD><TABLE SUMMARY='diagram 16' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=210><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR>
+  <TD><A NAME=d17></A>tdc
+ <TD ALIGN=RIGHT NOWRAP>3.22e-03
+ <TD><TABLE SUMMARY='diagram 17' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+  <TD WIDTH=162><HR SIZE=4 NOSHADE>
+  <TD CLASS='c0' WIDTH=30>+1
+  <TD WIDTH=18><HR SIZE=4 NOSHADE>
+  <TD WIDTH=22>
+ </TABLE>
+<TR><TH CLASS='blue' COLSPAN=2 ROWSPAN=2 ALIGN=LEFT>SCALE
+  <TD><TABLE SUMMARY='scale' WIDTH=232 BORDER=0 ALIGN=LEFT CELLSPACING=0 CELLPADDING=0><TR ALIGN=CENTER>
+    <TD CLASS='blue' WIDTH=48 ALIGN=LEFT>|</TD>
+    <TD CLASS='blue' WIDTH=50 ALIGN=LEFT>|</TD>
+    <TD CLASS='blue' WIDTH=50 ALIGN=LEFT>|</TD>
+    <TD CLASS='blue' WIDTH=50 ALIGN=LEFT>|</TD>
+  <TR><TD CLASS='blue' WIDTH=48 ALIGN=LEFT>1</TD>
+    <TD CLASS='blue' WIDTH=50 ALIGN=LEFT>25</TD>
+    <TD CLASS='blue' WIDTH=50 ALIGN=LEFT>50</TD>
+    <TD CLASS='blue' WIDTH=50 ALIGN=LEFT>75</TD>
+  </TABLE>
+</TABLE>
+<INPUT TYPE = "HIDDEN" NAME = "motif-summary" VALUE = "
+ce1cg 2.03e-03 1 105  +1 64 1.12e-05
+ara 4.96e-04 1 105  -1 57 2.72e-06
+bglr1 1.69e-03 1 105  -1 78 9.29e-06
+crp 2.45e-03 1 105  -1 65 1.35e-05
+cya 9.39e-04 1 105  -1 52 5.16e-06
+deop2 1.86e-03 1 105  -1 9 1.02e-05
+gale 1.02e-02 1 105  +1 54 5.66e-05
+ilv 2.77e-02 0 105
+lac 2.78e-04 1 105  -1 11 1.53e-06
+male 2.94e-03 1 105  -1 16 1.62e-05
+malk 9.39e-04 1 105  +1 64 5.16e-06
+malt 2.03e-03 1 105  +1 44 1.12e-05
+ompa 4.43e-04 1 105  +1 51 2.44e-06
+tnaa 6.86e-04 1 105  +1 74 3.77e-06
+uxu1 2.94e-03 1 105  +1 20 1.62e-05
+pbr322 1.04e-03 1 105  -1 55 5.73e-06
+trn9cat 4.06e-02 0 105
+tdc 3.22e-03 1 105  +1 81 1.77e-05
+ ">
+<INPUT TYPE = HIDDEN NAME = nmotifs VALUE = 1><BR><INPUT TYPE = 'SUBMIT' NAME = 'action' VALUE = 'View motif summary'> <B>Motif summary in machine readable format.</B>
+
+<HR><CENTER><A NAME=stopped></A>
+  <BIG><B> <A HREF="#stopped_doc">Stopped</A>  because nmotifs = 1 reached.
+</B></BIG></CENTER><HR>
+<PRE>
+
+CPU: www05
+
+</PRE>
+
+<!---
+##
+## $Id: crp0.ememe,v 1.1 2009/01/21 10:35:56 smoretti Exp $
+##
+## $Log: crp0.ememe,v $
+## Revision 1.1  2009/01/21 10:35:56  smoretti
+## Add missing tests for EMBASSY programs: hmm.ehmmfetch, hmm.ehmmindex, hmm.ehmmpfam, nucleic_rna_folding.vrnaalifoldpf, nucleic_rna_folding.vrnacofoldconc, nucleic_rna_folding.vrnacofoldpf, nucleic_rna_folding.vrnafoldpf, nucleic_rna_folding.vrnapaln, utils_database_creation.cathparse, utils_database_creation.pdbtosp, utils_database_creation.ssematch. + Add some missing input test files in data/embassyTestsInputs/
+##
+## Revision 1.2  2006/01/03 01:56:13  tbailey
+## Fix documentation of PSSM and PSPM in meme-explanation.html and
+## meme-output-example.html.
+##
+## Revision 1.1  2005/10/13 21:15:51  nadya
+## move meme-explanation.html to etc/ to allow html conversion without installing web site
+##
+##
+##
+--->
+
+<A NAME=explanation>
+<CENTER><H3><HR>
+EXPLANATION OF MEME RESULTS
+<HR></H3></CENTER>
+
+<H4>The MEME results consist of:</H4>
+
+<UL>
+<A NAME=version_doc></A><LI>
+	The <A HREF=#version><B>version</B></A>
+        of MEME and the date it was released.
+<A NAME=reference_doc></A><LI>
+	The <A HREF=#reference><B>reference</B></A>
+        to cite if you use MEME in your research.
+<A NAME=sequences_doc></A><LI>
+	A description of the
+        <A HREF=#sequences><B>sequences</B></A>
+        you submitted (the "training set") showing the name,
+	"weight" and length of each sequence.
+<A NAME=command_doc></A><LI>
+	The <A HREF=#command><B>command line summary
+        </B></A> detailing the parameters with which you ran MEME.
+<A NAME=motifs_doc></A><LI>
+	Information on each of the
+        <A HREF=#motifs><B>motifs</B></A> MEME discovered, including:
+<OL>
+<LI>    A <A NAME=summary_doc HREF=#summary_doc2>
+	summary line</A>
+        showing the width, number of occurrences, log likelihood ratio
+	and statistical significance of the motif.
+<LI>    A <A NAME=simplified_doc HREF=#simplified_doc2>
+        simplified position-specific probability matrix</A>.
+<LI>    A <A NAME=IC_doc HREF=#IC_doc2>
+	diagram</A>
+        showing the degree of conservation at each motif position.
+<LI>    A <A NAME=consensus_doc HREF=#consensus_doc2>
+        multilevel consensus sequence</A> 
+	showing the most conserved letter(s) at each motif position.
+<LI>    The <A NAME=sites_doc HREF=#sites_doc2>
+	occurrences of the motif</A>
+	sorted by <I>p</I>-value and aligned with each other.
+<LI>	<A NAME=diagrams_doc HREF=#diagrams_doc2>
+	Block diagrams</A> 
+	of the occurrences of the motif within each sequence in the training 
+	set.
+<LI>    The motif in 
+	<A NAME=BLOCKS_doc HREF=#BLOCKS_doc2>
+	BLOCKS or FASTA format</A>.
+<LI>    A <A NAME=pssm_doc HREF=#pssm_doc2>
+        position-specific scoring matrix (PSSM)</A> 
+	for use by the
+        <A HREF="mast-intro.html">MAST</A> database search program.
+<LI>    The <A NAME=pspm_doc HREF=#pspm_doc2>
+        position specific probability matrix (PSPM)</A> 
+	describing the motif.
+</OL>
+
+<A NAME=motif-summary_doc></A><LI>
+	A <A HREF=#motif-summary><B>summary of motifs</B></A>
+        showing an optimized (non-overlapping) tiling of all of the motifs onto
+        each of the sequences in the training set.
+<A NAME=stopped_doc></A><LI>
+	The reason why MEME <A HREF=#stopped>stopped</A>
+	and the name of the CPU on which it ran.
+<A NAME=explanation_doc></A><LI>
+	This <B>explanation</B> of how to interpret MEME results.
+</UL>
+
+<P>
+<A HREF=#summary1 NAME=motifs> MOTIFS </A>
+
+<P>
+For each motif that it discovers in the training set,
+MEME prints the following information:
+ 
+<UL>
+<P>
+<LI> <A NAME=summary_doc2 HREF=#summary1><H4>Summary Line</H4></A>
+
+This line gives the width (`width'), 
+number of occurrences in the training set (`sites'), log likelihood
+ratio (`llr') and <I>E</I>-value of the motif.
+Each motif describes a pattern of a fixed width--no gaps are allowed in
+MEME motifs.
+MEME numbers the motifs consecutively from one as it finds them. 
+MEME usually finds the most statistically significant (low <I>E</I>-value) 
+motifs first.
+The statistical significance of a motif is based on its log likelihood ratio,
+its width and number of occurrences, the background letter frequencies
+(given in the <A HREF=#command_doc>command line summary</A>), and 
+the size of the training set.  The <I>E</I>-value is an
+estimate of the expected number of motifs with the given log likelihood
+ratio (or higher), and with the same width and number of occurrences,
+that one would find in a similarly sized set of random sequences. 
+(In random sequences each position is independent with letters chosen
+according to the background letter frequencies.)  The log likelihood
+ratio is the logarithm of the ratio of the probability of the occurrences 
+of the motif given the motif model (likelihood given the motif) 
+versus their probability given the background model (likelihood given the
+null model).  (Normally the background model is a 0-order Markov model
+using the background letter frequencies, but higher order Markov models
+may be specified via the <B>-bfile</B> option to MEME.)
+
+Clicking on the <B>buttons</B> to the left of the motif summary line 
+takes you to the previous motif (P) or next motif (N).
+
+<P>
+<LI> <A NAME=simplified_doc2 HREF=#simplified1><H4>Simplified 
+  Position-Specific Probability Matrix</H4></A>
+
+MEME motifs are represented by position-specific probability matrices 
+that specify the probability of each possible letter appearing at each
+possible position in an occurrence of the motif.  In order to make it easier 
+to see which letters are most likely in each of the columns of the
+motif, the simplified motif shows the letter probabilities multiplied by 10 
+rounded to the nearest integer ("a" means 10).  Zeros are replaced by ":" 
+(the colon) for readability.
+
+<P>
+<LI> <A NAME=IC_doc2 HREF=#IC1><H4>Information Content Diagram</H4></A>
+
+The information content diagram provides 
+an idea of which positions in the motif are most highly conserved.
+Each column (position) in a motif can be characterized by the amount of
+information it contains (measured in bits).  Highly conserved positions
+in the motif have high information; positions where all letters are equally
+likely have low information.  (The information content is relative to
+the background letter frequencies which are given in the 
+<A HREF=#command_doc>command line summary</A> section.)
+The diagram is printed so that each column lines up with the same column in 
+the simplified position-specific probability matrix above it.
+
+Columns in the information content diagram are colored according to the
+majority category of the letters occurring in that column of the alignment.
+If no letter category has frequency above 0.5, the column in the diagram
+is colored black.  For DNA sequences, the letter categories contain one letter
+each.  For proteins,  the categories are based on the biochemical properties
+of the various amino acids.  The categories and their colors are:
+<P>
+<CENTER>
+  <TABLE BORDER>
+    <TR> <TH>NUCLEIC ACIDS</TH> <TH ALIGN=LEFT>COLOR</TH> </TR>
+    <TR> 
+      <TD>A</TD> 
+      <TD><FONT COLOR=RED>RED</FONT></TD></TR>
+    <TR> 
+       <TD>C</TD> 
+       <TD><FONT COLOR=BLUE>BLUE</FONT></TD></TR>
+    <TR> 
+      <TD>G</TD> 
+      <TD><FONT COLOR=ORANGE>ORANGE</FONT></TD></TR>
+    <TR> 
+      <TD>T</TD> 
+      <TD><FONT COLOR=GREEN>GREEN</FONT></TD></TR>
+  </TABLE>
+  <P>
+  <TABLE BORDER>
+    <TR> <TH>AMINO ACIDS</TH> <TH ALIGN=LEFT>COLOR</TH> 
+	 <TH ALIGN=LEFT>PROPERTIES</TH> </TR>
+      <TD>A, C, F, I, L, V, W and M</TD>
+      <TD><FONT COLOR=BLUE>BLUE</FONT></TD>
+      <TD>Most hydrophobic[Kyte and Doolittle, 1982]</TD>
+    </TR>
+    <TR>
+      <TD>NQST</TD>
+      <TD><FONT COLOR=GREEN>GREEN</FONT></TD>
+      <TD>Polar, non-charged, non-aliphatic residues</TD>
+    </TR>
+    <TR>
+      <TD>DE</TD>
+      <TD><FONT COLOR=MAGENTA>MAGENTA</FONT></TD>
+      <TD>Acidic</TD>
+    </TR>
+    <TR>
+      <TD>KR</TD>
+      <TD><FONT COLOR=RED>RED</FONT></TD>
+      <TD>Positively charged</TD>
+    </TR>
+    <TR>
+      <TD>H</TD>
+      <TD><FONT COLOR=PINK>PINK</FONT></TD> </TR>
+    <TR>
+      <TD>G</TD>
+      <TD><FONT COLOR=ORANGE>ORANGE</FONT></TD> </TR>
+    <TR>
+      <TD>P</TD>
+      <TD><FONT COLOR=YELLOW>YELLOW</FONT></TD> </TR>
+    <TR>
+      <TD>Y</TD>
+      <TD><FONT COLOR=TURQUOISE>TURQUOISE</FONT></TD> </TR>
+  </TABLE>
+</CENTER>
+<p>
+J. Kyte and R. Doolittle, 1982.
+"A Simple Method for Displaying the Hydropathic Character of a Protein",
+J. Mol Biol. 157, 105-132.
+
+<p>
+Summing the information content for each position in the motif gives
+the total information content of the motif (shown in parentheses to the
+left of the diagram).  The total information content is approximately
+equal to the log likelihood ratio divided by the number of occurrences times
+ln(2).
+The total information content gives a measure of
+the usefulness of the motif for database searches.
+For a motif to be useful for database searches, it must as a rule contain at 
+least log_2(N) bits of information 
+where N is the number of sequences in the database being searched.  
+For example, to effectively search a database containing 100,000 sequences
+for occurrences of a <I>single</I> motif, the motif should have an IC of at
+least 16.6 bits.  Motifs with lower information content are still useful when a 
+family of sequences shares more than one motif since they can be combined
+in <I>multiple</I> motif searches (using MAST).
+
+<P>
+<LI> <A NAME=consensus_doc2 HREF=#consensus1><H4>Multilevel 
+  Consensus Sequence</H4></A>
+
+The multilevel consensus sequence corresponding to the motif is an aid in 
+remembering and understanding the motif.   It is calculated from the motif 
+position-specific probability matrix as follows.  
+Separately for each column of the motif, 
+the letters in the alphabet are sorted in decreasing order by the probability 
+with which they are expected to occur in that position of motif occurrences.  
+The sorted letters are then printed vertically with the most probable letter 
+on top.  Only letters with probabilities of 0.2 or higher at that position in 
+the motif are printed.  As an example, the multilevel consensus sequence of 
+motif 1 in the sample output is:
+<PRE>
+<B>Multilevel</B> <B>TTATGTGAACGACGTCACACT</B>
+<B>consensus</B>  AA  T A G A GA     AA
+<B>sequence</B>           T C TT     T
+</PRE>
+This multilevel consensus sequence says several things about the motif.
+First, the most likely form of the motif
+can be read from the top line as 
+<TT>TTATGTGAACGACGTCACACT</TT>.
+Second, that only letter <TT>A</TT> has probability more than 0.2 in
+position 3 of the motif, both <TT>T</TT> and <TT>A</TT> have probability
+greater than 0.2 in position 1, etc.
+Third, a <I>rough approximation</I> of the motif can be made by converting the
+multilevel consensus sequence into the Prosite signature<UL> 
+<TT>[TA]-[TA]-A-T-[GT]-[T]-[GA]-A-[AGT]-C-[GAC]-A-[CGT]-[GAT]-T-C-A-C-A-[CAT]-[TA]</TT>.</UL>
+
+<P>
+<LI> <A NAME=sites_doc2 HREF=#sites1><H4>Occurrences of the Motif</H4></A>
+
+MEME displays the occurrences (sites) of the motif in the training set.  
+The sites are shown aligned with each other, and the ten sequence
+positions preceding and following each site are also shown.
+Each site is identified by the name of the sequence where it occurs,
+the strand (if both strands of DNA sequences are being used), and the
+position in the sequence where the site begins.  When the DNA strand
+is specified, `+' means the sequence in the training set,
+and `-' means the reverse complement of the training set sequence.
+(For `-' strands, the `start' position is actually the position on the
+<B>positive</B> strand where the site ends.)
+The sites are listed in order of increasing statistical significance
+(<I>p</I>-value).  The <I>p</I>-value of a site is computed from the the match 
+score of the site with the <A HREF=#pssm>position specific scoring matrix</A> 
+for the motif.  The <I>p</I>-value gives the probability of a random string
+(generated from the background letter frequencies) having the same match
+score or higher.  (This is referred to as the <B>position <I>p</I>-value</B>
+by the MAST algorithm.)
+
+<P>
+<LI> <A NAME=diagrams_doc2 HREF=#diagrams1><H4>
+Block Diagrams of Motif Occurrences</H4>
+</A>
+The occurrences of the motif in the training set sequences are 
+shown with MAST-style block diagrams.  One diagram is printed for each
+sequence showing all the occurrences of the motif in that sequence.
+The sequences are sorted by the <B>lowest</B> <I>p</I>-value among all 
+occurrences of the motif in a given sequence.
+(The <I>p</I>-value of an occurrence is the probability of a single
+random subsequence the length of the motif,
+generated according to the 0-order background model, having a score
+at least as high as the score of the occurrence.)
+When the DNA strand is specified, `+' means the motif appears from left to
+right on the sequence, and `-' means the motif appears from right to left 
+on the complementary strand.
+A sequence position scale is shown at the end of each table of block
+diagrams.  Very long sequences are shown with thick lines connecting the
+motifs and are <B>not</B> drawn to scale.
+
+<P>
+<LI> <A NAME=BLOCKS_doc2 HREF=#BLOCKS1><H4>
+Motif in BLOCKS format or FASTA format</H4>
+</A>
+
+For use with 
+<A HREF="http://blocks.fhcrc.org/blocks">BLOCKS tools</A>, 
+MEME prints the occurrences of the motif in BLOCKS format. 
+<P>
+You can convert these blocks to 
+PSSMs (position-specific scoring matrices), LOGOS (color representations
+of the motifs), phylogeny trees and search them against a database of other
+blocks by pasting everything from the "BL" line to the "//" line (inclusive)
+into the  
+<A HREF=http://blocks.fhcrc.org/blocks/process_blocks.html>
+Multiple Alignment Processor.</A> 
+If you include the <B>-print_fasta</B> switch on the command line, MEME prints
+the motif sites in FASTA format instead of BLOCKS format.
+
+<P>
+<LI> <A NAME=pssm_doc2 HREF=#pssm1><H4>Position-Specific Scoring Matrix</H4></A>
+
+The position-specific scoring matrix corresponding to the motif is printed
+for use by database search programs such as MAST.  This matrix is a
+log-odds matrix calculated
+by taking the log (base 2) of the ratio <I>p/f</I> at each position in
+the motif where <I>p</I> is the probability of a particular letter at that
+position in the motif, and <I>f</I> is the background frequency of the
+letter (given in the <A HREF=#command_doc>command line summary</A> section.)
+This is the same matrix that is used above in computing the <I>p</I>-values
+of the occurrences of the motif in the <A HREF=#sites_doc2>Occurrences of the
+Motif</A> and <A HREF=#diagrams_doc2>Block Diagrams of Motif Occurrences</A>
+sections.  
+The scoring matrix is printed "sideways"--columns
+correspond to the letters in the alphabet (in the same order as shown in
+the simplified motif) and rows corresponding to the positions of the motif,
+position one first.  The scoring matrix is preceded by a line starting with
+"log-odds matrix:" and containing the length of the alphabet, width
+of the motif, number of characters in the training set, the scoring 
+threshold (obsolete) and the motif <I>E</I>-value.
+<P>
+<B>Note:</B> The probability <I>p</I> used to compute the PSSM
+is <I>not</I> exactly the same as the corresponding value in the 
+Position Specific Probability Matrix (PSPM).  
+The values of <I>p</I> used to compute the PSSM take
+into account the motif prior, whereas the values in the PSPM are just
+the <I>observed</I> frequencies of letters in the motif sites.
+
+<P>
+<LI> <A NAME=pspm_doc2 HREF=#pspm1><H4>
+Position-Specific Probability Matrix</H4></A>
+
+The motif itself is a position-specific probability matrix giving,
+for each position in the pattern, the observed frequency 
+("probability") of each possible letter.  
+The probability matrix is printed "sideways"--columns
+correspond to the letters in the alphabet (in the same order as shown in
+the simplified motif) and rows corresponding to the positions of the motif,
+position one first.
+The motif is preceded by a line starting with
+"letter-probability matrix:" and containing the length of the alphabet, width
+of the motif, number of occurrences of the motif, and the <I>E</I>-value of the
+motif.
+<p>
+<b>Note:</b> Earlier versions
+of MEME gave the posterior probabilities--the probability after applying
+a prior on letter frequencies--rather than the observed frequencies.
+These versions of MEME also gave the number of <I>possible</I>
+positions for the motif rather than the actual number of occurrences.
+The output from these earlier versions of MEME can be distinguished
+by "n=" rather than "nsites=" in the line preceding the matrix.
+
+</UL>
+<HR><TABLE SUMMARY='buttons' ALIGN=LEFT CELLSPACING=0><TR>
+  <TD BGCOLOR='#DDDDFF'><A HREF="#top_buttons"><B>Go to top</B></A></TABLE><BR>
+</FORM>
+</BODY>
+</HTML>

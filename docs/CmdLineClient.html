@@ -1,0 +1,199 @@
+<html> <head>
+<title>Soaplab2: Command-line client</title>
+
+<link rel="shortcut icon" href="images/favicon.ico" >
+<link rel="icon" href="images/animated_favicon1.gif" type="image/gif" >
+<link rel="stylesheet" href="images/stylesheet.css" type="text/css">
+
+</head>
+
+<body>
+<h1>Command-line Client Guide</h1>
+<img class="motto-img" src="images/motto-command-line-client.jpg" border=0 align="left"/>
+
+The main Soaplab2 command-line client is a typical testing tool. It
+covers the full functionality of the Soaplab2 features but it is,
+after all, only a command-line program. Which means that its
+user-friendliness is limited, but it can be very well used for testing
+and for batch and automated Soaplab2 services calls.
+
+<br clear="all"/>
+
+<pre class="sscript">
+CmdLineClient
+=============
+
+Usage:
+   build/run/run-cmdline-client -h[elp]
+   build/run/run-cmdline-client &lt;find-arguments&gt; &lt;list-options&gt;
+   build/run/run-cmdline-client &lt;find-arguments&gt; [options] [inputs] [results] 
+
+where:
+
+  -h[elp]  ... print this help
+  -q       ... quiet mode (useful when you want to redirect
+               a result into a file)
+  -stack   ... in case of any error it prints the stack trace
+               (without this option, it prints it only when a
+                serious runtime error occures)
+
+where &lt;find-arguments&gt; defines what service to use, where to find it
+and what protocol to use to access it (some of these parameters may
+also be specified in the Soaplab client configuration property file -
+by default named soaplab.client.properties and put on the CLASSPATH):
+
+   -protocol jaxws   ... service will be accessed as a Web Service,
+                         using JAX-WS toolkit (default protocol)
+   -protocol local   ... service will be accessed as local class
+                         (no remote server or any Web Service used)
+   -protocol axis1   ... service will be accessed as a Web Service,
+                         using old Axis 1 toolkit (such protocol may
+                         not be supported by the given Soaplab server)
+
+   -host &lt;host&gt;      ... host name (default: localhost)
+   -port &lt;port&gt;      ... port number (defaullt: 8080)
+   -ctx &lt;context&gt;    ... context part of the URL (default: soaplab2)
+
+ For Analysis service requests:
+
+   -name &lt;service&gt;   ... a name of a service to be called
+                         (mostly mandatory, unless -e given or
+                          only &lt;list-options&gt; used)
+
+   -e &lt;url&gt;          ... a full service URL (an endpoint);
+                         if given it has precedence over -host, -port,
+                         -ctx, and -name;
+                         default is created from other parameters as:
+                         http://&lt;host&gt;:&lt;port&gt;/&lt;context&gt;/services/&lt;service&gt;
+
+ For List service requests:
+
+   -lname &lt;service&gt;  ... a name of a list service to be called
+                         (default   'AnalysisFactory' for axis1 protocol,
+                          otherwise 'list')
+
+   -el &lt;url&gt;         ... a full List service URL (an endpoint);
+                         if given it has precedence over -host, -port, -ctx,
+                         and -lname;
+                         default is created from other parameters as:
+                         http://&lt;host&gt;:&lt;port&gt;/&lt;context&gt;/services/&lt;list-service&gt;
+
+   -sl &lt;filename&gt;    ... where to save produced lists;
+                         by default the lists are shown on standard
+                         output (which is usually a screen)
+
+
+where &lt;list-options&gt; defines list request:
+
+   -l                ... show all analyses and categories
+   -la               ... show all analyses
+   -lad              ... show all analyses with short descriptions
+   -lc               ... show all categories
+   -category &lt;category-name&gt;
+                     show analyses of the given category
+
+where the main &lt;options&gt; are one of the following (the behaviour may
+depend on whether also parameter '-job' is given):
+
+   -j                ... create a job, but not start it
+   -x                ... create a job and start it, but do not wait for it
+   -x -job &lt;job-ID&gt;  ... start given job, do not wait for it
+                         (note that the options -j and -x have none or only
+                          limited use for '-protocol local')
+   -w                ... create a job, start it, wait for its completion
+   -w -job &lt;job-ID&gt;  ... wait for completion of the given job
+   -k -job &lt;job-ID&gt;  ... kill the given job
+   -jp &lt;file&gt;        ... store a job ID into given file
+                         (default: print it on standard error)
+
+where other &lt;options&gt; are (they are associated either with a job
+created in the same invocation, or with a job defined by a '-job' parameter):
+
+   -s                ... print job status
+   -c                ... print job time characteristics
+   -le               ... print the last event associated with a job
+                         (TBD: more options related to notification)
+   -clean            ... destroy given job and all its resources
+                         (which includes removing also results)
+
+where options showing metadata (not associated with any particular job) are:
+
+   -d                ... show analysis full description
+                         (it prints an XML file with all details)
+   -t                ... show analysis type and few other properties
+   -i                ... show names of analysis inputs
+   -ii               ... show names and attributes of analysis inputs
+   -o                ... show names of possible results
+   -oo               ... show names and types of possible results
+
+where &lt;inputs&gt; is a list of input names and its values:
+      available names can be found using option -i,
+
+   &lt;input-name&gt; &lt;input-value&gt;
+      for boolean inputs the &lt;input-value&gt; should be
+      'true' or 'false' (but see also below -&lt;input-name&gt;);
+
+      some inputs allow multiple (repetitive) values - they can be
+      entered using a bar character as separator '|', for example:
+         name 'Kim|Blanka'
+      (note that the quote characters must be there to avoid the UNIX
+       shell to misinterpret the bar character);
+      you need to quote the value if the bar character should be part
+      of the value, for example (again, double quoting is because of
+      the UNIX shell):
+         name "'this|is|not|a|pipe'"  (means just single value)
+                     
+   &lt;input-name&gt; :&lt;input-value&gt;
+      a value starting with ':' is treated as a file name
+      and the contents of this file is used as an input;
+
+      multiple (repetitive) values with file names are also allowed:
+         name ':file1|:file2|not-a-file'
+
+   &lt;input-name&gt; ::&lt;input-value&gt;
+      a value starting with two colons ('::') is treated as a file
+      name whose contents is a list of line-separated file names;
+      these files are read and their contents is sent as an array
+      to the service as an input (of course, it works only for the
+      services that expects such input);
+
+      Note that this feature cannot be combined with a
+      repeatable value;
+
+   -&lt;input-name&gt;
+      can be used for boolean parameters and it means the same as:
+        &lt;input-name&gt; true
+
+
+
+where &lt;results&gt; defines if any results will be returned back:
+
+   -ri                ... return info (such as size) about all results
+   -r                 ... return all results
+   -r &lt;list of names&gt; ... what results to retrieve,
+                          available result names can be found using option -o
+                          (no list means getting all available results);
+                          Note: the binary results are written into a file,
+                                or into several files, with unique names
+                                (unless given an almost undocumented
+                                 "binary print" option -bp) 
+   -sr                    saves results (except 'report') to the current
+                          working directory
+</pre>
+
+
+<p>
+<iframe id="maintoc" src="TOC.html" scrolling="auto"></iframe>
+
+<div align=right><font size=-2>
+<!-- hhmts start -->
+Last modified: Mon Feb  4 17:27:32 2008
+<!-- hhmts end -->
+</font></div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1011961-1";
+urchinTracker();
+</script>
+</body> </html>

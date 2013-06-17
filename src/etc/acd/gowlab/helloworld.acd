@@ -1,0 +1,9 @@
+appl: Gowlab [
+  documentation: "Classic greeting from the beginning of the UNIX epoch"
+  groups: "Gowlab"
+  nonemboss: "Y"
+  comment: "launcher get"
+  supplier: "http://www.ebi.ac.uk/~senger/cgi-bin/helloworld.cgi"
+]
+outfile: result  [
+]

@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+#  Run Soaplab main command-line client.
+#
+#  Use ./build/run/run-cmdline-client -help for list of
+#  all available arguments.
+#
+#  $Id: run-cmdline-client,v 1.6 2007/06/19 21:39:26 marsenger Exp $
+# ----------------------------------------------------
+
+PROJECT_HOME=@PROJECT_HOME@
+LIBS_PATH=@PROJECT_DEPS@
+
+CLASSPATH=$LIBS_PATH
+CLASSPATH=`echo ${PROJECT_HOME}/build/lib/*.jar | tr ' ' ':'`:$CLASSPATH
+CLASSPATH=${PROJECT_HOME}/build/classes:$CLASSPATH
+CLASSPATH=${PROJECT_HOME}/build/plugins:$CLASSPATH
+
+exec java -cp $CLASSPATH @LOG4J@ org.soaplab.clients.CmdLineClient "$@"

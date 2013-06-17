@@ -1,0 +1,29 @@
+appl: Binaries [
+  documentation: "Dealing with binary data"
+  groups: "Testing"
+  nonemboss: "Y"
+  executable: "copy-files.pl"
+]
+
+infile: input  [
+  additional: "Y"
+  qualifier: i
+#  comment: "qualifier i"
+]
+
+outfile: output  [
+  default: "stdout"
+  extension: bin
+  comment: bindata
+#  comment: "mimetype text/plain"
+  comment: "make_url no"
+]
+
+#outfile: outputs  [
+#  default: "stdout"
+#  extension: bin
+##  comment: bindata
+##  comment: "mimetype text/plain"
+#  comment: "make_url no"
+#  comment: "output_type byte[][]"
+#]

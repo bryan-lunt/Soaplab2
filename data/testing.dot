@@ -1,0 +1,5 @@
+digraph TheQuestion {
+   Hamlet -> "Prince of Denmark";
+   To -> Be -> Or -> Not -> To -> Be;
+   That -> Is -> The -> Question;
+}

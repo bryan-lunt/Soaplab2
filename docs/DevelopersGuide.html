@@ -1,0 +1,802 @@
+<html> <head>
+<title>Soaplab2: Developers Guide</title>
+
+<link rel="shortcut icon" href="images/favicon.ico" >
+<link rel="icon" href="images/animated_favicon1.gif" type="image/gif" >
+<link rel="stylesheet" href="images/stylesheet.css" type="text/css">
+
+</head>
+
+<body>
+<h1>Developers Guide</h1>
+
+<img class="motto-img" src="images/motto-developers-guide.jpg" border=0 align="left"/>
+
+<br clear="all"/>
+
+<div class="doctoc">
+<dl>
+  <dt> <a href="#plugin">Plug-in mechanisms</a>
+       <dl>
+	 <dt> <a href="#spi-plugin">SPI plug-ins</a>
+	 <dt> <a href="#class-plugin">Naming a class in services metadata</a>
+       </dl>
+  <dt> <a href="#architecture">Architecture</a>
+  <dt> <a href="#spi_plugins">Details on SPI-based plug-ins</a>
+       <dl>
+	 <dt> <a href="#spi_analysisinventory">AnalysisInventory</a>
+	 <dt> <a href="#spi_metadatafactory">MetadataAccessorFactory</a>
+	 <dt> <a href="#spi_eventlistener">EventListener and EventDeserializer</a>
+	 <dt> <a href="#spi_persistentstorage">PersistentStorage</a>
+       </dl>
+  <dt> <a href="#class_plugins">Details on classes-based plug-ins</a>
+       <dl>
+	 <dt> <a href="#class_job">Job</a>
+	 <dt> <a href="#class_data">Input/Result</a>
+	 <dt> <a href="#class_parameter">Parameter</a>
+       </dl>
+  <dt> <a href="#junit">JUnit testing</a>
+</dl>
+</div>
+<p>
+
+Daily bread of every developer is an API. Soaplab2 API, including
+those classes and interfaces that are supposed to be extended,
+enhanced or re-implemented, are generated <a
+href="API/index.html">here</a>.
+
+<div class="note">
+
+Here, and on several other places, this document refers to the Soaplab2
+API. If you are browsing your local copy of the Soaplab2
+documentation, and the API links are broken, you need to generate the
+API first by calling an Ant task <tt>docs</tt>:
+
+<pre class="script">
+ant docs
+</pre>
+
+</div>
+
+But browsing the Soaplab2 source code is usually inevitable (e.g. the
+generated API does not include <tt>protected</tt> methods that could
+be quite helpful when sub-classing). <p>
+
+Many features in Soaplab2 are configurable by Java properties. When
+developing, you should be aware of the singleton class <a
+href="API/org/soaplab/services/Config.html">Config</a> that provides
+access to all Soaplab2 properties and also defines their
+names. Because Soaplab2 configuration is equally important for
+Soaplab2 service providers, the <a
+href="ConfigurationGuide.html">Configuration Guide</a> with all
+details is included in their documentation section. <p>
+
+The Soaplab2 design is driven by the idea of being flexible and
+extensible. Therefore, the core of the Soaplab2 architecture are
+the plug-in mechanisms: <p>
+
+
+<a name="plugin"></a>
+<h2>Plug-in mechanisms</h2>
+
+A plug-in mechanism (in contrast to a regular sub-classing) adds
+specific behaviour to the system without a need to change and
+recompile the existing classes. The Soaplab2 uses two such mechanisms:
+
+<dl class="indent">
+<dt> <a href="#spi-plugin">SPI-based plug-ins</a>
+<dt> <a href="#class-plugin">Naming a class in services metadata</a>
+</dl><p>
+
+
+<a name="spi-plugin"></a>
+<h3>SPI (<em>Service Provider Interface</em>) plug-ins</h3>
+
+Java (starting from version 1.3) defines rules how to store and find
+various implementations of the same interface. It is part of the <a
+href="http://java.sun.com/j2se/1.5.0/docs/guide/jar/jar.html">Jar File
+Specification</a>, chapter <a
+href="http://java.sun.com/j2se/1.5.0/docs/guide/jar/jar.html#Service%20Provider">Service
+Provider</a>. A usual, almost reference, implementation of this Java
+part, also used by Soaplab2, is the <a
+href="http://jakarta.apache.org/commons/discovery/">Apache Commons
+Service Discovery</a> library. <p>
+
+The Soaplab2 uses this mechanism to add behaviour shared by <b>all</b>
+Soaplab2 services (in contrast to the second mechanism, see below,
+that allows to add specific behaviour per service base). Here is a
+list of the available SPI plug-in hooks (described <a
+href="#spi_plugins">below</a> in details):
+
+<ul>
+  <li> <span class="highlight">AnalysisInventory</span> allows to add new lists of available services
+  <li> <span class="highlight">EventDeserializer</span> allows to deal with user-defined Soaplab events
+  <li> <span class="highlight">EventListener</span> allows to add Soaplab2 events listeners
+  <li> <span class="highlight">MetadataAccessorFactory</span> allows to use user-specific metadata formats
+  <li> <span class="highlight">PersistentStorage</span> allows to add various kinds of result storages
+</ul> <p>
+
+The usage of the SPI plug-ins is straightforward:
+
+<ol>
+  <li class="dcount"> The directory
+<tt>src/etc/config/services/META-INF/services</tt> contains a file for
+each plug-in, named by the same name as an interface that the plug-in
+implements. For example, file
+<tt>org.soaplab.services.storage.PersistentStorage</tt> is for the
+plug-in dealing with storing results. <p>
+
+       Write your own implementation of a selected interface and put
+the name of such class into this file (each class name on a separate
+line). For example, the persistent storage file may have this content:
+
+       <pre class="script">
+org.soaplab.services.storage.FileStorage
+org.soaplab.services.storage.DBStorage
+       </pre>
+
+       Which means that there are two mechanisms how and where to
+store Soaplab2 results: one is a local file system (implemented by the
+class <tt>org.soaplab.services.storage.FileStorage</tt>) and the
+second one stores results in a database (implemented by the class
+<tt>org.soaplab.services.storage.DBStorage</tt>). <p>
+
+       
+  <li class="dcount"> Run the Soaplab2's Ant task <em>config</em> (or the default
+<em>compile</em> - which includes the <em>config</em>, as well):
+
+       <pre class="script">
+ant config
+       </pre>
+
+       It creates a jar file <tt>services-config.jar</tt> in the
+<tt>build/lib</tt> directory. When this jar file - and, of course,
+your own implementation class - are found on the CLASSPATH, your
+plug-in starts to work. <p>
+
+       There are few properties that can be set to influence this Ant
+task (but usually there is no need to change them):
+
+       <dl>
+	 <dt> <pn>services.config.dir</pn> <dd>contains a directory name
+with plug-in files (default value is
+<tt>&lt;soaplab-home&gt;/src/etc/config/services/META-INF/services</tt>)
+
+	 <dt> <pn>services.config.jar</pn> <dd>names the resulting jar
+file (default value is <tt>services-config.jar</tt>)
+
+	 <dt> <pn>released.date</pn> <dd>contains a date that
+is put in the created jar file as a MANIFEST property
+<em>Released-Date</em> (default value is the today's date).
+       </dl>
+       <p>
+
+</ol>
+<p>
+
+<a name="class-plugin"></a>
+<h3>Naming a class in services metadata</h3>
+
+Another plug-in mechanism is designed for individual services. Each
+service has its own metadata and they can contain class names (or, in
+some cases, a convenient synonyms of class names). In some point, the
+Soaplab2 makes instances of these classes and they serve particular
+purposes for this particular service. <p>
+
+There are the following uses for this kind of plug-in mechanism
+(again, the details <a href="#class_plugins">below</a>):
+
+<ul>
+  <li> A very important one, actually the most crucial one, is a class
+representing a <span class="highlight">Job</span>. <p>
+
+       A Job represents a single service invocation (such as running
+an analysis tool, or fetching a web page). The whole Soaplab2
+infrastructure (including accessing service metadata, storing and
+retrieving results to and from various persistent storages, and
+sending events about jobs) is the same for all Soaplab2 services - but
+Jobs are specific. Some of them can start local tools (aka AppLab in
+previous Soaplab), some of them can fetch web pages (Gowlab), and some
+of them can, for example, just start a local Java class to do some
+computation. <p>
+
+       Therefore, anytime you consider an extension to Soaplab2, you
+should think in terms of a new implementation of a Job interface. <p>
+
+
+       Each service needs to know what class should be instantiated
+when a request to create a job comes. Some Job classes can represent
+the whole family of services (for example, all services invoking a
+command-line analysis tool use the same Job class for it - in this
+case it is the <tt>org.soaplab.services.cmdline.CmdLineJob</tt>), some
+Job classes are specific for one or only few services (for example,
+there could be a specific Job exploring Google search API). Depending
+on the Job scope, the Job class name can be specified directly in the
+service metadata, or in metadata containing list of available
+services. Details in <a href="MetadataGuide.html">metadata
+guide</a>. <p>
+
+       The Job interface (that all Job classes must implement) is
+defined in <a
+href="API/org/soaplab/services/Job.html"><tt>org.soaplab.services.Job</tt></a>. The
+best way how to implement a new Job type is to inherit from the
+<tt>org.soaplab.services.AbstractJob</tt> class. <p>
+
+       More about it <a href="#class_job">below</a>. <p>
+
+
+  <li> Each <span class="highlight">input</span> provided to an
+analysis tool (or to other sources, like web pages), and each <span
+class="highlight">result</span> obtained from an analysis tool (or
+from other sources), can be adapted by a plug-in defined by the
+interface <a
+href="API/org/soaplab/services/adaptor/DataAdaptor.html"><tt>org.soaplab.services.adaptor.DataAdaptor</tt></a>.
+       This is an optional interface (most of the inputs and results
+will <em>not</em> be adapted). <p>
+
+       More about it <a href="#class_data">below</a>. <p>
+
+
+  <li> Rarely used, but helpful in special cases, is an interface that
+defines a new kind of a <span class="highlight">command-line
+argument</span>. An argument whose syntax and use is so special that
+cannot be expressed in the existing set of Soaplab2 parameter classes
+in package <tt>org.soaplab.services.cmdline</tt>. The interface is
+defined in <a
+href="API/org/soaplab/services/cmdline/Parameter.html"><tt>org.soaplab.services.cmdline.Parameter</tt></a>. <p>
+
+       More about it <a href="#class_parameter">below</a>. <p>
+
+</ul> <p>
+
+So far, we described how to name a class in service metadata. But
+there is also one other place where to name a class: a place that is
+dictated by the used protocol. <p>
+
+All web applications (and the Web Services are just kinds of web
+applications) are "servlets" and they require to specify what class
+should be instantiated when a request for a particular web application
+comes to a servlet container (such as the Apache Tomcat server).
+Different Java toolkits for Web Services require to specify it in
+different places. For example, the <em>JAX-WS</em> toolkit uses
+configuration files <tt>web.xml</tt> and <tt>sun-jaxws.xml</tt>. Or,
+the old <em>Axis 1</em> needs it in <tt>server-config.wsdd</tt>
+file. <p>
+
+In Soaplab2, creating or changing these files is part of the service
+deployment, and therefore, it is described in the documentation for
+service providers. Few details are also mentioned below, in the
+section <a href="#new-protocol">What to do in order to add a new
+protocol</a>. <p>
+
+
+<a name="architecture"></a>
+<h2>Architecture</h2>
+
+<a href="images/architecture.png"><img src="images/architecture-small.png" border=0 align="left"/></a>
+
+The architecture image shows the major parts of the Soaplab2
+infrastructure, and the colours indicate where and how it can be
+extended. <p>
+
+The <span class="yellow">yellow</span> boxes are places where the SPI
+mechanism looks for plug-ins. (There is one more SPI place that is not
+shown here - because of clarity - the <tt>EventDeserializer</tt>
+interface.) <p>
+
+The <span class="khaki">khaki</span> boxes show implementation classes
+discovered by the SPI mechanism. These are, therefore, the real
+plug-ins. The picture shows only those that are distributed as a part
+of the Soaplab2 package - but they may be others, from other projects
+(after all, that's why it is called a plug-in mechanism, isn't
+it). <p>
+
+The <span class="cyan">cyan</span> boxes are the core of extending by
+"naming a class". The focus points here are interfaces
+<tt>AnalysisService</tt> and <tt>AnalysisListService</tt> - they
+represents what the end-users (Soaplab2 clients) really see, and what
+functionality they may expect from Soaplab2. They are instantiated by
+the "Protocol layer": depending on the protocol used, they can handle
+different Web Service protocols. <p>
+
+The <tt>Job</tt> interface is the place where the major work
+happens. For example, there is a class (inheriting from the
+<tt>AbstractJob</tt>) representing command-line tools (aka AppLab),
+and another class representing not-that-old Gowlab. <p>
+
+<div class="highlight">
+Architecture guided tour
+</div>
+<p>
+
+The requests from clients come using a particular protocol. Because
+Soaplab2 was designed to be primarily a Web service, the usual
+protocol is SOAP/HTTP. But even this protocol can be supported by
+various Java toolkits, such as <em>JAX-WS</em> or <em>Apache
+Axis</em>. Also, other protocols can be added without changing the
+rest of the picture (HTML REST jumps into mind first). There are few
+things dependent on the chosen protocol (e.g. how to find under which
+name a service was invoked, what is the <em>service name</em> that the
+client used) - those are accessible through the <a
+href="API/org/soaplab/services/protocol/ProtocolToolkit.html"><tt>org.soaplab.services.protocol.ProtocolToolkit</tt></a>
+interface. Therefore, each Soaplab2 service is represented by a class
+implementing the <a
+href="API/org/soaplab/share/Analysis.html"><tt>org.soaplab.share.Analysis</tt></a>
+interface and the
+<tt>org.soaplab.services.protocol.ProtocolToolkit</tt> interface. <p>
+
+<a name="new-protocol"></a>
+<u>What to do in order to add a new protocol?</u> <p>
+
+First, you need a class that understands how to interpret (read,
+un-marshal) incoming requests, and how to create (write, marshal)
+results, both complying with the chosen protocol. This class also
+needs to provide all functionality defined in the <a
+href="API/org/soaplab/share/Analysis.html"><tt>org.soaplab.share.Analysis</tt></a>
+interface. <p>
+
+The usual way to achieve this is to sub-class the class
+<tt>org.soaplab.services.AnalysisService</tt>. An example of that can
+be found in
+<tt>org.soaplab.services.protocol.jaxws.AnalysisService</tt>, a class
+used for the <em>JAX-WS</em> toolkit. Another example (using rather
+delegation pattern than a direct inheritance) is in
+<tt>org.soaplab.services.protocol.axis1.AnalysisService</tt>. <p>
+
+Second, you need to <em>deploy</em> your new class (or classes) in
+order to be recognised by your Web server. Which usually mean to
+specify your class name in some, protocol/toolkit specific
+configuration file. Soaplab2 provides support for <em>JAX-WS</em> and,
+for backward compatibility with Soaplab1, the old <em>Apache
+Axis</em>. Both protocols have own Ant task that does the deployment:
+
+<pre class="script">
+ant jaxdeploy
+ant axis1deploy
+</pre>
+
+More details about deployment is in the section for service
+providers.<p>
+
+
+<u>What is actually available to the clients?</u> <p>
+
+Soaplab2 core functionality can be expressed by two interfaces: the <a
+href="API/org/soaplab/share/Analysis.html">Analysis</a> interface and
+the <a href="API/org/soaplab/share/AnalysisList.html">AnalysisList</a>
+interface. The former one can be also extended by type-safe interface
+of so-called <em>derived services</em> (not yet implemented, not shown
+in the picture). <p>
+
+The <tt>AnalysisList</tt> interface is implemented by the
+<tt>AnalysisListService</tt> class (or by its sub-classes, depending
+on which protocol is used) which uses an
+<tt>AnalysisInventoryProvider</tt> to get a list of provided
+services. The inventory provider relies on the SPI mechanism to get
+one or more lists (it merges them together). The default provider
+reads the lists of available services from XML files. An
+explanation how to add your own list, possibly in another format, is
+<a href="#spi_analysisinventory">below</a>. <p>
+
+The <tt>AnalysisService</tt> class uses the same lists each time a
+service request comes in order to check whether such service is still
+available. It allows to add or remove new services on-the-fly, without
+restarting your servlet engine. Just by editing the XML file with a
+list of available services makes it happen. <p>
+
+<div class="note">
+
+Well, this is correct for the <em>JAX-WS</em> implementation (which is
+supposed to be the most usual one). For Axis-1 protocol, however, it
+is not enough. A full deployment Ant's task must be run every time you
+add a new service.
+
+</div>
+
+<u>Service metadata</u> <p>
+
+Each service needs metadata. It accesses them using the <a
+href="API/org/soaplab/services/metadata/MetadataAccessor.html"><tt>MetadataAccessor</tt></a>
+interface. A default implementation of this interface is the class
+<tt>org.soaplab.services.metadata.MetadataAccessorXML</tt> that reads
+it, as the name suggests, from the XML files. Instances of this class
+are created by the factory, and this factory can be replaced by the
+SPI plug-in. Details how to make a service reading its metadata from a
+different source are <a href="#spi_metadatafactory">below</a>. <p>
+
+<a name="jobs"></a>
+<u>Jobs - The main <em>raison d'etre</em> of each service</u> <p>
+
+When a service gets a request to really do something (like starting a
+command-line analysis, fetching a web page, or submitting a task to a
+grid infrastructure) it asks <tt>JobManager</tt> to create an instance
+of a <tt>Job</tt>. Some related requests share, however, the same Job
+instance (typically, for example, one invocation of a command-line
+analysis is one Job, but it can contain more requests, such as
+starting the job, asking for its status, and requesting its
+results). <p>
+
+For each job, the job manager creates a <tt>Reporter</tt>, an
+inter-mediator between jobs and their results and states, and an
+<tt>EventManager</tt>, another inter-mediator connecting job events
+with their listeners. <p>
+
+The ultimate worker, however, is the Job. Each service can have its
+own class implementing the <a
+href="API/org/soaplab/services/Job.html"><tt>Job</tt></a> interface,
+but usually a whole group of services use the same Job class. The name
+of this class is taken from service metadata, or from service list
+metadata (it is called there a <em>module</em> - which should not be
+confused with <em>service category</em> that rather classifies
+services semantically). <p>
+
+Soaplab2 provides a convenient parent for Jobs, an <a
+href="API/org/soaplab/services/AbstractJob.html"><tt>AbstractJob</tt></a>,
+or - for jobs dealing with command-line tools - a <a
+href="API/org/soaplab/services/cmdline/CmdLineJob.html"><tt>CmdLineJob</tt></a>. These
+classes do most of the job, except the <tt>run</tt> method. They
+should be sub-classed whenever implementing a new Job. <p>
+
+Once again: writing a Job implementation is the most powerful way how
+to extend Soaplab2. All the SPI plug-ins and other classes are here to
+allow <em>tweaking</em> but new Jobs really do new things. <p>
+
+<u>And the rest...</u> <p>
+
+Remaining pieces of Soaplab2 infrastructure take care about storing
+persistently analysis results (see <a
+href="#spi_persistentstorage">below</a> the SPI PersistentStorage
+plug-in) and about propagating job events to interested listeners (see
+<a href="#spi_eventlistener">below</a> the SPI EventListener
+plug-in). <p>
+
+
+<BR CLEAR=LEFT>
+
+<a name="spi_plugins"></a>
+<h2>Details on SPI-based plug-ins</h2>
+
+
+<a name="spi_analysisinventory"></a>
+  <h3>AnalysisInventory</h3>
+
+The <a
+href="API/org/soaplab/services/AnalysisInventory.html"><tt>AnalysisInventory</tt></a>
+interface allows to add new lists of available services. <p>
+
+It is not, however, needed for cases when a list of services is
+split across more than one file - such case can be already handled by
+the <tt>org.soaplab.services.DefaultAnalysisInventory</tt> class. This
+class reads list of available analyses (services) from an XML file
+whose name is given in a property <tt>applist</tt> (see more about
+configuration properties in the <a
+href="ConfigurationGuide.html">Configuration Guide</a>). The
+<tt>applist</tt> property, can actually contain more than one file
+name (or, the same property can be used several times, with several
+different file names). <p>
+
+Therefore, use this SPI plug-in, and create your own class
+implementing the <tt>org.soaplab.services.AnalysisInventory</tt>
+interface, when you have a list of services in a different format, or
+if you wish to keep it in a different kind of storage (such as a
+database). <p>
+
+The <tt>AnalysisInventory</tt> interface allows to identify each list
+by adding a (reasonably) unique identifier to it, called a <em>list
+authority</em>. If not empty, the list authority becomes part of the
+service name. <p>
+
+<a name="standard-list"></a>
+<u>Standard format of an analysis list</u> <p>
+
+The class <tt>org.soaplab.services.DefaultAnalysisInventory</tt>
+understands lists in XML format that follow the <a
+href="SoaplabList.dtd">SoaplabList.dtd</a> where:
+
+<dl>
+  <dt class="highlight">category</dt>
+  <dd> Is a group of semantically related services.<p>
+
+  <dt class="highlight">app</dt>
+  <dd> Is a service (an analysis) that belongs to a category.
+       <div class="inote">
+       
+       To Be Done: I still need to find how to express that a service
+can belong to more than one category.
+
+       </div>
+
+  <dt class="highlight">name</dt>
+  <dd> A name (unique within category) of this service/analysis. <p>
+       
+  <dt class="highlight">xml</dt>
+  <dd> A name of an XML file with service metadata. More about service
+metadata <a href="#spi_metadatafactory">elsewhere</a>.
+       <div class="inote">
+       
+       To Be Done: I still need to find how to express when service
+metadata are not in a file but, for example, in a relation database.
+
+       </div>
+       
+  <dt class="highlight">module</dt>
+  <dd> Is a class name that represents a Job for this service. More
+about Jobs <a href="#jobs">here</a>. Or it is a synonym for a class
+name. For example, all services fetching web pages have module
+<em>gowlab</em>, and all services starting command-line analyses have
+module <em>sowa</em> (which, by the way, means, historically, "SOaplab
+Without Applab"). <p>
+
+       If it is missing, the <em>module</em> attribute is looked for
+in the individual service metadata. If neither there can be found, the
+default synonym <em>sowa</em> is used. <p>
+       
+  <dt class="highlight">desc</dt>
+  <dd> Is a short, often just one-line, description of this
+service. The more detailed description can be put in the individual
+service metadata.
+       
+</dl>
+<p>
+
+An example of such list is in
+<tt>&lt;soaplab-home&gt;/metadata/DefaultApplications.xml</tt>. <p>
+
+
+<a name="spi_metadatafactory"></a>
+  <h3> MetadataAccessorFactory</h3>
+
+Again, as have been said above: Each service needs metadata. When you
+are developing a Job class you can access metadata through <a
+href="API/org/soaplab/services/metadata/MetadataAccessor.html"><tt>MetadataAccessor</tt></a>
+interface. Description what you can get from it, however, requires a
+separate guide (<em>not yet written</em>). This SPI plug-in is more
+about how to allow each service to read its metadata in its own format
+and from its own resource. <p>
+
+The SPI plug-in mechanism is usually used to bring together more
+classes implementing the given interface. In this case, however, only
+one class is used (and if there are more found only the first one is
+used). This class is a factory, implementing interface <a
+href="API/org/soaplab/services/metadata/DefaultMetadataAccessorFactory.html"><tt>MetadataAccessorFactory</tt></a>
+with only one method - <tt>getInstance(String serviceName)</tt> - that
+returns a metadata accessor for the given service. <p>
+
+The default implementation is class
+<tt>org.soaplab.services.metadata.DefaultMetadataAccessorFactory</tt>
+that finds service metadata in the service list (see the <em>xml</em>
+attribute in the <a href="#standard-list">standard list format</a>),
+or in the configuration properties "metadata.dir" and/or
+".metadata.file" (see details in <a
+href="ConfigurationGuide.html">Configuration guide</a>). In fact, this
+class just delegates the task to the <tt>MetadataAccessorXML</tt> but
+that is only an implementation detail. <p>
+
+
+<a name="spi_eventlistener"></a>
+  <h3> EventListener and EventDeserializer</h3>
+
+A running job changes its state and the user may be interested in
+being notified about these changes. A prominent change in the job
+lifecycle is, of course, when the job terminates (either by an error
+or by a user request or by its own nature). <p>
+
+There are two mechanisms how to deliver such notifications:
+<em>client-pull</em> or <em>server-push</em>. They differ in a way how
+the events are being exchanged but both share the same format of the
+events themselves. <p>
+
+From the Soaplab2 infrastructure perspective, both delivery and - up
+to certain extent - format of events are hidden in individual
+<em>event listeners</em>. An Event Listener is a class implementing
+the <a
+href="API/org/soaplab/services/events/EventListener.html"><tt>EventListener</tt></a>
+interface. Any number of such listeners can be added using the SPI
+plug-in mechanism. (There are, for example, plans to have a listener
+in the Soaplab2 GUI - called Dashboard - that will display events
+coming from all jobs as HTML pages.) <p>
+
+If you implement your own event listener you decide which events to
+listen to. The interface assumes several default event types (of
+course, you are free to ignore any of them) - but they can be
+extended. If you do so, you also need to write a class that can
+convert these new events from their XML representation back to their
+Java instances. Such <em>deserializer</em> is added to the system by
+another SPI plug-in point - an interface <a
+href="API/org/soaplab/services/events/EventDeserializer.html"><tt>EventDeserializer</tt></a>
+(this plug-in is not shown in the Architecture picture above). Where
+is then event <em>serializer</em>? Well, it is part of the <a
+href="API/org/soaplab/services/events/EventListener.html"><tt>EventListener</tt></a>
+interface - see there method <tt>toXML()</tt>. <p>
+
+<u>Existing event types</u> <p>
+
+<img src="images/AnalysisEvent.jpg" border=0 align="left"/>
+
+The picture is taken from the standard <a
+href="http://www.omg.org/technology/documents/formal/lsae.htm">Life
+Sciences Analysis Engine</a> specification which Soaplab2
+follows. Only the names of Java classes representing individual events
+are more Java-like (e.g. the main event is the class <a
+href="API/org/soaplab/services/events/AnalysisEvent.html"><tt>AnalysisEvent</tt></a>). <p>
+
+The XML representation of the events follows the <a
+href="AnalysisEvent.dtd">AnalysisEvent.dtd</a>. <p>
+
+The details of individual events are described in their <a
+href="API/org/soaplab/services/events/package-summary.html">API</a>. <p>
+
+<BR CLEAR=LEFT>
+
+You can see (static) examples of all standard events by running:
+
+<pre class="script">
+build/run/run-any-client org.soaplab.services.testing.TestEvents
+</pre>
+<p>
+
+The default event listener provided by Soaplab2 is class
+<tt>org.soaplab.services.events.DefaultEventListener</tt> that simply
+records events into a log file. For example:
+
+<pre class="sscript">
+2006-11-15 19:45:18,555 641  [main] DEBUG EventListener - [grid.helloworld]-576da760.10eed26e2d1.-8000 UNKNOWN --> CREATED
+2006-11-15 19:45:18,604 690  [main] DEBUG EventListener - [grid.helloworld]-576da760.10eed26e2d1.-8000 CREATED --> RUNNING
+2006-11-15 19:45:18,609 695  [main] DEBUG EventListener - [grid.helloworld]-576da760.10eed26e2d1.-8000 RUNNING --> COMPLETED
+</pre>
+
+The <a href="ConfigurationGuide.html">Configuration Guide</a> has some
+details how it can be configured. <p>
+
+
+<a name="spi_persistentstorage"></a>
+  <h3> PersistentStorage</h3>
+
+This SPI plug-in allows to deal with the analysis results. Primarily
+meant to store them and retrieve on request later, it can also play a
+role of the result visualisers. The interface <a
+href="API/org/soaplab/services/storage/PersistentStorage.html"><tt>PersistentStorage</tt></a>
+has a boolean method <tt>isSink()</tt>. When it returns <em>true</em>
+the methods retrieving results are supposed to return nothing -
+exactly what a visualiser would do. <p>
+
+The default storage is in a local file system, implementing by the
+class <tt>org.soaplab.services.storage.FileStorage</tt>. A database
+storage is going to be added soon. <p>
+
+The existing contents and cleaning can be done by a command-line
+program <tt>ExploreStorage</tt>. For details, see <a
+href="AdminTools.html">Administration Tools</a>, or start the on-line
+help by typing:
+
+<pre class="script">
+build/run/run-any-client org.soaplab.admin.ExploreStorage -help
+</pre>
+
+<p>
+
+
+
+<a name="class_plugins"></a>
+<h2>Details on classes-based plug-ins</h2>
+
+Several places can be extended by developer's own classes. Their names
+are (usually) in service metadata. A developer needs:
+
+<ul>
+  <li class="tiny"> to implement a correct interface,
+  <li class="tiny"> to put new class (or classes) on the CLASSPATH
+together with other Soaplab2 classes, and
+  <li class="tiny"> to put the name of the implementing class on a
+proper place in service metadata.
+</ul> <p>
+
+The best practise is to extend an existing class rather than develop
+from the scratch. See examples below. <p>
+
+
+<a name="class_job"></a>
+  <h3>Job - <a href="API/org/soaplab/services/Job.html"><tt>org.soaplab.services.Job</tt></a></h3>
+
+The most crucial extension. It brings the whole new functionality to a
+service or to a group of services. <p>
+
+A full example of such class-based plug-in is a Job that submits tasks
+to a computational grid. It is represented by the class
+<tt>org.bioinfogrid.services.GridJob</tt>. This project is in a
+separate CVS module <span class="highlight">bioinfogrid-plugin</span>
+(in the same repository as Soaplab2, at SourceForge). <p>
+
+When writing a new Job implementation, consider to inherit either from
+the <a
+href="API/org/soaplab/services/AbstractJob.html"><tt>AbstractJob</tt></a>
+or from the <a
+href="API/org/soaplab/services/cmdline/CmdLineJob.html"><tt>CmdLineJob</tt></a>. <p>
+
+
+<a name="class_data"></a>
+  <h3>Input/Result - <a
+href="API/org/soaplab/services/adaptor/DataAdaptor.html"><tt>org.soaplab.services.adaptor.DataAdaptor</tt></a></h3>
+
+<em>Yet to be written... for now, check the API</em><p>
+
+
+<a name="class_parameter"></a>
+  <h3>Parameter - <a href="API/org/soaplab/services/cmdline/Parameter.html"><tt>org.soaplab.services.cmdline.Parameter</tt></a></h3>
+
+<em>Yet to be written... for now, check the API</em><p>
+<p>
+
+<a name="junit"></a>
+<h2>JUnit testing</h2>
+
+For junit testing, there is an Ant's task <tt>test-junit</tt>:
+
+<pre class="script">
+ant test-junit
+</pre>
+
+The tests included in this junit testing task are all Java sources
+defined in the directory tree within <tt>src/test/java/</tt> that
+contain "Test" in their names. <p>
+
+The <tt>test-junit</tt> task compiles test classes and run the
+tests. The tests reports are stored in the directory
+<tt>test-reports</tt>. <p>
+
+Soaplab2 uses junit version 4 (and above). The corresponding
+<tt>junit.jar</tt> is downloaded by usual maven procedure (as any
+other dependencies) and stored in your local maven
+repository. However, it may not be (yet) visible to the testing
+tasks. If that happens, the following message (and instructions what
+to do) are being displayed:
+
+<pre class="script">
+ant test-junit
+...
+junit-present:
+     [echo]
+     [echo] ================================= WARNING ================================
+     [echo] Junit library is not present in a correct directory. Tests not executed.
+     [echo] The library (junit.jar) is, however, in your local Maven repository.
+     [echo] Therefore:
+     [echo]     Put it in your ${ANT_HOME}/lib directory.
+     [echo]     Or, put in your ${HOME}/.ant/lib directory.
+     [echo]     Or start ant with -lib &lt;your junit library&gt;.
+     [echo] ==========================================================================
+     [echo]
+</pre>
+
+Sometimes it is more convenient to run only some tests (because the
+other tests may take too long). It can be done by compiling first the
+test classes (by the Ant's task <tt>compile-tests</tt>) and running a
+script with the name of the class containing the wanted tests. For
+example:
+
+<pre class="script">
+ant compile-tests
+build/run/run-junit-test org.soaplab.clients.RepeatabilityTests
+JUnit version 4.3.1
+.
+Time: 1.352
+
+OK (1 test)
+</pre>
+
+
+<p>
+
+<iframe id="maintoc" src="TOC.html" scrolling="auto"></iframe>
+
+<div align=right><font size=-2>
+<!-- hhmts start -->
+Last modified: Fri May 16 14:18:40 2008
+<!-- hhmts end -->
+</font></div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1011961-1";
+urchinTracker();
+</script>
+</body> </html>

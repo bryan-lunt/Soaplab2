@@ -1,0 +1,34 @@
+Usage:
+   build/run/run-any-client org.soaplab.admin.ExploreConfig [options]
+
+where <options> are:
+
+-h[elp]  ... print this help
+-q       ... "quiet" (less verbose mode)
+-stack   ... in case of any error it print the stact trace
+             (without this option, it prints it only when a
+              serious runtime error occures)
+
+Exploring options are:
+
+-lf   ... list all current config resources (files)
+-l[a] ... list available properties,
+          (-la includes also System properties)
+
+<property-name>...
+    ... show values of the given properties
+
+-prefix <property-name-prefix> [-service <service-name>]
+    ... shows all properties whose names start with
+        'property-name-prefix', or (if given) with
+        'service-name'.'property-name-prefix'
+
+Testing options are:
+
+-f <properties-file>[,<properties-file>...]
+    ... add properties from the given file(s)
+        (comma-separated list of file names)
+
+-xml <xml-file>[,<xml-file>...]
+    ... add properties from the given XML file(s)
+        (comma-separated list of file names)
