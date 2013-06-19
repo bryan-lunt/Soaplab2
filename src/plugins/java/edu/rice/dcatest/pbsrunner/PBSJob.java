@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Enumeration;
 import java.util.Properties;
+import java.edu.rice.dcatest.pbsrunner.PBSUtils;
 import java.io.*;
 
 /**
@@ -487,17 +488,9 @@ public class PBSJob
 			
 			while(!terminated && running) {
 				try{
-					pbsTorque.Job pbJ = pbsTorque.Job.getJobById(pbs_jid);
-
-					if(pbJ == null){
-						running = false;
-						synchronized (reporter){
-							reporter.getState().set (JobState.UNKNOWN);
-							reporter.notifyAll();
-						}
-					}else{
 					
-						char jobStatus = pbJ.getStatus().charAt(0);
+					
+						char jobStatus = PBSUtils.get_job_status(pbs_jid);
 						
 						synchronized (reporter) {
 							switch(jobStatus){
@@ -517,13 +510,14 @@ public class PBSJob
 								jobExitCode=1;
 								running = false;
 								break;
+							case 'U':
 							default:
 								reporter.getState().set (JobState.UNKNOWN);
 								running = false;
 							}
 						    reporter.notifyAll();
 						}
-					}
+
 					
 					Thread.sleep(QSTAT_INTERVAL);
 				}catch(InterruptedException e){}
