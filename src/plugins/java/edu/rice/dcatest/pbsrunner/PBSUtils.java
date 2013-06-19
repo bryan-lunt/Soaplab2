@@ -1,4 +1,4 @@
-package java.edu.rice.dcatest.pbsrunner;
+package edu.rice.dcatest.pbsrunner;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
