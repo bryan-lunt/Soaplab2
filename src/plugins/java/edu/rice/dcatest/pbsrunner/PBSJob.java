@@ -73,7 +73,7 @@ public class PBSJob
     boolean lsf;
     
     public String pbs_jid;
-    public static final int QSTAT_INTERVAL = 10000;
+    public static final int QSTAT_INTERVAL = 2000;
     public static final boolean DEBUG = true;
     
     /**************************************************************************
