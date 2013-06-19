@@ -475,6 +475,11 @@ public class PBSJob
 					jid_builder.append(tmp.trim());
 					tmp = br.readLine();
 				}
+				
+				if(DEBUG){
+					System.out.print("PBSJOB : qsub stdout: " + jid_builder.toString());
+				}
+				
 			}catch(Exception e){e.printStackTrace();}
 			
 			pbs_jid = jid_builder.toString();
