@@ -369,52 +369,16 @@ public class PBSJob
 	    ioData = createIO();
 
 
-			// catch STDOUT and STDERR even if not defined in service metadata
+		// catch STDOUT and STDERR even if not defined in service metadata
 	    stdout2Report = new File (getJobDir(), "stdout");
-
 	    stderr2Report = new File (getJobDir(), "stderr");
 
 
 
 	    
 	    /*Copy the ProcessBuilder*/
-	    this.qsubpb = new ProcessBuilder();
-	   //Don't copy the command! Just the environment and directory and stuff!
-	    this.qsubpb.environment().putAll(pb.environment());
-	    this.qsubpb.directory(pb.directory());
-	    this.qsubpb.redirectErrorStream(pb.redirectErrorStream());
-	    
-	    //Setup the qsub command
-	    List<String> pbsCommand = this.qsubpb.command();
-	    pbsCommand.clear();
-	    pbsCommand.add("/usr/bin/qsub");
-	    
-	    pbsCommand.add("-d" + getJobDir().getAbsolutePath());
-	    
-	    pbsCommand.add("-o" + stdout2Report.getAbsolutePath());
-	    
-	    pbsCommand.add("-e" + stderr2Report.getAbsolutePath());
-	    
-	    pbsCommand.add("-V");//Because we used a copied process builder, it now gets all the environment variables it would have gotten anyway.
-	    
-	    pbsCommand.add("__thescript");//Script file to qsub...
-	    
-	    
-	    //setup the script for qsub
 	    try{
-	    File script_file = new File(getJobDir(),"__thescript");
-	    PrintWriter fw = new PrintWriter(new BufferedWriter(new FileWriter(script_file.getAbsoluteFile())));
-
-	    List<String> theCommand = pb.command();
-	    
-	    for(int i = 0;i<theCommand.size();i++){
-	    	fw.print(theCommand.get(i));
-	    	fw.print(" ");
-	    }
-	    fw.println("");
-	    
-	    fw.flush();
-	    fw.close();
+	    	this.qsubpb = PBSUtils.createQsubProccessBuilder(pb,getJobDir(),stdout2Report,stderr2Report);
 	    }catch(Exception e){internalError("Problems creating a script for qsub : " + e.getMessage());}
 	    
 	    if(DEBUG){
@@ -445,39 +409,17 @@ public class PBSJob
 		
 			if(DEBUG){
 				System.out.println("PBSJOB : qsub exit code :" + qsubexitCode);
+				System.out.println("PBSJOB : qsub error: " + PBSUtils.readAll(process.getErrorStream()));
+			}
+			
+			pbs_jid = PBSUtils.readALL(process.getInputStream());
+			
 				
-				try{
-					BufferedReader ebr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-					StringBuilder stderrbuilder = new StringBuilder();
-					String tmp = ebr.readLine();
-					while(tmp != null){
-						stderrbuilder.append(tmp);
-						tmp = ebr.readLine();
-					}
-					
-					System.out.print("PBSJOB : qsub error: " + stderrbuilder.toString());
-				}catch(Exception e){e.printStackTrace();}
-				
+			if(DEBUG){
+					System.out.print("PBSJOB : qsub stdout: " + pbs_jid.toString());
 			}
 			
 			
-			StringBuilder jid_builder = new StringBuilder();
-			
-			try{
-				BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
-				String tmp = br.readLine();
-				while(tmp != null){
-					jid_builder.append(tmp.trim());
-					tmp = br.readLine();
-				}
-				
-				if(DEBUG){
-					System.out.print("PBSJOB : qsub stdout: " + jid_builder.toString());
-				}
-				
-			}catch(Exception e){e.printStackTrace();}
-			
-			pbs_jid = jid_builder.toString();
 			int jobExitCode = qsubexitCode;
 			if(qsubexitCode != 0){
 				running = false;
@@ -491,36 +433,19 @@ public class PBSJob
 				try{
 					
 					
-						char jobStatus = PBSUtils.get_job_status(pbs_jid).charAt(0);
+						int currJobState = PBSUtils.get_job_status(pbs_jid).charAt(0);
 						
 						synchronized (reporter) {
-							switch(jobStatus){
-							case 'Q':
-								reporter.getState().set (JobState.CREATED);
-								break;
-							case 'R':
-								reporter.getState().set (JobState.RUNNING);
-								break;
-							case 'C':
-								reporter.getState().set (JobState.COMPLETED);
-								jobExitCode = 0;
-								running = false;
-								break;
-							case 'E':
-								reporter.getState().set (JobState.TERMINATED_BY_ERROR);
-								jobExitCode=1;
-								running = false;
-								break;
-							case 'U':
-							default:
-								reporter.getState().set (JobState.UNKNOWN);
-								running = false;
-							}
+							reporter.getState().set(currJobState);
+							
+								if(currJobState == JobState.COMPLETED || currJobState == JobState.TERMINATED_BY_ERROR || currJobState == JobState.UNKNOWN) {
+									running = false;
+								}
 						    reporter.notifyAll();
 						}
 
-					
-					Thread.sleep(QSTAT_INTERVAL);
+					if(running)//if not running, we want to terminate immediately.
+						Thread.sleep(QSTAT_INTERVAL);
 				}catch(InterruptedException e){}
 			}
 			}
