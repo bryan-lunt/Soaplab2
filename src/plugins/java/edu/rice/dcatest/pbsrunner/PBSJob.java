@@ -430,6 +430,7 @@ public class PBSJob
 			/*this just makes it wait a bit so that it doesn't try to get job status before it shows up in qsub output.
 			Really, it should be something like an FSA, it polls first starting for the info to be available, then it changes mode to waiting for it to finish.
 			*/
+			
 			initialwait:
 			for(int i=0;i<30&&running;i++){
 				try{
@@ -447,7 +448,7 @@ public class PBSJob
 			
 			while(!terminated && running) {
 				try{
-						update_status(true);
+						currJobState = update_status(true);
 					if(running)//if not running, we want to terminate immediately.
 						Thread.sleep(QSTAT_INTERVAL);
 				}catch(InterruptedException e){}
@@ -462,10 +463,12 @@ public class PBSJob
 	private int update_status(boolean andTerminate){
 		int currJobState = PBSUtils.get_job_status(pbs_jid);
 		
+		System.out.println("PBSJOB : Got Job State : " + currJobState);
+		
 		synchronized (reporter) {
 			reporter.getState().set(currJobState);
 			
-				if(andTerminate && (currJobState == JobState.COMPLETED || currJobState == JobState.TERMINATED_BY_ERROR || currJobState == JobState.UNKNOWN)) {
+				if(andTerminate && (currJobState == JobState.COMPLETED || currJobState == JobState.TERMINATED_BY_ERROR)) {
 					running = false;
 				}
 		    reporter.notifyAll();
