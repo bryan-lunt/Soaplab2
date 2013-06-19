@@ -369,9 +369,9 @@ public class PBSJob
 
 
 			// catch STDOUT and STDERR even if not defined in service metadata
-	    stdout2Report = new File (getJobDir(), "_log_STDOUT_");
+	    stdout2Report = new File (getJobDir(), "log_STDOUT");
 
-	    stderr2Report = new File (getJobDir(), "_log_STDERR_");
+	    stderr2Report = new File (getJobDir(), "log_STDERR");
 
 
 
