@@ -433,6 +433,7 @@ public class PBSJob
 			initialwait:
 			for(int i=0;i<10&&running;i++){
 				try{
+					/*
 					currJobState = update_status(false);
 					switch(currJobState){
 					case JobState.CREATED:
@@ -440,7 +441,7 @@ public class PBSJob
 					default:
 						break initialwait;
 					}
-					
+					*/
 					Thread.sleep(500);
 				}catch(InterruptedException e){}
 			}
