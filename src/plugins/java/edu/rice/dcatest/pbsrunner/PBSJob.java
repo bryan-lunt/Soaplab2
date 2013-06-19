@@ -392,11 +392,6 @@ public class PBSJob
 	    try {
 			// submit via qsub
 
-			synchronized (reporter) {
-			    reporter.getState().set (JobState.CREATED);
-			    reporter.notifyAll();
-			}
-	    	
 			process = qsubpb.start();
 			
 
@@ -411,11 +406,16 @@ public class PBSJob
 			}
 		
 			
+			
 			pbs_jid = PBSUtils.readAll(process.getInputStream());
 			
 			int jobExitCode = qsubexitCode;
 			if(qsubexitCode == 0){
 				running = true;
+				synchronized (reporter) {
+				    reporter.getState().set (JobState.CREATED);
+				    reporter.notifyAll();
+				}
 				
 			}else{
 				running = false;
@@ -431,17 +431,16 @@ public class PBSJob
 			Really, it should be something like an FSA, it polls first starting for the info to be available, then it changes mode to waiting for it to finish.
 			*/
 			initialwait:
-			for(int i=0;i<10&&running;i++){
+			for(int i=0;i<30&&running;i++){
 				try{
-					/*
-					currJobState = update_status(false);
-					switch(currJobState){
-					case JobState.CREATED:
-						break;
-					default:
-						break initialwait;
+					currJobState = PBSUtils.get_job_status(pbs_jid);
+					if(currJobState != JobState.UNKNOWN){
+						synchronized(reporter){
+							reporter.getState().set(currJobState);
+							reporter.notifyAll();
+							break initialwait;
+						}
 					}
-					*/
 					Thread.sleep(500);
 				}catch(InterruptedException e){}
 			}
