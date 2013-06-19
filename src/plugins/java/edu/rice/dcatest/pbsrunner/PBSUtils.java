@@ -19,7 +19,7 @@ public class PBSUtils {
 	private static Map<String,Integer> pbs_s_to_s_s;
 	
 	static{
-		job_status_pattern = Pattern.compile("job_state = (.*?)\n");
+		job_status_pattern = Pattern.compile("job_state[ ]*=[ ]*(.)");
 		
 		pbs_s_to_s_s = new HashMap<String,Integer>();
 		pbs_s_to_s_s.put("Q", new Integer(JobState.CREATED));
