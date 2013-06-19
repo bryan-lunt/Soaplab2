@@ -314,7 +314,7 @@ public class PBSJob
 				return;
 			}
 			terminated = true;
-			process.destroy();
+			PBUtils.qdel(pbs_jid);
 			try {
 				// we shouldn't wait here much, under normal circumstances above
 				// process.destroy() call should return fairly quickly
@@ -332,7 +332,7 @@ public class PBSJob
 				// process by a bkill process
 				// and the second process doesn't always dies smoothly,
 				// especially when using LSF 7
-				process.destroy();
+				PBSUtils.qdel(pbs_jid);
 			}
 			try {
 				process.exitValue();
@@ -427,6 +427,9 @@ public class PBSJob
 			}else{
 				running = true;
 			
+			/*this just makes it wait a bit so that it doesn't try to get job status before it shows up in qsub output.
+			Really, it should be something like an FSA, it polls first starting for the info to be available, then it changes mode to waiting for it to finish.
+			*/
 			try{Thread.sleep(QSTAT_INTERVAL);}catch(InterruptedException e){}
 			
 			while(!terminated && running) {

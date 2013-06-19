@@ -43,6 +43,15 @@ public class PBSUtils {
 			return JobState.UNKNOWN;
 	}
 	
+	public static void qdel(String jobid){
+		try{
+			ProcessBuilder pb = new ProcessBuilder();
+			pb.command().add("qdel");
+			pb.command().add(jobid);
+			Process qdel = pb.start();
+		}catch(Exception e){/*just return, don't even wait for the process to finish*/}
+	}
+	
 	public static String runQstat(String jobid){
 		try{
 		ProcessBuilder pb = new ProcessBuilder();
