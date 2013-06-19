@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Enumeration;
 import java.util.Properties;
-import edu.rice.dcatest.pbsrunner.PBSUtils;
+import edu.rice.dcatest.pbsrunner.*;
 import java.io.*;
 
 /**
