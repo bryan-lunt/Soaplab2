@@ -407,9 +407,10 @@ public class PBSJob
 
 	    List<String> theCommand = pb.command();
 	    
-	    for(int i = 0;i<theCommand.size();i++)
+	    for(int i = 0;i<theCommand.size();i++){
 	    	fw.print(theCommand.get(i));
 	    	fw.print(" ");
+	    }
 	    fw.println("");
 	    
 	    fw.flush();
