@@ -28,6 +28,7 @@ import org.soaplab.services.Reporter;
 import org.soaplab.services.JobState;
 import org.soaplab.services.IOData;
 import org.soaplab.services.metadata.MetadataAccessor;
+import org.soaplab.services.JobState;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -427,26 +428,28 @@ public class PBSJob
 			}else{
 				running = true;
 			
+			int currJobState = JobState.CREATED;
 			/*this just makes it wait a bit so that it doesn't try to get job status before it shows up in qsub output.
 			Really, it should be something like an FSA, it polls first starting for the info to be available, then it changes mode to waiting for it to finish.
 			*/
-			try{Thread.sleep(QSTAT_INTERVAL);}catch(InterruptedException e){}
+			initialwait:
+			for(int i=0;i<10;i++){
+				try{
+					currJobState = update_status(false);
+					switch(currJobState){
+					case JobState.CREATED:
+						break;
+					default:
+						break initialwait;
+					}
+					
+					Thread.sleep(500);
+				}catch(InterruptedException e){}
+			}
 			
 			while(!terminated && running) {
 				try{
-					
-					
-						int currJobState = PBSUtils.get_job_status(pbs_jid).charAt(0);
-						
-						synchronized (reporter) {
-							reporter.getState().set(currJobState);
-							
-								if(currJobState == JobState.COMPLETED || currJobState == JobState.TERMINATED_BY_ERROR || currJobState == JobState.UNKNOWN) {
-									running = false;
-								}
-						    reporter.notifyAll();
-						}
-
+						update_status(true);
 					if(running)//if not running, we want to terminate immediately.
 						Thread.sleep(QSTAT_INTERVAL);
 				}catch(InterruptedException e){}
@@ -459,6 +462,20 @@ public class PBSJob
 	    }catch(Exception e){e.printStackTrace();}		
 	}
  
+	private int update_status(boolean andTerminate){
+		int currJobState = PBSUtils.get_job_status(pbs_jid);
+		
+		synchronized (reporter) {
+			reporter.getState().set(currJobState);
+			
+				if(andTerminate && (currJobState == JobState.COMPLETED || currJobState == JobState.TERMINATED_BY_ERROR || currJobState == JobState.UNKNOWN)) {
+					running = false;
+				}
+		    reporter.notifyAll();
+		}
+		return currJobState;
+	}
+	
     protected void reportOutput() {
 
 

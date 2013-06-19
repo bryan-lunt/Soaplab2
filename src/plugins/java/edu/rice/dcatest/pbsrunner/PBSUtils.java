@@ -29,7 +29,7 @@ public class PBSUtils {
 		pbs_s_to_s_s.put('U', JobState.UNKNOWN);
 	}
 	
-	public static JobState get_job_status(String jobid){
+	public static int get_job_status(String jobid){
 		String ret = "U";
 		String info = runQstat(jobid);
 		Matcher myMatcher = job_status_pattern.matcher(info);
