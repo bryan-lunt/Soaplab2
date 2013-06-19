@@ -411,7 +411,7 @@ public class PBSJob
 			}
 		
 			
-			pbs_jid = PBSUtils.readALL(process.getInputStream());
+			pbs_jid = PBSUtils.readAll(process.getInputStream());
 			
 			int jobExitCode = qsubexitCode;
 			if(qsubexitCode == 0){
