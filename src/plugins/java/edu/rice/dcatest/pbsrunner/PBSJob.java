@@ -453,6 +453,16 @@ public class PBSJob
 		
 			if(DEBUG){
 				System.out.println("PBSJOB : qsub exit code :" + qsubexitCode);
+				
+				try{
+					BufferedReader ebr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+					String tmp = ebr.readLine();
+					while(tmp != null){
+						System.out.print("PBSJOB : qsub error: " + tmp);
+						tmp = ebr.readLine();
+					}
+				}catch(Exception e){e.printStackTrace();}
+				
 			}
 			
 			
