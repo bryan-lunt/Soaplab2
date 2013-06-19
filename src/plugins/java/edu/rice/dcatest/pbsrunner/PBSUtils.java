@@ -37,6 +37,8 @@ public class PBSUtils {
 			ret = myMatcher.group(1);
 		}
 		
+		System.out.println("Job Status : " + ret);
+		
 		if(pbs_s_to_s_s.containsKey(ret))
 			return pbs_s_to_s_s.get(ret).intValue();
 		else
