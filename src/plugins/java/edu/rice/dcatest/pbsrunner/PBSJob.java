@@ -422,7 +422,7 @@ public class PBSJob
 	    
 	    fw.flush();
 	    fw.close();
-	    }catch(Exception e){/*we really need to abort here.*/}
+	    }catch(Exception e){internalError("Problems creating a script for qsub : " + e.getMessage());}
 	}
 
 	public void run() {
@@ -516,7 +516,7 @@ public class PBSJob
 			reportOutput();
 			postJobOutputAndReporting(jobExitCode);
 			
-	    }catch(Exception e){}		
+	    }catch(Exception e){internalError("Some problem while running : " + e.getMessage());}		
 	}
  
     protected void reportOutput() {
