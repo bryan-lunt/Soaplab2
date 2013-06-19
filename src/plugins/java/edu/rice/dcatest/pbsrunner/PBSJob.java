@@ -426,8 +426,8 @@ public class PBSJob
 	    }catch(Exception e){internalError("Problems creating a script for qsub : " + e.getMessage());}
 	    
 	    if(DEBUG){
-	    	System.out.println("PBSJOB : About to run: " + qsubpb.toString());
-	    	System.out.println("PBSJOB : The script is : " + pb.toString());
+	    	System.out.println("PBSJOB : About to run: " + qsubpb.command());
+	    	System.out.println("PBSJOB : The script is : " + pb.command());
 	    }
 	}
 
