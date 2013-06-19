@@ -392,12 +392,14 @@ public class PBSJob
 	    try {
 			// submit via qsub
 
-			process = qsubpb.start();
-			
 			synchronized (reporter) {
 			    reporter.getState().set (JobState.CREATED);
 			    reporter.notifyAll();
 			}
+	    	
+			process = qsubpb.start();
+			
+
 	
 			// wait until the qsub process ends
 			int qsubexitCode = -324;
@@ -408,18 +410,8 @@ public class PBSJob
 			    } catch (InterruptedException e) {/*Don't care*/}
 			}
 		
-			if(DEBUG){
-				System.out.println("PBSJOB : qsub exit code :" + qsubexitCode);
-				System.out.println("PBSJOB : qsub error: " + PBSUtils.readAll(process.getErrorStream()));
-			}
 			
 			pbs_jid = PBSUtils.readALL(process.getInputStream());
-			
-				
-			if(DEBUG){
-					System.out.print("PBSJOB : qsub stdout: " + pbs_jid.toString());
-			}
-			
 			
 			int jobExitCode = qsubexitCode;
 			if(qsubexitCode == 0){
@@ -427,6 +419,11 @@ public class PBSJob
 				
 			}else{
 				running = false;
+				synchronized (reporter) {
+				    reporter.getState().set (JobState.TERMINATED_BY_ERROR);
+				    reporter.report("Problem Submitting Job : ", PBSUtils.readAll(process.getErrorStream()));
+				    reporter.notifyAll();
+				}
 			}
 			
 			int currJobState = JobState.CREATED;
