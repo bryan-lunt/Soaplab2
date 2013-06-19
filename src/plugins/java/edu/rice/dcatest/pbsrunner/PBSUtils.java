@@ -15,6 +15,8 @@ import org.soaplab.services.JobState;
 
 public class PBSUtils {
 
+	private static final boolean DEBUG = false;
+	
 	private static Pattern job_status_pattern;
 	private static Map<String,Integer> pbs_s_to_s_s;
 	
@@ -37,7 +39,7 @@ public class PBSUtils {
 			ret = myMatcher.group(1);
 		}
 		
-		System.out.println("Job Status : " + ret);
+		if(DEBUG){System.out.println("Job Status : " + ret);}
 		
 		if(pbs_s_to_s_s.containsKey(ret))
 			return pbs_s_to_s_s.get(ret).intValue();

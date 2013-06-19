@@ -75,7 +75,7 @@ public class PBSJob
     
     public String pbs_jid;
     public static final int QSTAT_INTERVAL = 2000;
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
     
     /**************************************************************************
      * The main constructor.
@@ -463,7 +463,7 @@ public class PBSJob
 	private int update_status(boolean andTerminate){
 		int currJobState = PBSUtils.get_job_status(pbs_jid);
 		
-		System.out.println("PBSJOB : Got Job State : " + currJobState);
+		if(DEBUG){System.out.println("PBSJOB : Got Job State : " + currJobState);}
 		
 		synchronized (reporter) {
 			reporter.getState().set(currJobState);
