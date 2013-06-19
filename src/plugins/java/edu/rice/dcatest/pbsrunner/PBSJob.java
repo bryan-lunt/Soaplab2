@@ -73,6 +73,7 @@ public class PBSJob
     
     public String pbs_jid;
     public static final int QSTAT_INTERVAL = 10000;
+    public static final boolean DEBUG = true;
     
     /**************************************************************************
      * The main constructor.
@@ -384,7 +385,7 @@ public class PBSJob
 	    
 	    /*Copy the ProcessBuilder*/
 	    this.qsubpb = new ProcessBuilder();
-	    this.qsubpb.command(pb.command());
+	   //Don't copy the command! Just the environment and directory and stuff!
 	    this.qsubpb.environment().putAll(pb.environment());
 	    this.qsubpb.directory(pb.directory());
 	    this.qsubpb.redirectErrorStream(pb.redirectErrorStream());
@@ -423,6 +424,11 @@ public class PBSJob
 	    fw.flush();
 	    fw.close();
 	    }catch(Exception e){internalError("Problems creating a script for qsub : " + e.getMessage());}
+	    
+	    if(DEBUG){
+	    	System.out.println("PBSJOB : About to run: " + qsubpb.toString());
+	    	System.out.println("PBSJOB : The script is : " + pb.toString());
+	    }
 	}
 
 	public void run() {
@@ -445,6 +451,9 @@ public class PBSJob
 			    } catch (InterruptedException e) {/*Don't care*/}
 			}
 		
+			if(DEBUG){
+				System.out.println("PBSJOB : qsub exit code :" + qsubexitCode);
+			}
 			
 			
 			StringBuilder jid_builder = new StringBuilder();
@@ -456,7 +465,7 @@ public class PBSJob
 					jid_builder.append(tmp.trim());
 					tmp = br.readLine();
 				}
-			}catch(Exception e){}
+			}catch(Exception e){e.printStackTrace();}
 			
 			pbs_jid = jid_builder.toString();
 			int jobExitCode = qsubexitCode;
@@ -516,7 +525,7 @@ public class PBSJob
 			reportOutput();
 			postJobOutputAndReporting(jobExitCode);
 			
-	    }catch(Exception e){internalError("Some problem while running : " + e.getMessage());}		
+	    }catch(Exception e){e.printStackTrace();}		
 	}
  
     protected void reportOutput() {
