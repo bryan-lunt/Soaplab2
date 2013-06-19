@@ -315,7 +315,7 @@ public class PBSJob
 				return;
 			}
 			terminated = true;
-			PBUtils.qdel(pbs_jid);
+			PBSUtils.qdel(pbs_jid);
 			try {
 				// we shouldn't wait here much, under normal circumstances above
 				// process.destroy() call should return fairly quickly

@@ -16,17 +16,17 @@ import org.soaplab.services.JobState;
 public class PBSUtils {
 
 	private static Pattern job_status_pattern;
-	private static Map<String,JobState> pbs_s_to_s_s;
+	private static Map<String,Integer> pbs_s_to_s_s;
 	
 	static{
 		job_status_pattern = Pattern.compile("job_state = (.*?)\n");
 		
-		pbs_s_to_s_s = new HashMap<String,JobState>();
-		pbs_s_to_s_s.put('Q', JobState.CREATED);
-		pbs_s_to_s_s.put('R', JobState.RUNNING);
-		pbs_s_to_s_s.put('C', JobState.COMPLETED);
-		pbs_s_to_s_s.put('E', JobState.TERMINATED_BY_ERROR);
-		pbs_s_to_s_s.put('U', JobState.UNKNOWN);
+		pbs_s_to_s_s = new HashMap<String,Integer>();
+		pbs_s_to_s_s.put("Q", new Integer(JobState.CREATED));
+		pbs_s_to_s_s.put("R", new Integer(JobState.RUNNING));
+		pbs_s_to_s_s.put("C", new Integer(JobState.COMPLETED));
+		pbs_s_to_s_s.put("E", new Integer(JobState.TERMINATED_BY_ERROR));
+		pbs_s_to_s_s.put("U", new Integer(JobState.UNKNOWN));
 	}
 	
 	public static int get_job_status(String jobid){
@@ -38,7 +38,7 @@ public class PBSUtils {
 		}
 		
 		if(pbs_s_to_s_s.containsKey(ret))
-			return pbs_s_to_s_s.get(ret);
+			return pbs_s_to_s_s.get(ret).intValue();
 		else
 			return JobState.UNKNOWN;
 	}
