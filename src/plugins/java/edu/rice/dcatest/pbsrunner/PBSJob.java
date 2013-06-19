@@ -366,18 +366,15 @@ public class PBSJob
 
 	    // create IO streams (as defined in service metadata)
 	    ioData = createIO();
-	    try {
+
 
 			// catch STDOUT and STDERR even if not defined in service metadata
-			    stdout2Report = new File (getJobDir(), "_log_STDOUT_");
+	    stdout2Report = new File (getJobDir(), "_log_STDOUT_");
 
-			    stderr2Report = new File (getJobDir(), "_log_STDERR_");
+	    stderr2Report = new File (getJobDir(), "_log_STDERR_");
 
 
-	    } catch (FileNotFoundException e) {
-		internalError ("Problems with creating file for a standard stream: " +
-			       e.getMessage());
-	    }
+
 	    
 	    /*Copy the ProcessBuilder*/
 	    this.qsubpb = new ProcessBuilder();
