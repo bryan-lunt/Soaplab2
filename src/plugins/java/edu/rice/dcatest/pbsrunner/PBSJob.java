@@ -353,9 +353,7 @@ public class PBSJob
 
     ProcessBuilder qsubpb;
 	ProcessBuilder pb;
-	InputStream stdin;
-	OutputStream stdout;
-	OutputStream stderr;
+	
 	File stdout2Report;
 	File stderr2Report;
 	IOData[] ioData;
@@ -372,10 +370,8 @@ public class PBSJob
 
 			// catch STDOUT and STDERR even if not defined in service metadata
 			    stdout2Report = new File (getJobDir(), "_log_STDOUT_");
-			    stdout = new FileOutputStream (stdout2Report);
 
 			    stderr2Report = new File (getJobDir(), "_log_STDERR_");
-			    stderr = new FileOutputStream (stderr2Report);
 
 
 	    } catch (FileNotFoundException e) {
@@ -393,7 +389,7 @@ public class PBSJob
 	    //Setup the qsub command
 	    List<String> pbsCommand = this.qsubpb.command();
 	    pbsCommand.clear();
-	    pbsCommand.add("qsub");
+	    pbsCommand.add("/usr/bin/qsub");
 	    
 	    pbsCommand.add("-d");
 	    pbsCommand.add(getJobDir().getAbsolutePath());
@@ -436,7 +432,7 @@ public class PBSJob
 			// submit via qsub
 
 			process = qsubpb.start();
-	
+			
 			synchronized (reporter) {
 			    reporter.getState().set (JobState.CREATED);
 			    reporter.notifyAll();
