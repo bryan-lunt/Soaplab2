@@ -1,3 +1,4 @@
+package edu.rice.dcatest.pbsrunner;
 // SowaJob.java
 //
 // Created: April 2007
@@ -367,30 +368,14 @@ public class PBSJob
 	    // create IO streams (as defined in service metadata)
 	    ioData = createIO();
 	    try {
-			for (IOData io: ioData) {
-			    if (io.getDefinition().isStdout()) {
-				stdout = new FileOutputStream (io.getReference());
-				continue;
-			    } 
-			    if (io.getDefinition().isStderr()) {
-				stderr = new FileOutputStream (io.getReference());
-				continue;
-			    } 
-			    if (io.getDefinition().isStdin()) {
-				stdin = new FileInputStream (io.getReference());
-				continue;
-			    } 
-			}
 
 			// catch STDOUT and STDERR even if not defined in service metadata
-			if (stdout == null) {
 			    stdout2Report = new File (getJobDir(), "_log_STDOUT_");
 			    stdout = new FileOutputStream (stdout2Report);
-			}
-			if (stderr == null) {
+
 			    stderr2Report = new File (getJobDir(), "_log_STDERR_");
 			    stderr = new FileOutputStream (stderr2Report);
-			}
+
 
 	    } catch (FileNotFoundException e) {
 		internalError ("Problems with creating file for a standard stream: " +
