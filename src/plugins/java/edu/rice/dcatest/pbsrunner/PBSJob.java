@@ -490,7 +490,7 @@ public class PBSJob
 				try{
 					
 					
-						char jobStatus = PBSUtils.get_job_status(pbs_jid);
+						char jobStatus = PBSUtils.get_job_status(pbs_jid).charAt(0);
 						
 						synchronized (reporter) {
 							switch(jobStatus){
