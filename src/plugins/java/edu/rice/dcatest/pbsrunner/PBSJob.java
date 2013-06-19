@@ -388,14 +388,11 @@ public class PBSJob
 	    pbsCommand.clear();
 	    pbsCommand.add("/usr/bin/qsub");
 	    
-	    pbsCommand.add("-d");
-	    pbsCommand.add(getJobDir().getAbsolutePath());
+	    pbsCommand.add("-d" + getJobDir().getAbsolutePath());
 	    
-	    pbsCommand.add("-o ");
-	    pbsCommand.add(stdout2Report.getAbsolutePath());
+	    pbsCommand.add("-o" + stdout2Report.getAbsolutePath());
 	    
-	    pbsCommand.add("-e ");
-	    pbsCommand.add(stderr2Report.getAbsolutePath());
+	    pbsCommand.add("-e" + stderr2Report.getAbsolutePath());
 	    
 	    pbsCommand.add("-V");//Because we used a copied process builder, it now gets all the environment variables it would have gotten anyway.
 	    
@@ -449,11 +446,14 @@ public class PBSJob
 				
 				try{
 					BufferedReader ebr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+					StringBuilder stderrbuilder = new StringBuilder();
 					String tmp = ebr.readLine();
 					while(tmp != null){
-						System.out.print("PBSJOB : qsub error: " + tmp);
+						stderrbuilder.append(tmp);
 						tmp = ebr.readLine();
 					}
+					
+					System.out.print("PBSJOB : qsub error: " + stderrbuilder.toString());
 				}catch(Exception e){e.printStackTrace();}
 				
 			}
