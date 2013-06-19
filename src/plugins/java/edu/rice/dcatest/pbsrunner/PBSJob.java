@@ -422,18 +422,19 @@ public class PBSJob
 			
 			
 			int jobExitCode = qsubexitCode;
-			if(qsubexitCode != 0){
-				running = false;
+			if(qsubexitCode == 0){
+				running = true;
 				
 			}else{
-				running = true;
+				running = false;
+			}
 			
 			int currJobState = JobState.CREATED;
 			/*this just makes it wait a bit so that it doesn't try to get job status before it shows up in qsub output.
 			Really, it should be something like an FSA, it polls first starting for the info to be available, then it changes mode to waiting for it to finish.
 			*/
 			initialwait:
-			for(int i=0;i<10;i++){
+			for(int i=0;i<10&&running;i++){
 				try{
 					currJobState = update_status(false);
 					switch(currJobState){
@@ -453,7 +454,6 @@ public class PBSJob
 					if(running)//if not running, we want to terminate immediately.
 						Thread.sleep(QSTAT_INTERVAL);
 				}catch(InterruptedException e){}
-			}
 			}
 			
 			reportOutput();
