@@ -90,7 +90,11 @@ public class PBSJob
  	
     qsubOptions = metadataAccessor.getAnalysisDef().launcher.split("\\s*");
     //DEBUG
-    System.out.println("PBSJOB launcher = \"" + qsubOptions + "\"");
+    String foobar = "";
+    for(int i = 0;i<qsubOptions.length;i++)
+    	foobar = foobar + " " + qsubOptions[i];
+    
+    System.out.println("PBSJOB launcher = \"" + foobar + "\"");
 	
 	
 	
