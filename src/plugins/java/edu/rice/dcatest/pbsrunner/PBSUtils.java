@@ -96,7 +96,7 @@ public class PBSUtils {
 		return retstr;
 	}
 	
-	public static ProcessBuilder createQsubProccessBuilder(ProcessBuilder pb, File jobDir,File stdout2Report, File stderr2Report) throws java.io.IOException {
+	public static ProcessBuilder createQsubProccessBuilder(ProcessBuilder pb, String[] otherOptions, File jobDir, File stdout2Report, File stderr2Report) throws java.io.IOException {
 		 /*Copy the ProcessBuilder*/
 	    ProcessBuilder qsubpb = new ProcessBuilder();
 	   //Don't copy the command! Just the environment and directory and stuff!
@@ -107,6 +107,10 @@ public class PBSUtils {
 	    //Setup the qsub command
 	    qsubpb.command().clear();
 	    qsubpb.command().add("/usr/bin/qsub");
+	    
+	    for(int i = 0;i<otherOptions.length;i++){
+	    	qsubpb.command().add(otherOptions[i]);
+	    }
 	    
 	    qsubpb.command().add("-d" + jobDir.getAbsolutePath());
 	    

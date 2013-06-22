@@ -71,7 +71,7 @@ public class PBSJob
     
     protected boolean terminated = false;
     
-    public String qsubOptions;
+    public String[] qsubOptions;
     
     public String pbs_jid;
     public static final int QSTAT_INTERVAL = 2000;
@@ -88,7 +88,7 @@ public class PBSJob
 	super(jobId, metadataAccessor, reporter, sharedAttributes, jobRecreated);
 
  	
-    qsubOptions = metadataAccessor.getAnalysisDef().launcher;
+    qsubOptions = metadataAccessor.getAnalysisDef().launcher.split("\\s*");
     //DEBUG
     System.out.println("PBSJOB launcher = \"" + qsubOptions + "\"");
 	
@@ -383,7 +383,7 @@ public class PBSJob
 	    
 	    /*Copy the ProcessBuilder*/
 	    try{
-	    	this.qsubpb = PBSUtils.createQsubProccessBuilder(pb,getJobDir(),stdout2Report,stderr2Report);
+	    	this.qsubpb = PBSUtils.createQsubProccessBuilder(pb,qsubOptions,stdout2Report,stderr2Report);
 	    }catch(Exception e){internalError("Problems creating a script for qsub : " + e.getMessage());}
 	    
 	    if(DEBUG){
