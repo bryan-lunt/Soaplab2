@@ -383,7 +383,7 @@ public class PBSJob
 	    
 	    /*Copy the ProcessBuilder*/
 	    try{
-	    	this.qsubpb = PBSUtils.createQsubProccessBuilder(pb,qsubOptions,stdout2Report,stderr2Report);
+	    	this.qsubpb = PBSUtils.createQsubProccessBuilder(pb,qsubOptions,getJobDir(),stdout2Report,stderr2Report);
 	    }catch(Exception e){internalError("Problems creating a script for qsub : " + e.getMessage());}
 	    
 	    if(DEBUG){
