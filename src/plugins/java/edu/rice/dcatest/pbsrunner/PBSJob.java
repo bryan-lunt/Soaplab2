@@ -71,7 +71,7 @@ public class PBSJob
     
     protected boolean terminated = false;
     
-    boolean lsf;
+    public String qsubOptions;
     
     public String pbs_jid;
     public static final int QSTAT_INTERVAL = 2000;
@@ -84,12 +84,16 @@ public class PBSJob
 		    MetadataAccessor metadataAccessor,
 		    Reporter reporter,
 		    Map<String,Object> sharedAttributes,
-		    boolean jobRecreated)
-	throws SoaplabException {
-	super (jobId, metadataAccessor, reporter,
-	       sharedAttributes, jobRecreated);
-    lsf = Config.isEnabled(Config.LSF_ENABLED, false,
-            getServiceName(), this);
+		    boolean jobRecreated) throws SoaplabException {
+	super(jobId, metadataAccessor, reporter, sharedAttributes, jobRecreated);
+
+ 	
+    qsubOptions = metadataAccessor.getAnalysisDef().launcher;
+    //DEBUG
+    System.out.println("PBSJOB launcher = \"" + qsubOptions + "\"");
+	
+	
+	
     }
 
     /**************************************************************************
