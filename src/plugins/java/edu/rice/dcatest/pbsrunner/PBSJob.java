@@ -88,7 +88,7 @@ public class PBSJob
 	super(jobId, metadataAccessor, reporter, sharedAttributes, jobRecreated);
 
  	
-    qsubOptions = metadataAccessor.getAnalysisDef().launcher.split("\\s+");
+    qsubOptions = metadataAccessor.getAnalysisDef().launcher.trim().split("\\s+");
     //DEBUG
     String foobar = "";
     for(int i = 0;i<qsubOptions.length;i++)

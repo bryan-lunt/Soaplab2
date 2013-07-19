@@ -109,7 +109,9 @@ public class PBSUtils {
 	    qsubpb.command().add("/usr/bin/qsub");
 	    
 	    for(int i = 0;i<otherOptions.length;i++){
-	    	qsubpb.command().add(otherOptions[i]);
+	    	String anOtherOption = otherOptions[i].trim();
+	    	if(anOtherOption != null && !anOtherOption.equals(""))//Blank or empty options break things.
+	    		qsubpb.command().add(anOtherOption);
 	    }
 	    
 	    qsubpb.command().add("-d" + jobDir.getAbsolutePath());
