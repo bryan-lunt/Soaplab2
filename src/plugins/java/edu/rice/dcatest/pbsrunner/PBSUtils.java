@@ -18,31 +18,58 @@ public class PBSUtils {
 	private static final boolean DEBUG = false;
 	
 	private static Pattern job_status_pattern;
-	private static Map<String,Integer> pbs_s_to_s_s;
+	private static Pattern job_exitval_pattern;
+	private static Map<String,Integer> pbs_status_to_soaplab_status;
 	
 	static{
 		job_status_pattern = Pattern.compile("job_state[ ]*=[ ]*(.)");
+		job_exitval_pattern = Pattern.compile("exit_status[ ]*=[ ]*(.)");
 		
-		pbs_s_to_s_s = new HashMap<String,Integer>();
-		pbs_s_to_s_s.put("Q", new Integer(JobState.CREATED));
-		pbs_s_to_s_s.put("R", new Integer(JobState.RUNNING));
-		pbs_s_to_s_s.put("C", new Integer(JobState.COMPLETED));
-		pbs_s_to_s_s.put("E", new Integer(JobState.TERMINATED_BY_ERROR));
-		pbs_s_to_s_s.put("U", new Integer(JobState.UNKNOWN));
+		pbs_status_to_soaplab_status = new HashMap<String,Integer>();
+		pbs_status_to_soaplab_status.put("Q", new Integer(JobState.CREATED));
+		pbs_status_to_soaplab_status.put("R", new Integer(JobState.RUNNING));
+		pbs_status_to_soaplab_status.put("C", new Integer(JobState.COMPLETED));
+		pbs_status_to_soaplab_status.put("E", new Integer(JobState.TERMINATED_BY_ERROR));
+		pbs_status_to_soaplab_status.put("U", new Integer(JobState.UNKNOWN));
+	}
+	
+	public static int get_job_exitcode(String jobid){
+		String info = runQstat(jobid);
+		int exit_status = 0;
+		
+		Matcher exitStatusMatcher = job_exitval_pattern.matcher(info);
+		if(exitStatusMatcher.find()){
+			exit_status = Integer.parseInt(exitStatusMatcher.group(1));
+		}
+		
+		return exit_status;
 	}
 	
 	public static int get_job_status(String jobid){
-		String ret = "U";
+		String qstat_status = "U";
 		String info = runQstat(jobid);
+		int exit_status = 0;
+		
 		Matcher myMatcher = job_status_pattern.matcher(info);
 		if(myMatcher.find()){
-			ret = myMatcher.group(1);
+			qstat_status = myMatcher.group(1);
 		}
 		
-		if(DEBUG){System.out.println("Job Status : " + ret);}
+		Matcher exitStatusMatcher = job_exitval_pattern.matcher(info);
+		if(exitStatusMatcher.find()){
+			exit_status = Integer.parseInt(exitStatusMatcher.group(1));
+		}
 		
-		if(pbs_s_to_s_s.containsKey(ret))
-			return pbs_s_to_s_s.get(ret).intValue();
+		if(DEBUG){System.out.println("Job Status : " + qstat_status);}
+		
+		//Special logic for jobs that completed with error while running.
+		//PBS does not report errors if they are not _PBS_ errors, but it does get returnvalue.
+		if(0 != exit_status && ("C".equals(qstat_status) || "E".equals(qstat_status)) ){
+			qstat_status = "E";
+		}
+		
+		if(pbs_status_to_soaplab_status.containsKey(qstat_status))
+			return pbs_status_to_soaplab_status.get(qstat_status).intValue();
 		else
 			return JobState.UNKNOWN;
 	}

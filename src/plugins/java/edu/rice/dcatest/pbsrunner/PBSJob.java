@@ -463,6 +463,7 @@ public class PBSJob
 			}
 			
 			reportOutput();
+			jobExitCode = get_job_exitcode(pbs_jid);
 			postJobOutputAndReporting(jobExitCode);
 			
 	    }catch(Exception e){e.printStackTrace();}		
@@ -500,32 +501,32 @@ public class PBSJob
     private void postJobOutputAndReporting(int exitCode) {
     	// process exit code and results
     			try{
-    			report ("Exit: " + exitCode);
-    			reporter.getState().setDetailed ("" + exitCode);
-    			if ( exitCode == 0 ||
-    			     Config.isEnabled (Config.PROP_ACCEPT_ANY_EXITCODE,
-    					       false,
-    					       getServiceName(),
-    					       PBSJob.this) ) {
-    			    processResults (ioData);
-    			    reporter.getState().set (JobState.COMPLETED);
-    			}
-    			else if (process == null){
-    	        	reporter.getState().set(JobState.TERMINATED_BY_REQUEST);
-    	        }
-    			else {
-    			    reporter.getState().set (JobState.TERMINATED_BY_ERROR);
-    			}
-    			
+	    			report ("Exit: " + exitCode);
+	    			reporter.getState().setDetailed ("" + exitCode);
+	    			if ( exitCode == 0 ||
+	    			     Config.isEnabled (Config.PROP_ACCEPT_ANY_EXITCODE,
+	    					       false,
+	    					       getServiceName(),
+	    					       PBSJob.this) ) {
+	    			    processResults (ioData);
+	    			    reporter.getState().set (JobState.COMPLETED);
+	    			}
+	    			else if (process == null){
+	    	        	reporter.getState().set(JobState.TERMINATED_BY_REQUEST);
+	    	        }
+	    			else {
+	    			    reporter.getState().set (JobState.TERMINATED_BY_ERROR);
+	    			}
+	    			
     		    } catch (SoaplabException e) {
-    			error (e.getMessage());
-    			log.error (e.getMessage());
-    			reporter.getState().set (JobState.TERMINATED_BY_ERROR);
+	    			error (e.getMessage());
+	    			log.error (e.getMessage());
+	    			reporter.getState().set (JobState.TERMINATED_BY_ERROR);
 
     		    } catch (RuntimeException e) {
-    			error (INTERNAL_ERROR + e.getMessage());
-    			reporter.getState().set (JobState.TERMINATED_BY_ERROR);
-    			SoaplabException.formatAndLog (e, log);
+	    			error (INTERNAL_ERROR + e.getMessage());
+	    			reporter.getState().set (JobState.TERMINATED_BY_ERROR);
+	    			SoaplabException.formatAndLog (e, log);
     			
 	    		} finally {
 	    			try {
