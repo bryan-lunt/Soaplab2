@@ -387,6 +387,12 @@ public class PBSJob
 	    
 	    /*Copy the ProcessBuilder*/
 	    try{
+	    	String[] finalOptions = new String[qsubOptions.length + 1];
+	    	for(int i = 0;i<qsubOptions.length;i++){
+	    		finalOptions[i] = qsubOptions[i];
+	    	}
+	    	finalOptions[finalOptions.length-1] = "-N" + getId();
+	    	
 	    	this.qsubpb = PBSUtils.createQsubProccessBuilder(pb,qsubOptions,getJobDir(),stdout2Report,stderr2Report);
 	    }catch(Exception e){internalError("Problems creating a script for qsub : " + e.getMessage());}
 	    
