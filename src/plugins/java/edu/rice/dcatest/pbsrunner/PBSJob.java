@@ -463,7 +463,7 @@ public class PBSJob
 			}
 			
 			reportOutput();
-			jobExitCode = get_job_exitcode(pbs_jid);
+			jobExitCode = PBSUtils.get_job_exitcode(pbs_jid);
 			postJobOutputAndReporting(jobExitCode);
 			
 	    }catch(Exception e){e.printStackTrace();}		
