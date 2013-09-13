@@ -393,7 +393,7 @@ public class PBSJob
 	    	}
 	    	finalOptions[finalOptions.length-1] = "-N" + getId();
 	    	
-	    	this.qsubpb = PBSUtils.createQsubProccessBuilder(pb,qsubOptions,getJobDir(),stdout2Report,stderr2Report);
+	    	this.qsubpb = PBSUtils.createQsubProccessBuilder(pb,finalOptions,getJobDir(),stdout2Report,stderr2Report);
 	    }catch(Exception e){internalError("Problems creating a script for qsub : " + e.getMessage());}
 	    
 	    if(DEBUG){
