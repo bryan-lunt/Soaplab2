@@ -4,6 +4,7 @@
     <artifactId>${maven.project.artifactId}</artifactId>
     <groupId>${maven.project.groupId}</groupId>
     <version>${maven.project.version}</version>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>${maven.project.groupId}</groupId>
