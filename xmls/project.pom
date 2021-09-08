@@ -20,15 +20,14 @@
   </developers>
 
   <repositories>
-    <!--
     <repository>
       <id>central</id>
-      <url>http://repo1.maven.org/maven2/</url>
+      <url>https://repo1.maven.org/maven2/</url>
       <releases>
         <updatePolicy>never</updatePolicy>
       </releases>
     </repository>
-    -->
+    <!--
     <repository>
       <id>java.net-m1</id>
       <url>http://download.java.net/maven/1/</url>
@@ -51,6 +50,7 @@
         <updatePolicy>never</updatePolicy>
       </releases>
     </repository>
+  -->
   </repositories>
 
   <dependencies>
@@ -60,7 +60,8 @@
       <artifactId>jaxws-tools</artifactId>
       <version>2.1.7</version>
     </dependency>
-    
+   
+<!-- https://mvnrepository.com/artifact/org.tulsoft/alltools-core -->
     <dependency>
       <groupId>org.tulsoft</groupId>
       <artifactId>alltools</artifactId>
