@@ -101,6 +101,10 @@ http://soaplab.sourceforge.net/soaplab2/.
     <path location="${basedir}"/>
   </pathconvert>
 
+  <!-- Read properties from the maven pom, such as version and projectId. -->
+  <!-- Thanks to Stack Exchange : https://stackoverflow.com/a/39658133 -->
+  <xmlproperty file="pom.xml" prefix="maven" />
+
   <!-- ================================================================== -->
   <!--                           My own tasks                             -->
   <!-- ================================================================== -->
