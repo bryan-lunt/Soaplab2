@@ -25,7 +25,8 @@ repositories - the uploading tasks are in file upload2maven.xml.
 
 <!-- what Maven-Ant library is needed -->
 <property name="old.maven.ant.file" value="maven-ant-tasks-2.0.8.jar"/>
-<property name="maven.ant.file" value="maven-ant-tasks-2.0.9.jar"/>
+<property name="maven.ant.version" value="2.0.9"/>
+<property name="maven.ant.file" value="maven-ant-tasks-${maven.ant.version}.jar"/>
 
 <!-- project dependency files -->
 <property name="project.deps.file"  location="${basedir}/xmls/project.pom"/>
@@ -38,11 +39,11 @@ repositories - the uploading tasks are in file upload2maven.xml.
   description="Fetch Maven library - needed only the first time.">
 
   <!-- where is Maven-Ant library -->
-  <property name="maven.ant.dir" value="http://biomoby.org/jmoby-jars"/>
+  <property name="maven.ant.dir" value="https://repo.maven.apache.org/maven2/org/apache/maven/maven-ant-tasks"/>
 
   <!-- get it -->
   <get
-    src="${maven.ant.dir}/${maven.ant.file}"
+    src="${maven.ant.dir}/${maven.ant.version}/${maven.ant.file}"
     dest="${lib.dir}/${maven.ant.file}"
     verbose="true"
     usetimestamp="true"/>
