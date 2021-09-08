@@ -60,7 +60,19 @@
       <artifactId>jaxws-tools</artifactId>
       <version>2.1.7</version>
     </dependency>
-   
+
+    <dependency>
+      <groupId>org.apache.axis</groupId>
+      <artifactId>axis</artifactId>
+      <version>1.4</version>
+    </dependency>
+  
+    <dependency>
+      <groupId>org.apache.axis</groupId>
+      <artifactId>axis-jaxrpc</artifactId>
+      <version>1.4</version>
+    </dependency>
+ 
 <!-- https://mvnrepository.com/artifact/org.tulsoft/alltools-core -->
     <dependency>
       <groupId>org.tulsoft</groupId>

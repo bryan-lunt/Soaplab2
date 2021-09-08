@@ -139,25 +139,19 @@ differently:
 
 </target>
 
+<!-- Thanks Stack Exchange! https://stackoverflow.com/a/10745278 -->
+<property name="version.required" value="1.6.5" />
 <target name="check-ant-version">
-  <fail
-    taskname="check"
-    message="Sorry, but you need to use Ant version 1.6.5 or newer...">
-    <condition>
-      <and>
-        <not>
-          <or>
-            <contains string="${ant.version}" substring="1.7"/>
-            <contains string="${ant.version}" substring="1.8"/>
-          </or>
-        </not>
-        <not>
-          <contains string="${ant.version}" substring="1.6.5"/>
-        </not>
-      </and>
-    </condition>
-  </fail>
+    <antversion property="version.running" />
+    <fail message="FATAL ERROR:  The running Ant version, ${version.running}, is too old.">
+        <condition>
+            <not>
+                <antversion atleast="${version.required}" />
+            </not>
+        </condition>
+    </fail>
 </target>
+
 
 <target name="libcheck" if="old.jar.present">
   <echo/>
